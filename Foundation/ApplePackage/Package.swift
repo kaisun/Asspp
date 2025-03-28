@@ -5,14 +5,33 @@ import PackageDescription
 
 let package = Package(
     name: "ApplePackage",
+    defaultLocalization: "en",
+    platforms: [
+        .iOS(.v13),
+        .macOS(.v12),
+    ],
     products: [
-        .library(name: "ApplePackage", targets: ["ApplePackage"]),
+        .library(
+            name: "ApplePackage",
+            targets: ["ApplePackage"]
+        ),
     ],
     dependencies: [
-        .package(url: "https://github.com/weichsel/ZIPFoundation.git", .upToNextMajor(from: "0.9.0")),
+        .package(url: "https://github.com/Flight-School/AnyCodable", from: "0.6.7"),
+        .package(url: "https://github.com/weichsel/ZIPFoundation", from: "0.9.19"),
+        .package(url: "https://github.com/CoreOffice/XMLCoder", from: "0.17.1"),
     ],
     targets: [
-        .target(name: "ApplePackage", dependencies: ["ZIPFoundation"]),
-        .testTarget(name: "ApplePackageTests", dependencies: ["ApplePackage"]),
+        .target(
+            name: "ApplePackage", dependencies: [
+                "AnyCodable",
+                "ZIPFoundation",
+                "XMLCoder",
+            ]
+        ),
+        .testTarget(
+            name: "ApplePackageTests",
+            dependencies: ["ApplePackage"]
+        ),
     ]
 )

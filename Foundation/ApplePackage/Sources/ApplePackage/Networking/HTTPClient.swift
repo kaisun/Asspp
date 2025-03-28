@@ -1,99 +1,64 @@
-//
-//  HTTPClient.swift
-//  IPATool
-//
-//  Created by Majd Alfhaily on 22.05.21.
-//
-
 import Foundation
+import XMLCoder
 
-protocol HTTPClientInterface {
-    func send(_ request: HTTPRequest, completion: @escaping (Result<HTTPResponse, Error>) -> Void)
-}
+public class HTTPClient {
+    private let session: URLSession
+    public static let shared = HTTPClient()
 
-extension HTTPClientInterface {
-    func send(_ request: HTTPRequest) throws -> HTTPResponse {
-        let semaphore = DispatchSemaphore(value: 0)
-        var result: Result<HTTPResponse, Error>?
-
-        send(request) {
-            result = $0
-            semaphore.signal()
-        }
-
-        _ = semaphore.wait(timeout: .distantFuture)
-
-        switch result {
-        case .none:
-            throw HTTPClient.Error.timeout
-        case let .failure(error):
-            throw error
-        case let .success(response):
-            return response
-        }
-    }
-}
-
-public final class HTTPClient: HTTPClientInterface {
-    private let urlSession: URLSession
-
-    public init(urlSession: URLSession) {
-        self.urlSession = urlSession
+    private init() {
+        let config = URLSessionConfiguration.default
+        config.httpCookieStorage = HTTPCookieStorage.shared
+        session = URLSession(configuration: config)
     }
 
-    func send(_ request: HTTPRequest, completion: @escaping (Result<HTTPResponse, Swift.Error>) -> Void) {
-        do {
-            let urlRequest = try makeURLRequest(from: request)
-
-            urlSession.dataTask(with: urlRequest) { data, response, error in
-                if let error {
-                    return completion(.failure(error))
-                }
-
-                guard let response = response as? HTTPURLResponse else {
-                    return completion(.failure(Error.invalidResponse(response)))
-                }
-
-                completion(.success(.init(statusCode: response.statusCode, data: data, allHeaderFields: response.allHeaderFields)))
-            }.resume()
-        } catch {
-            completion(.failure(error))
-        }
+    public enum ResponseFormat {
+        case json
+        case xml
     }
 
-    private func makeURLRequest(from request: HTTPRequest) throws -> URLRequest {
-        var urlRequest = URLRequest(url: request.endpoint.url)
-        urlRequest.httpMethod = request.method.rawValue
+    public func request<T: Decodable>(
+        url: URL,
+        method: String,
+        headers: [String: String] = [:],
+        body: Data? = nil,
+        format: ResponseFormat = .json
+    ) async throws -> (T, [String: String]) {
+        var request = URLRequest(url: url)
+        request.httpMethod = method
 
-        switch request.payload {
-        case .none:
-            urlRequest.httpBody = nil
-        case let .urlEncoding(propertyList):
-            urlRequest.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
+        if !headers.keys.contains("User-Agent") {
+            request.addValue(Constants.defaultUserAgent, forHTTPHeaderField: "User-Agent")
+        }
 
-            var urlComponents = URLComponents(string: request.endpoint.url.absoluteString)
-            urlComponents?.queryItems = !propertyList.isEmpty ? propertyList.map { URLQueryItem(name: $0.0, value: $0.1.description) } : nil
+        for (key, value) in headers {
+            request.addValue(value, forHTTPHeaderField: key)
+        }
 
-            switch request.method {
-            case .get:
-                urlRequest.url = urlComponents?.url
-            case .post:
-                urlRequest.httpBody = urlComponents?.percentEncodedQuery?.data(using: .utf8, allowLossyConversion: false)
+        if let body {
+            request.httpBody = body
+        }
+
+        let (data, response) = try await session.data(for: request)
+
+        guard let httpResponse = response as? HTTPURLResponse else {
+            throw AppStoreError.invalidResponse
+        }
+
+        let headers = httpResponse.allHeaderFields.reduce(into: [String: String]()) { result, item in
+            if let key = item.key as? String, let value = item.value as? String {
+                result[key] = value
             }
-        case let .xml(value):
-            urlRequest.setValue("application/xml", forHTTPHeaderField: "Content-Type")
-            urlRequest.httpBody = try PropertyListSerialization.data(fromPropertyList: value, format: .xml, options: 0)
         }
 
-        request.headers.forEach { urlRequest.setValue($0.value, forHTTPHeaderField: $0.key) }
-
-        return urlRequest
-    }
-}
-
-extension HTTPClient {
-    enum Error: Swift.Error {
-        case invalidResponse(URLResponse?)
-        case timeout
+        switch format {
+        case .json:
+            let decoder = JSONDecoder()
+            let decoded = try decoder.decode(T.self, from: data)
+            return (decoded, headers)
+        case .xml:
+            let decoder = XMLDecoder()
+            let decoded = try decoder.decode(T.self, from: data)
+            return (decoded, headers)
+        }
     }
 }
