@@ -53,6 +53,17 @@ extension Downloads {
                 metadata = [:]
             }
         }
+
+        // 添加从下载信息直接创建Request的新构造函数
+        init(account: AppStore.Account, package: iTunesResponse.iTunesArchive, url: String, md5: String?, sinfs: [Sinf], metadata: [String: AnyCodable]?) {
+            self.account = account
+            self.package = package
+            self.url = URL(string: url)!
+            self.md5 = md5 ?? ""
+            signatures = sinfs.map { StoreResponse.Item.Signature.from(sinf: $0) }
+            creation = .init()
+            self.metadata = metadata ?? [:]
+        }
     }
 }
 

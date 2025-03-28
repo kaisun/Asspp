@@ -1,6 +1,6 @@
 import Foundation
 
-public struct Account: Codable {
+public struct Account: Codable, Equatable, Hashable {
     public let email: String
     public let passwordToken: String
     public let directoryServicesID: String

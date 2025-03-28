@@ -141,15 +141,15 @@ class Downloads: ObservableObject {
             let object = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] ?? [:]
 
             print("[*] sending metadata into \(targetLocation.path)")
-            let item = StoreResponse.Item(
-                url: request.url,
-                md5: request.md5,
-                signatures: request.signatures,
-                metadata: object
-            )
+
+            // 使用新的StoreResponse.Item初始化方式
+            let sinfs = request.signatures.map { signature in
+                Sinf(id: .init(signature.hashValue), data: signature.data, provider: signature.provider)
+            }
+
             let signatureClient = SignatureClient(fileManager: .default, filePath: targetLocation.path)
-            try signatureClient.appendMetadata(item: item, email: request.account.email)
-            try signatureClient.appendSignature(item: item)
+            try signatureClient.appendMetadata(email: request.account.email, metadata: .init(object))
+            try signatureClient.appendSignatures(sinfs: sinfs)
 
             reportSuccess(reqId: request.id)
         } catch {

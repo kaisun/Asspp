@@ -1,7 +1,7 @@
 import Foundation
 
 public class StorefrontService {
-    private let storeFronts: [String: String] = [
+    public let storeFronts: [String: String] = [
         "AE": "143481", "AG": "143540", "AI": "143538", "AL": "143575",
         "AM": "143524", "AO": "143564", "AR": "143505", "AT": "143445",
         "AU": "143460", "AZ": "143568", "BB": "143541", "BD": "143490",
@@ -51,4 +51,6 @@ public class StorefrontService {
 
         throw AppStoreError.custom(String(localized: "country_code_not_found_format").replacingOccurrences(of: "{storefront}", with: storeFront))
     }
+
+    public init() {}
 }

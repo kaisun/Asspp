@@ -9,6 +9,14 @@ import ApplePackage
 import Kingfisher
 import SwiftUI
 
+enum EntityType: String, CaseIterable, Codable {
+    case iPhone
+    case iPad
+    case macOS
+    case watchOS
+    case tvOS
+}
+
 struct SearchView: View {
     @AppStorage("searchKey") var searchKey = ""
     @AppStorage("searchRegion") var searchRegion = "US"
@@ -16,7 +24,7 @@ struct SearchView: View {
     @State var searchType = EntityType.iPhone
 
     @State var searching = false
-    let regionKeys = Array(ApplePackage.countryCodeMap.keys.sorted())
+    let regionKeys = Array(ApplePackage.storeFrontCodeMap.keys.sorted())
 
     @State var searchInput: String = ""
     @State var searchResult: [iTunesResponse.iTunesArchive] = []
@@ -86,7 +94,7 @@ struct SearchView: View {
                 }
             } label: {
                 HStack {
-                    Text("\(searchRegion) - \(ApplePackage.countryCodeMap[searchRegion] ?? NSLocalizedString("Unknown", comment: ""))")
+                    Text("\(searchRegion) - \(ApplePackage.storeFrontCodeMap[searchRegion] ?? NSLocalizedString("Unknown", comment: ""))")
                     Image(systemName: "arrow.up.arrow.down")
                 }
             }
@@ -95,7 +103,7 @@ struct SearchView: View {
 
     func buildPickView(for keys: [String]) -> some View {
         ForEach(keys, id: \.self) { key in
-            Button("\(key) - \(ApplePackage.countryCodeMap[key] ?? NSLocalizedString("Unknown", comment: ""))") {
+            Button("\(key) - \(ApplePackage.storeFrontCodeMap[key] ?? NSLocalizedString("Unknown", comment: ""))") {
                 searchRegion = key
             }
         }
@@ -105,28 +113,53 @@ struct SearchView: View {
         searchKeyFocused = false
         searching = true
         searchInput = "\(searchRegion) - \(searchKey)" + " ..."
-        DispatchQueue.global().async {
-            var result = (try? ApplePackage.search(
-                type: searchType,
-                term: searchKey,
-                limit: 32,
-                region: searchRegion
-            )) ?? []
+        Task {
+            // 创建服务实例
+            let appStoreService = AppStoreService(guid: vm.deviceSeedAddress)
 
-            let httpClient = HTTPClient(urlSession: URLSession.shared)
-            let itunesClient = iTunesClient(httpClient: httpClient)
-            if let app = try? itunesClient.lookup(
-                type: searchType,
-                bundleIdentifier: searchKey,
-                region: searchRegion
-            ) {
-                result.insert(app, at: 0)
-            }
+            do {
+                // 构建一个临时账户用于搜索
+                let storefront = ApplePackage.storeFrontCodeMap[searchRegion] ?? ""
 
-            DispatchQueue.main.async {
-                searching = false
-                searchResult = result
-                searchInput = "\(searchRegion) - \(searchKey)"
+                let tempAccount = Account(
+                    email: "",
+                    passwordToken: "",
+                    directoryServicesID: "",
+                    name: "",
+                    storeFront: storefront,
+                    password: ""
+                )
+
+                // 使用搜索服务
+                let apps = try await appStoreService.search(
+                    account: tempAccount,
+                    term: searchKey,
+                    limit: 32
+                )
+
+                // 转换为 iTunesResponse.iTunesArchive
+                let results = apps.map { app -> iTunesResponse.iTunesArchive in
+                    // 构建缩略图URL
+                    let artworkUrl = "https://is1-ssl.mzstatic.com/image/thumb/Purple128/v4/\(String(app.id))/100x100bb.jpg"
+
+                    return iTunesResponse.iTunesArchive(
+                        from: app,
+                        artworkUrl: artworkUrl,
+                        entityType: searchType
+                    )
+                }
+
+                DispatchQueue.main.async {
+                    searching = false
+                    searchResult = results
+                    searchInput = "\(searchRegion) - \(searchKey)"
+                }
+            } catch {
+                DispatchQueue.main.async {
+                    searching = false
+                    searchResult = []
+                    searchInput = "\(searchRegion) - \(searchKey) (错误: \(error.localizedDescription))"
+                }
             }
         }
     }

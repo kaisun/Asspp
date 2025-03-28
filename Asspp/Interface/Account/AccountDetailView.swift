@@ -33,7 +33,7 @@ struct AccountDetailView: View {
                 Text("This email is used to sign in to Apple services.")
             }
             Section {
-                Text("\(account.countryCode) - \(ApplePackage.countryCodeMap[account.countryCode] ?? NSLocalizedString("Unknown", comment: ""))")
+                Text("\(account.countryCode) - \(ApplePackage.storeFrontCodeMap[account.countryCode] ?? NSLocalizedString("Unknown", comment: ""))")
                     .onTapGesture { UIPasteboard.general.string = account.email }
             } header: {
                 Text("Country Code")
@@ -45,11 +45,11 @@ struct AccountDetailView: View {
                     Text("88888888888")
                         .redacted(reason: .placeholder)
                 } else {
-                    Text(account.storeResponse.directoryServicesIdentifier)
+                    Text(account.storeResponse.directoryServicesID)
                         .font(.system(.body, design: .monospaced))
                         .onTapGesture { UIPasteboard.general.string = account.email }
                 }
-                Text(ApplePackage.overrideGUID ?? "Seed Not Available")
+                Text("--------" ?? "Seed Not Available")
                     .font(.system(.body, design: .monospaced))
                     .onTapGesture { UIPasteboard.general.string = account.email }
             } header: {
@@ -90,9 +90,9 @@ struct AccountDetailView: View {
 
     func rotate() {
         rotating = true
-        DispatchQueue.global().async {
+        Task.detached {
             do {
-                try vm.rotate(id: account.id)
+                await try vm.rotate(id: account.id)
                 DispatchQueue.main.async {
                     rotating = false
                     rotatingHint = NSLocalizedString("Success", comment: "")

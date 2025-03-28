@@ -90,38 +90,74 @@ struct AddDownloadView: View {
         guard let account else { return }
         searchKeyFocused = false
         obtainDownloadURL = true
-        DispatchQueue.global().async {
-            let httpClient = HTTPClient(urlSession: URLSession.shared)
-            let itunesClient = iTunesClient(httpClient: httpClient)
-            let storeClient = StoreClient(httpClient: httpClient)
-
+        Task.detached {
             do {
-                let app = try itunesClient.lookup(
-                    type: searchType,
-                    bundleIdentifier: bundleID,
-                    region: account.countryCode
+                // 创建App Store服务
+                let appStoreService = AppStoreService(guid: avm.deviceSeedAddress)
+
+                // 先构建一个临时账户用于查询
+                let storefrontService = StorefrontService()
+                let storefront = storefrontService.storeFronts[account.countryCode] ?? ""
+
+                let tempAccount = Account(
+                    email: account.email,
+                    passwordToken: account.storeResponse.passwordToken,
+                    directoryServicesID: account.storeResponse.directoryServicesID,
+                    name: "",
+                    storeFront: storefront,
+                    password: account.password
                 )
-                let item = try storeClient.item(
-                    identifier: String(app.identifier),
-                    directoryServicesIdentifier: account.storeResponse.directoryServicesIdentifier
+
+                // 使用新的lookup API查询应用
+                let app = try await appStoreService.lookup(account: tempAccount, bundleID: bundleID)
+
+                // 构造iTunesArchive
+                let itunesApp = iTunesResponse.iTunesArchive(
+                    from: app,
+                    artworkUrl: "https://is1-ssl.mzstatic.com/image/thumb/Purple128/v4/\(app.id)/100x100bb.jpg",
+                    entityType: searchType
                 )
+
+                // 获取下载信息
+                let downloadInfo = try await appStoreService.getDownloadInfo(account: tempAccount, app: app)
+
+                // 添加下载请求
                 let id = Downloads.this.add(request: .init(
-                    account: account,
-                    package: app,
-                    item: item
+                    account: .init(
+                        email: tempAccount.email,
+                        password: tempAccount.password,
+                        countryCode: tempAccount.storeFront,
+                        storeResponse: tempAccount
+                    ),
+                    package: .init(
+                        identifier: itunesApp.identifier,
+                        bundleIdentifier: itunesApp.bundleIdentifier,
+                        name: itunesApp.name,
+                        version: itunesApp.version
+                    ),
+                    url: downloadInfo.url,
+                    md5: downloadInfo.md5,
+                    sinfs: downloadInfo.sinfs,
+                    metadata: [:]
                 ))
+
                 Downloads.this.resume(requestID: id)
             } catch {
                 DispatchQueue.main.async {
                     obtainDownloadURL = false
-                    if (error as NSError).code == 9610 {
-                        hint = NSLocalizedString("License Not Found, please acquire license first.", comment: "")
-                    } else if (error as NSError).code == 2034 {
-                        hint = NSLocalizedString("Password Token Expired, please re-authenticate within account page.", comment: "")
-                    } else if (error as NSError).code == 2059 {
-                        hint = NSLocalizedString("Temporarily Unavailable, please try again later.", comment: "")
+                    if let appStoreError = error as? AppStoreError {
+                        switch appStoreError {
+                        case .licenseRequired:
+                            hint = NSLocalizedString("License Not Found, please acquire license first.", comment: "")
+                        case .passwordTokenExpired:
+                            hint = NSLocalizedString("Password Token Expired, please re-authenticate within account page.", comment: "")
+                        case .temporarilyUnavailable:
+                            hint = NSLocalizedString("Temporarily Unavailable, please try again later.", comment: "")
+                        default:
+                            hint = NSLocalizedString("Unable to retrieve download url, please try again later.", comment: "") + "\n" + error.localizedDescription
+                        }
                     } else {
-                        hint = NSLocalizedString("Unable to retrieve download url, please try again later.", comment: "") + "\n" + error.localizedDescription
+                        hint = NSLocalizedString("Error: ", comment: "") + error.localizedDescription
                     }
                 }
                 return

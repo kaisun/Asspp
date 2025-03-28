@@ -15,5 +15,5 @@ public protocol AppStorePurchaseService {
 
 public protocol AppStoreDownloadService {
     func download(account: Account, app: App, outputPath: String, progressHandler: ((Double) -> Void)?) async throws -> (path: String, sinfs: [Sinf])
-    func getDownloadInfo(account: Account, app: App) async throws -> (url: String, sinfs: [Sinf])
+    func getDownloadInfo(account: Account, app: App) async throws -> (url: String, sinfs: [Sinf], md5: String)
 }

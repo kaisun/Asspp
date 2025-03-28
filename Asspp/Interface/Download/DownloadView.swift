@@ -99,7 +99,7 @@ extension Downloads.Request {
                 String(Int(runtime.progress.fractionCompleted * 100)) + "%",
                 runtime.speed.isEmpty ? "" : runtime.speed + "/s",
             ]
-            .compactMap { $0 }
+            .compactMap(\.self)
             .joined(separator: " ")
         case .verifying:
             NSLocalizedString("Verifying...", comment: "")

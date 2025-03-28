@@ -116,7 +116,7 @@ struct PackageView: View {
                 } else {
                     Text(request.account.email)
                 }
-                Text("\(request.account.countryCode) - \(ApplePackage.countryCodeMap[request.account.countryCode] ?? "-1")")
+                Text("\(request.account.countryCode) - \(ApplePackage.storeFrontCodeMap[request.account.countryCode] ?? "-1")")
             } header: {
                 Text("Account")
             } footer: {

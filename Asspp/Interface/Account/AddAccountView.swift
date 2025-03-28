@@ -76,19 +76,30 @@ struct AddAccountView: View {
 
     func authenticate() {
         openProgress = true
-        DispatchQueue.global().async {
-            defer { DispatchQueue.main.async { openProgress = false } }
-            let auth = ApplePackage.Authenticator(email: email)
+        Task {
             do {
-                let account = try auth.authenticate(password: password, code: code.isEmpty ? nil : code)
-                DispatchQueue.main.async {
-                    vm.save(email: email, password: password, account: account)
+                let appStoreService = AppStoreService(guid: UUID().uuidString)
+                let account = try await appStoreService.login(
+                    email: email,
+                    password: password,
+                    authCode: code.isEmpty ? "" : code
+                )
+
+                await MainActor.run {
+                    vm.save(email: email, password: password, account: .init(
+                        email: account.email,
+                        password: account.password,
+                        countryCode: account.storeFront,
+                        storeResponse: account
+                    ))
                     dismiss()
+                    openProgress = false
                 }
             } catch {
-                DispatchQueue.main.async {
+                await MainActor.run {
                     self.error = error
                     codeRequired = true
+                    openProgress = false
                 }
             }
         }

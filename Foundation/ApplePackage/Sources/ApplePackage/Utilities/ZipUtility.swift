@@ -4,10 +4,12 @@ import ZIPFoundation
 public struct Sinf: Codable {
     public let id: Int64
     public let data: Data
+    public let provider: String
 
-    public init(id: Int64, data: Data) {
+    public init(id: Int64, data: Data, provider: String) {
         self.id = id
         self.data = data
+        self.provider = provider
     }
 }
 

@@ -2,7 +2,10 @@ import AnyCodable
 import Foundation
 
 extension AppStoreService: AppStoreDownloadService {
-    public func getDownloadInfo(account: Account, app: App) async throws -> (url: String, sinfs: [Sinf]) {
+    public func getDownloadInfo(
+        account: Account,
+        app: App
+    ) async throws -> (url: String, sinfs: [Sinf], md5: String) {
         let host = "\(Constants.privateAppStoreAPIDomainPrefixWithoutAuthCode)-\(Constants.privateAppStoreAPIDomain)"
         let url = URL(string: "https://\(host)\(Constants.privateAppStoreAPIPathDownload)?guid=\(guid)")!
 
@@ -57,7 +60,7 @@ extension AppStoreService: AppStoreDownloadService {
             if let message = response.customerMessage, !message.isEmpty {
                 throw AppStoreError.custom(message)
             }
-            throw AppStoreError.custom("下载错误: \(failureType)")
+            throw AppStoreError.custom(failureType)
         }
 
         if response.songList.isEmpty {
@@ -65,10 +68,19 @@ extension AppStoreService: AppStoreDownloadService {
         }
 
         let item = response.songList[0]
-        return (item.URL, item.sinfs)
+        guard let md5 = item.md5 else {
+            throw AppStoreError.custom("", nil)
+        }
+
+        return (item.URL, item.sinfs, md5)
     }
 
-    public func download(account: Account, app: App, outputPath: String, progressHandler: ((Double) -> Void)? = nil) async throws -> (path: String, sinfs: [Sinf]) {
+    public func download(
+        account: Account,
+        app: App,
+        outputPath: String,
+        progressHandler: ((Double) -> Void)? = nil
+    ) async throws -> (path: String, sinfs: [Sinf]) {
         let host = "\(Constants.privateAppStoreAPIDomainPrefixWithoutAuthCode)-\(Constants.privateAppStoreAPIDomain)"
         let url = URL(string: "https://\(host)\(Constants.privateAppStoreAPIPathDownload)?guid=\(guid)")!
 

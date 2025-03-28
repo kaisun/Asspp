@@ -1,6 +1,9 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "--------" : {
+
+    },
     "@Lakr233" : {
       "localizations" : {
         "en" : {
@@ -769,6 +772,9 @@
         }
       }
     },
+    "Error: " : {
+
+    },
     "Failed to rotate password token, please re-authenticate within account page." : {
       "localizations" : {
         "en" : {
@@ -1456,6 +1462,9 @@
           }
         }
       }
+    },
+    "Seed Not Available" : {
+
     },
     "Select Account" : {
       "localizations" : {

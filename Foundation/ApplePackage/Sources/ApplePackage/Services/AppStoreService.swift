@@ -2,9 +2,9 @@ import AnyCodable
 import Foundation
 
 public class AppStoreService {
-    let zipUtility: ZipProtocol
-    let storefrontService: StorefrontService
-    let guid: String
+    public let zipUtility: ZipProtocol
+    public let storefrontService: StorefrontService
+    public let guid: String
 
     public init(
         guid: String,

@@ -159,38 +159,71 @@ struct ProductView: View {
     func startDownload() {
         guard let account else { return }
         obtainDownloadURL = true
-        DispatchQueue.global().async {
-            let httpClient = HTTPClient(urlSession: URLSession.shared)
-            let itunesClient = iTunesClient(httpClient: httpClient)
-            let storeClient = StoreClient(httpClient: httpClient)
-
+        Task.detached {
             do {
-                let app = try itunesClient.lookup(
-                    type: archive.entityType ?? .iPhone,
-                    bundleIdentifier: archive.bundleIdentifier,
-                    region: account.countryCode
+                // 创建App Store服务
+                let appStoreService = AppStoreService(guid: vm.deviceSeedAddress)
+
+                // 创建临时账户和应用模型
+                let storefrontService = StorefrontService()
+                let storefront = storefrontService.storeFronts[account.countryCode] ?? ""
+
+                let tempAccount = Account(
+                    email: account.email,
+                    passwordToken: account.storeResponse.passwordToken,
+                    directoryServicesID: account.storeResponse.directoryServicesID,
+                    name: "",
+                    storeFront: storefront,
+                    password: account.password
                 )
-                let item = try storeClient.item(
-                    identifier: String(app.identifier),
-                    directoryServicesIdentifier: account.storeResponse.directoryServicesIdentifier
+
+                let appModel = App(
+                    id: archive.identifier,
+                    bundleID: archive.bundleIdentifier,
+                    name: archive.name,
+                    version: archive.version,
+                    price: archive.price ?? 0
                 )
+
+                // 获取下载信息
+                let downloadInfo = try await appStoreService.getDownloadInfo(account: tempAccount, app: appModel)
+
                 let id = Downloads.this.add(request: .init(
-                    account: account,
-                    package: archive,
-                    item: item
+                    account: .init(
+                        email: tempAccount.email,
+                        password: tempAccount.password,
+                        countryCode: tempAccount.storeFront,
+                        storeResponse: tempAccount
+                    ),
+                    package: .init(
+                        identifier: appModel.id,
+                        bundleIdentifier: appModel.bundleID,
+                        name: appModel.name,
+                        version: appModel.version
+                    ),
+                    url: downloadInfo.url,
+                    md5: downloadInfo.md5,
+                    sinfs: downloadInfo.sinfs,
+                    metadata: [:]
                 ))
+
                 Downloads.this.resume(requestID: id)
             } catch {
                 DispatchQueue.main.async {
                     obtainDownloadURL = false
-                    if (error as NSError).code == 9610 {
-                        hint = NSLocalizedString("License Not Found, please acquire license first.", comment: "")
-                    } else if (error as NSError).code == 2034 {
-                        hint = NSLocalizedString("Password Token Expired, please re-authenticate within account page.", comment: "")
-                    } else if (error as NSError).code == 2059 {
-                        hint = NSLocalizedString("Temporarily Unavailable, please try again later.", comment: "")
+                    if let appStoreError = error as? AppStoreError {
+                        switch appStoreError {
+                        case .licenseRequired:
+                            hint = NSLocalizedString("License Not Found, please acquire license first.", comment: "")
+                        case .passwordTokenExpired:
+                            hint = NSLocalizedString("Password Token Expired, please re-authenticate within account page.", comment: "")
+                        case .temporarilyUnavailable:
+                            hint = NSLocalizedString("Temporarily Unavailable, please try again later.", comment: "")
+                        default:
+                            hint = NSLocalizedString("Unable to retrieve download url, please try again later.", comment: "") + "\n" + error.localizedDescription
+                        }
                     } else {
-                        hint = NSLocalizedString("Unable to retrieve download url, please try again later.", comment: "") + "\n" + error.localizedDescription
+                        hint = NSLocalizedString("Error: ", comment: "") + error.localizedDescription
                     }
                 }
                 return
@@ -205,9 +238,9 @@ struct ProductView: View {
     func acquireLicense() {
         guard let account else { return }
         acquiringLicense = true
-        DispatchQueue.global().async {
+        Task.detached {
             do {
-                guard let account = try AppStore.this.rotate(id: account.id) else {
+                guard let account = try? await AppStore.this.rotate(id: account.id) else {
                     throw NSError(domain: "AppStore", code: 401, userInfo: [
                         NSLocalizedDescriptionKey: NSLocalizedString(
                             "Failed to rotate password token, please re-authenticate within account page.",
@@ -215,12 +248,34 @@ struct ProductView: View {
                         ),
                     ])
                 }
-                try ApplePackage.purchase(
-                    token: account.storeResponse.passwordToken,
-                    directoryServicesIdentifier: account.storeResponse.directoryServicesIdentifier,
-                    trackID: archive.identifier,
-                    countryCode: account.countryCode
+
+                // 创建App Store服务
+                let appStoreService = AppStoreService(guid: vm.deviceSeedAddress)
+
+                // 创建临时账户和应用模型
+                let storefrontService = StorefrontService()
+                let storefront = storefrontService.storeFronts[account.countryCode] ?? ""
+
+                let tempAccount = Account(
+                    email: account.email,
+                    passwordToken: account.storeResponse.passwordToken,
+                    directoryServicesID: account.storeResponse.directoryServicesID,
+                    name: "",
+                    storeFront: storefront,
+                    password: account.password
                 )
+
+                let appModel = App(
+                    id: archive.identifier,
+                    bundleID: archive.bundleIdentifier,
+                    name: archive.name,
+                    version: archive.version,
+                    price: archive.price ?? 0
+                )
+
+                // 使用购买服务获取许可证
+                try await appStoreService.purchase(account: tempAccount, app: appModel)
+
                 DispatchQueue.main.async {
                     acquiringLicense = false
                     licenseHint = NSLocalizedString("Request Successes", comment: "")
@@ -231,30 +286,6 @@ struct ProductView: View {
                     licenseHint = error.localizedDescription
                 }
             }
-        }
-    }
-}
-
-extension iTunesResponse.iTunesArchive {
-    var displaySupportedDevicesIcon: String {
-        var supports_iPhone = false
-        var supports_iPad = false
-        for device in supportedDevices ?? [] {
-            if device.lowercased().contains("iphone") {
-                supports_iPhone = true
-            }
-            if device.lowercased().contains("ipad") {
-                supports_iPad = true
-            }
-        }
-        if supports_iPhone, supports_iPad {
-            return "ipad.and.iphone"
-        } else if supports_iPhone {
-            return "iphone"
-        } else if supports_iPad {
-            return "ipad"
-        } else {
-            return "questionmark"
         }
     }
 }
