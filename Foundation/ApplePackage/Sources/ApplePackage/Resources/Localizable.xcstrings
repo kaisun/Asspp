@@ -49,6 +49,22 @@
         }
       }
     },
+    "failed_to_purchase" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "failed to purchase"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "购买失败"
+          }
+        }
+      }
+    },
     "invalid_url" : {
       "localizations" : {
         "en" : {
@@ -145,23 +161,7 @@
         }
       }
     },
-    "login_failed_with_error" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Login Failed With Error"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "登录失败，出现错误"
-          }
-        }
-      }
-    },
-    "network_error_format" : {
+    "network_error %@" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -172,7 +172,7 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "网络错误：%@"
+            "value" : "网络错误 %@"
           }
         }
       }
@@ -354,6 +354,7 @@
       }
     },
     "unable_to_extract_download_info" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {

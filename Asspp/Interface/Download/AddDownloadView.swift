@@ -11,7 +11,7 @@ import SwiftUI
 struct AddDownloadView: View {
     @State var bundleID: String = ""
     @State var searchType: EntityType = .iPhone
-    @State var selection: AppStore.Account.ID = .init()
+    @State var selection: Account.ID = .init()
     @State var obtainDownloadURL = false
     @State var hint = ""
 
@@ -22,7 +22,7 @@ struct AddDownloadView: View {
 
     @Environment(\.dismiss) var dismiss
 
-    var account: AppStore.Account? {
+    var account: Account? {
         avm.accounts.first { $0.id == selection }
     }
 
@@ -48,19 +48,14 @@ struct AddDownloadView: View {
             }
 
             Section {
-                if avm.demoMode {
-                    Text("Demo Mode Redacted")
-                        .redacted(reason: .placeholder)
-                } else {
-                    Picker("Account", selection: $selection) {
-                        ForEach(avm.accounts) { account in
-                            Text(account.email)
-                                .id(account.id)
-                        }
+                Picker("Account", selection: $selection) {
+                    ForEach(avm.accounts) { account in
+                        Text(account.email)
+                            .id(account.id)
                     }
-                    .pickerStyle(.menu)
-                    .onAppear { selection = avm.accounts.first?.id ?? .init() }
                 }
+                .pickerStyle(.menu)
+                .onAppear { selection = avm.accounts.first?.id ?? .init() }
             } header: {
                 Text("Account")
             } footer: {
@@ -92,14 +87,10 @@ struct AddDownloadView: View {
         obtainDownloadURL = true
         Task.detached {
             do {
-                // 创建App Store服务
-                let appStoreService = AppStoreService(guid: avm.deviceSeedAddress)
+                let service = await avm.service
+                let storefront = service.storefront.codeMap[account.countryCode] ?? ""
 
-                // 先构建一个临时账户用于查询
-                let storefrontService = StorefrontService()
-                let storefront = storefrontService.storeFronts[account.countryCode] ?? ""
-
-                let tempAccount = Account(
+                let tempAccount = ApplePackage.Account(
                     email: account.email,
                     passwordToken: account.storeResponse.passwordToken,
                     directoryServicesID: account.storeResponse.directoryServicesID,
@@ -109,39 +100,39 @@ struct AddDownloadView: View {
                 )
 
                 // 使用新的lookup API查询应用
-                let app = try await appStoreService.lookup(account: tempAccount, bundleID: bundleID)
+                let app = try await service.lookup(account: tempAccount, bundleID: bundleID)
 
-                // 构造iTunesArchive
-                let itunesApp = iTunesResponse.iTunesArchive(
-                    from: app,
-                    artworkUrl: "https://is1-ssl.mzstatic.com/image/thumb/Purple128/v4/\(app.id)/100x100bb.jpg",
-                    entityType: searchType
-                )
-
-                // 获取下载信息
-                let downloadInfo = try await appStoreService.getDownloadInfo(account: tempAccount, app: app)
-
-                // 添加下载请求
-                let id = Downloads.this.add(request: .init(
-                    account: .init(
-                        email: tempAccount.email,
-                        password: tempAccount.password,
-                        countryCode: tempAccount.storeFront,
-                        storeResponse: tempAccount
-                    ),
-                    package: .init(
-                        identifier: itunesApp.identifier,
-                        bundleIdentifier: itunesApp.bundleIdentifier,
-                        name: itunesApp.name,
-                        version: itunesApp.version
-                    ),
-                    url: downloadInfo.url,
-                    md5: downloadInfo.md5,
-                    sinfs: downloadInfo.sinfs,
-                    metadata: [:]
-                ))
-
-                Downloads.this.resume(requestID: id)
+//                // 构造iTunesArchive
+//                let itunesApp = iTunesResponse.iTunesArchive(
+//                    from: app,
+//                    artworkUrl: "https://is1-ssl.mzstatic.com/image/thumb/Purple128/v4/\(app.id)/100x100bb.jpg",
+//                    entityType: searchType
+//                )
+//
+//                // 获取下载信息
+//                let downloadInfo = try await service.getDownloadInfo(account: tempAccount, app: app)
+//
+//                // 添加下载请求
+//                let id = Downloads.this.add(request: .init(
+//                    account: .init(
+//                        email: tempAccount.email,
+//                        password: tempAccount.password,
+//                        countryCode: tempAccount.storeFront,
+//                        storeResponse: tempAccount
+//                    ),
+//                    package: .init(
+//                        identifier: itunesApp.identifier,
+//                        bundleIdentifier: itunesApp.bundleIdentifier,
+//                        name: itunesApp.name,
+//                        version: itunesApp.version
+//                    ),
+//                    url: downloadInfo.url,
+//                    md5: downloadInfo.md5,
+//                    sinfs: downloadInfo.sinfs,
+//                    metadata: [:]
+//                ))
+//
+//                Downloads.this.resume(requestID: id)
             } catch {
                 DispatchQueue.main.async {
                     obtainDownloadURL = false

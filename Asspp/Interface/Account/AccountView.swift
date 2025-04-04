@@ -16,21 +16,20 @@ struct AccountView: View {
     var body: some View {
         NavigationView {
             content
-                .background(
-                    NavigationLink(
-                        destination: AddAccountView(),
-                        isActive: $addAccount,
-                        label: { EmptyView() }
-                    )
-                )
                 .navigationTitle("Account")
                 .toolbar {
                     ToolbarItem {
-                        Button {
-                            addAccount.toggle()
-                        } label: {
-                            Label("Add Account", systemImage: "plus")
-                        }
+                        NavigationLink(
+                            destination: AddAccountView(),
+                            isActive: $addAccount,
+                            label: {
+                                Button {
+                                    addAccount.toggle()
+                                } label: {
+                                    Label("Add Account", systemImage: "plus")
+                                }
+                            }
+                        )
                     }
                 }
         }
@@ -42,12 +41,7 @@ struct AccountView: View {
             Section {
                 ForEach(vm.accounts) { account in
                     NavigationLink(destination: AccountDetailView(account: account)) {
-                        if vm.demoMode {
-                            Text("88888888888")
-                                .redacted(reason: .placeholder)
-                        } else {
-                            Text(account.email)
-                        }
+                        Text(account.email)
                     }
                 }
                 if vm.accounts.isEmpty {

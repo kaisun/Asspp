@@ -1,19 +1,28 @@
 import Foundation
 
 extension AppStoreService: AppStorePurchaseService {
-    public func purchase(account: Account, app: App) async throws {
+    public nonisolated
+    func purchase(account: Account, app: AppPackage) async throws {
         if app.price > 0 {
-            throw AppStoreError.custom(String(localized: "paid_app_not_supported"))
+            throw AppStoreError.custom(String(localized: "paid_app_not_supported", bundle: .module))
         }
 
         do {
-            try await purchaseWithParams(account: account, app: app, pricingParameters: Constants.pricingParameterAppStore)
+            try await purchaseWithParams(
+                account: account,
+                app: app,
+                pricingParameters: Constants.pricingParameterAppStore
+            )
         } catch AppStoreError.temporarilyUnavailable {
-            try await purchaseWithParams(account: account, app: app, pricingParameters: Constants.pricingParameterAppleArcade)
+            try await purchaseWithParams(
+                account: account,
+                app: app,
+                pricingParameters: Constants.pricingParameterAppleArcade
+            )
         }
     }
 
-    func purchaseWithParams(account: Account, app: App, pricingParameters: String) async throws {
+    func purchaseWithParams(account: Account, app: AppPackage, pricingParameters: String) async throws {
         let url = URL(string: "https://\(Constants.privateAppStoreAPIDomain)\(Constants.privateAppStoreAPIPathPurchase)")!
 
         let headers = [
@@ -52,12 +61,12 @@ extension AppStoreService: AppStorePurchaseService {
             let status: Int?
         }
 
-        let (response, _) = try await HTTPClient.shared.request(
+        let (response, _) = try await HTTPClient().request(
             url: url,
             method: "POST",
             headers: headers,
             body: propertyListData,
-            format: .xml
+            responseFormat: .xml
         ) as (PurchaseResponse, [String: String])
 
         if response.failureType == Constants.failureTypeTemporarilyUnavailable {
@@ -76,11 +85,11 @@ extension AppStoreService: AppStorePurchaseService {
             if let message = response.customerMessage, !message.isEmpty {
                 throw AppStoreError.custom(message)
             }
-            throw AppStoreError.custom("购买失败")
+            throw AppStoreError.custom(String(localized: "failed_to_purchase", bundle: .module))
         }
 
         if response.jingleDocType != "purchaseSuccess" || response.status != 0 {
-            throw AppStoreError.custom(String(localized: "purchase_failed"))
+            throw AppStoreError.custom(String(localized: "purchase_failed", bundle: .module))
         }
     }
 }

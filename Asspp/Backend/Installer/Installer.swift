@@ -13,7 +13,7 @@ import Vapor
 class Installer: Identifiable, ObservableObject {
     let id: UUID
     let app: Application
-    let archive: iTunesResponse.iTunesArchive
+    let archive: AppPackage
     let port = Int.random(in: 4000 ... 8000)
 
     enum Status {
@@ -28,7 +28,7 @@ class Installer: Identifiable, ObservableObject {
 
     var needsShutdown = false
 
-    init(archive: iTunesResponse.iTunesArchive, path packagePath: URL) throws {
+    init(archive: AppPackage, path packagePath: URL) throws {
         let id: UUID = .init()
         self.id = id
         self.archive = archive

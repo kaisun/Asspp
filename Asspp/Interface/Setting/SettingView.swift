@@ -15,13 +15,6 @@ struct SettingView: View {
         NavigationView {
             List {
                 Section {
-                    Toggle("Demo Mode", isOn: $vm.demoMode)
-                } header: {
-                    Text("Demo Mode")
-                } footer: {
-                    Text("By enabling this, all your account will be redacted.")
-                }
-                Section {
                     Text(vm.deviceSeedAddress)
                         .font(.system(.body, design: .monospaced))
                 } header: {

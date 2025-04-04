@@ -90,7 +90,7 @@ extension Installer {
                         ],
                     ],
                     "metadata": [
-                        "bundle-identifier": archive.bundleIdentifier,
+                        "bundle-identifier": archive.bundleID,
                         "bundle-version": archive.version,
                         "kind": "software",
                         "title": archive.name,

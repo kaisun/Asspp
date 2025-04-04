@@ -1,9 +1,6 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
-    "--------" : {
-
-    },
     "@Lakr233" : {
       "localizations" : {
         "en" : {
@@ -21,6 +18,7 @@
       }
     },
     "%@" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -69,6 +67,7 @@
       }
     },
     "%@ %@ %@" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -133,6 +132,7 @@
       }
     },
     "88888888888" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -341,6 +341,7 @@
       }
     },
     "By enabling this, all your account will be redacted." : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -517,6 +518,7 @@
       }
     },
     "Demo Mode" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -533,6 +535,7 @@
       }
     },
     "Demo Mode Redacted" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -773,20 +776,17 @@
       }
     },
     "Error: " : {
-
-    },
-    "Failed to rotate password token, please re-authenticate within account page." : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Failed to rotate password token, please re-authenticate within account page."
+            "value" : "Error:"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "无法更新你的凭证，请删除账户并重新认证。"
+            "value" : "错误："
           }
         }
       }
@@ -1462,9 +1462,6 @@
           }
         }
       }
-    },
-    "Seed Not Available" : {
-
     },
     "Select Account" : {
       "localizations" : {

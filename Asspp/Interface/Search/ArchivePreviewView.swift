@@ -10,11 +10,11 @@ import Kingfisher
 import SwiftUI
 
 struct ArchivePreviewView: View {
-    let archive: iTunesResponse.iTunesArchive
+    let archive: AppPackage
 
     var body: some View {
         HStack(spacing: 8) {
-            KFImage(URL(string: archive.artworkUrl512 ?? ""))
+            KFImage(URL(string: archive.artworkPreviewURL))
                 .antialiased(true)
                 .resizable()
                 .cornerRadius(8)
@@ -24,7 +24,7 @@ struct ArchivePreviewView: View {
                     .font(.system(.body, design: .rounded))
                     .bold()
                 Group {
-                    Text("\(archive.bundleIdentifier) \(archive.version) \(archive.byteCountDescription)")
+                    Text(archive.oneLineDescription)
                 }
                 .font(.system(.footnote, design: .rounded))
                 .foregroundStyle(.secondary)

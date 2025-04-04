@@ -41,7 +41,7 @@ struct DownloadView: View {
         ForEach(vm.requests) { req in
             NavigationLink(destination: PackageView(request: req)) {
                 VStack(spacing: 8) {
-                    ArchivePreviewView(archive: req.package)
+//                    ArchivePreviewView(archive: req.package)
                     SimpleProgress(progress: req.runtime.progress)
                         .animation(.interactiveSpring, value: req.runtime.progress)
                     HStack {

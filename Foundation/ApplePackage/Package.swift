@@ -19,14 +19,12 @@ let package = Package(
     dependencies: [
         .package(url: "https://github.com/Flight-School/AnyCodable", from: "0.6.7"),
         .package(url: "https://github.com/weichsel/ZIPFoundation", from: "0.9.19"),
-        .package(url: "https://github.com/CoreOffice/XMLCoder", from: "0.17.1"),
     ],
     targets: [
         .target(
             name: "ApplePackage", dependencies: [
                 "AnyCodable",
                 "ZIPFoundation",
-                "XMLCoder",
             ]
         ),
         .testTarget(

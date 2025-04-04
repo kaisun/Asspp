@@ -1,7 +1,7 @@
 import Foundation
 import ZIPFoundation
 
-public struct Sinf: Codable {
+public struct Sinf: Codable, Equatable, Hashable, Identifiable {
     public let id: Int64
     public let data: Data
     public let provider: String
@@ -13,20 +13,14 @@ public struct Sinf: Codable {
     }
 }
 
-public protocol ZipProtocol {
-    func unzip(at path: String) throws
-    func zip(files: [String], to path: String) throws
-    func replicateSinf(inputPath: String, outputPath: String, sinfs: [Sinf]) throws
-}
-
-public class ZipUtility: ZipProtocol {
+public class ZipUtility {
     public static let shared = ZipUtility()
 
     private init() {}
 
     public func unzip(at path: String) throws {
         guard let archive = Archive(url: URL(fileURLWithPath: path), accessMode: .read) else {
-            throw AppStoreError.custom(String(localized: "unable_to_open_zip"))
+            throw AppStoreError.custom(String(localized: "unable_to_open_zip", bundle: .module))
         }
 
         let destinationURL = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent(UUID().uuidString)
@@ -39,7 +33,7 @@ public class ZipUtility: ZipProtocol {
 
     public func zip(files: [String], to path: String) throws {
         guard let archive = Archive(url: URL(fileURLWithPath: path), accessMode: .create) else {
-            throw AppStoreError.custom(String(localized: "unable_to_create_zip"))
+            throw AppStoreError.custom(String(localized: "unable_to_create_zip", bundle: .module))
         }
 
         for file in files {
@@ -50,7 +44,7 @@ public class ZipUtility: ZipProtocol {
 
     public func replicateSinf(inputPath: String, outputPath: String, sinfs: [Sinf]) throws {
         guard let archive = Archive(url: URL(fileURLWithPath: inputPath), accessMode: .read) else {
-            throw AppStoreError.custom(String(localized: "unable_to_open_source_zip"))
+            throw AppStoreError.custom(String(localized: "unable_to_open_source_zip", bundle: .module))
         }
 
         let temporaryURL = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent(UUID().uuidString)
@@ -67,7 +61,7 @@ public class ZipUtility: ZipProtocol {
         }
 
         guard let newArchive = Archive(url: URL(fileURLWithPath: outputPath), accessMode: .create) else {
-            throw AppStoreError.custom(String(localized: "unable_to_create_new_zip"))
+            throw AppStoreError.custom(String(localized: "unable_to_create_new_zip", bundle: .module))
         }
 
         let enumerator = FileManager.default.enumerator(at: temporaryURL, includingPropertiesForKeys: [.isDirectoryKey])

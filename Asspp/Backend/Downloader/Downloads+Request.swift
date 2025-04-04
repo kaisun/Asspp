@@ -19,18 +19,17 @@ extension Downloads {
     struct Request: Identifiable, Codable, Hashable {
         var id: UUID = .init()
 
-        var account: AppStore.Account
-        var package: iTunesResponse.iTunesArchive
+        var account: Account
+        var package: AppPackage
 
         var url: URL
         var md5: String
-        var signatures: [StoreResponse.Item.Signature]
-        var metadata: [String: AnyCodable]
+        var signatures: [Sinf]
 
         var creation: Date
         var targetLocation: URL {
             storeDir
-                .appendingPathComponent(package.bundleIdentifier)
+                .appendingPathComponent(package.bundleID)
                 .appendingPathComponent(package.version)
                 .appendingPathComponent("\(md5)_\(id.uuidString)")
                 .appendingPathExtension("ipa")
@@ -38,31 +37,19 @@ extension Downloads {
 
         var runtime: Runtime = .init()
 
-        init(account: AppStore.Account, package: iTunesResponse.iTunesArchive, item: StoreResponse.Item) {
+        init(
+            account: Account,
+            package: AppPackage,
+            url: URL,
+            md5: String,
+            sinfs: [Sinf]
+        ) {
             self.account = account
             self.package = package
-            url = item.url
-            md5 = item.md5
-            signatures = item.signatures
+            self.url = url
+            self.md5 = md5
+            signatures = sinfs
             creation = .init()
-            if let jsonData = try? JSONSerialization.data(withJSONObject: item.metadata),
-               let json = try? JSONDecoder().decode([String: AnyCodable].self, from: jsonData)
-            {
-                metadata = json
-            } else {
-                metadata = [:]
-            }
-        }
-
-        // 添加从下载信息直接创建Request的新构造函数
-        init(account: AppStore.Account, package: iTunesResponse.iTunesArchive, url: String, md5: String?, sinfs: [Sinf], metadata: [String: AnyCodable]?) {
-            self.account = account
-            self.package = package
-            self.url = URL(string: url)!
-            self.md5 = md5 ?? ""
-            signatures = sinfs.map { StoreResponse.Item.Signature.from(sinf: $0) }
-            creation = .init()
-            self.metadata = metadata ?? [:]
         }
     }
 }

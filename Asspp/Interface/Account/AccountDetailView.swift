@@ -9,7 +9,7 @@ import ApplePackage
 import SwiftUI
 
 struct AccountDetailView: View {
-    let account: AppStore.Account
+    let account: Account
 
     @StateObject var vm = AppStore.this
     @Environment(\.dismiss) var dismiss
@@ -17,23 +17,20 @@ struct AccountDetailView: View {
     @State var rotating = false
     @State var rotatingHint = ""
 
+    @State var task: Task<Void, Never>?
+
     var body: some View {
         List {
             Section {
-                if vm.demoMode {
-                    Text("88888888888")
-                        .redacted(reason: .placeholder)
-                } else {
-                    Text(account.email)
-                        .onTapGesture { UIPasteboard.general.string = account.email }
-                }
+                Text(account.email)
+                    .onTapGesture { UIPasteboard.general.string = account.email }
             } header: {
                 Text("ID")
             } footer: {
                 Text("This email is used to sign in to Apple services.")
             }
             Section {
-                Text("\(account.countryCode) - \(ApplePackage.storeFrontCodeMap[account.countryCode] ?? NSLocalizedString("Unknown", comment: ""))")
+                Text("\(account.countryCode) - \(StorefrontService.shared.codeMap[account.countryCode] ?? NSLocalizedString("Unknown", comment: ""))")
                     .onTapGesture { UIPasteboard.general.string = account.email }
             } header: {
                 Text("Country Code")
@@ -41,15 +38,10 @@ struct AccountDetailView: View {
                 Text("App Store requires this country code to identify your package region.")
             }
             Section {
-                if vm.demoMode {
-                    Text("88888888888")
-                        .redacted(reason: .placeholder)
-                } else {
-                    Text(account.storeResponse.directoryServicesID)
-                        .font(.system(.body, design: .monospaced))
-                        .onTapGesture { UIPasteboard.general.string = account.email }
-                }
-                Text("--------" ?? "Seed Not Available")
+                Text(account.storeResponse.directoryServicesID)
+                    .font(.system(.body, design: .monospaced))
+                    .onTapGesture { UIPasteboard.general.string = account.email }
+                Text(AppStore.this.deviceSeedAddress)
                     .font(.system(.body, design: .monospaced))
                     .onTapGesture { UIPasteboard.general.string = account.email }
             } header: {
@@ -65,7 +57,12 @@ struct AccountDetailView: View {
                     Button("Rotating...") {}
                         .disabled(true)
                 } else {
-                    Button("Rotate Token") { rotate() }
+                    Button("Rotate Token") {
+                        task = Task {
+                            await rotate()
+                            task = nil
+                        }
+                    }
                 }
             } header: {
                 Text("Password Token")
@@ -88,20 +85,19 @@ struct AccountDetailView: View {
         .navigationTitle("Detail")
     }
 
-    func rotate() {
-        rotating = true
-        Task.detached {
-            do {
-                await try vm.rotate(id: account.id)
-                DispatchQueue.main.async {
-                    rotating = false
-                    rotatingHint = NSLocalizedString("Success", comment: "")
-                }
-            } catch {
-                DispatchQueue.main.async {
-                    rotating = false
-                    rotatingHint = error.localizedDescription
-                }
+    nonisolated
+    func rotate() async {
+        await MainActor.run { rotating = true }
+        do {
+            try await vm.rotate(id: account.id)
+            await MainActor.run {
+                rotating = false
+                rotatingHint = NSLocalizedString("Success", comment: "")
+            }
+        } catch {
+            await MainActor.run {
+                rotating = false
+                rotatingHint = error.localizedDescription
             }
         }
     }

@@ -11,7 +11,7 @@ import SwiftUI
 
 struct PackageView: View {
     let request: Downloads.Request
-    var archive: iTunesResponse.iTunesArchive {
+    var archive: AppPackage {
         request.package
     }
 
@@ -27,7 +27,7 @@ struct PackageView: View {
         List {
             Section {
                 VStack(alignment: .leading, spacing: 8) {
-                    KFImage(URL(string: archive.artworkUrl512 ?? ""))
+                    KFImage(URL(string: archive.artworkURL ?? ""))
                         .antialiased(true)
                         .resizable()
                         .cornerRadius(8)
@@ -40,7 +40,7 @@ struct PackageView: View {
             } header: {
                 Text("Package")
             } footer: {
-                Text("\(archive.bundleIdentifier) - \(archive.version) - \(archive.byteCountDescription)")
+                Text(archive.oneLineDescription)
             }
 
             if Downloads.this.isCompleted(for: request) {
@@ -61,7 +61,7 @@ struct PackageView: View {
 
                     Button("Install via AirDrop") {
                         let newUrl = temporaryDirectory
-                            .appendingPathComponent("\(archive.bundleIdentifier)-\(archive.version)")
+                            .appendingPathComponent("\(archive.bundleID)-\(archive.version)")
                             .appendingPathExtension("ipa")
                         try? FileManager.default.removeItem(at: newUrl)
                         try? FileManager.default.copyItem(at: url, to: newUrl)
@@ -110,13 +110,8 @@ struct PackageView: View {
             }
 
             Section {
-                if vm.demoMode {
-                    Text("88888888888")
-                        .redacted(reason: .placeholder)
-                } else {
-                    Text(request.account.email)
-                }
-                Text("\(request.account.countryCode) - \(ApplePackage.storeFrontCodeMap[request.account.countryCode] ?? "-1")")
+                Text(request.account.email)
+                Text("\(request.account.countryCode) - \(StorefrontService.shared.codeMap[request.account.countryCode] ?? "-1")")
             } header: {
                 Text("Account")
             } footer: {

@@ -1,14 +1,13 @@
 import Foundation
-import XMLCoder
 
-public class HTTPClient {
-    private let session: URLSession
-    public static let shared = HTTPClient()
+public class HTTPClient: NSObject, URLSessionTaskDelegate {
+    private var session: URLSession!
 
-    private init() {
+    override init() {
         let config = URLSessionConfiguration.default
         config.httpCookieStorage = HTTPCookieStorage.shared
-        session = URLSession(configuration: config)
+        super.init()
+        session = URLSession(configuration: config, delegate: self, delegateQueue: nil)
     }
 
     public enum ResponseFormat {
@@ -21,7 +20,7 @@ public class HTTPClient {
         method: String,
         headers: [String: String] = [:],
         body: Data? = nil,
-        format: ResponseFormat = .json
+        responseFormat: ResponseFormat = .json
     ) async throws -> (T, [String: String]) {
         var request = URLRequest(url: url)
         request.httpMethod = method
@@ -34,9 +33,7 @@ public class HTTPClient {
             request.addValue(value, forHTTPHeaderField: key)
         }
 
-        if let body {
-            request.httpBody = body
-        }
+        if let body { request.httpBody = body }
 
         let (data, response) = try await session.data(for: request)
 
@@ -46,19 +43,44 @@ public class HTTPClient {
 
         let headers = httpResponse.allHeaderFields.reduce(into: [String: String]()) { result, item in
             if let key = item.key as? String, let value = item.value as? String {
-                result[key] = value
+                result[key.lowercased()] = value
             }
         }
 
-        switch format {
+        switch responseFormat {
         case .json:
             let decoder = JSONDecoder()
             let decoded = try decoder.decode(T.self, from: data)
             return (decoded, headers)
         case .xml:
-            let decoder = XMLDecoder()
+            let decoder = PropertyListDecoder()
             let decoded = try decoder.decode(T.self, from: data)
             return (decoded, headers)
         }
+    }
+
+    // prevent redirect
+    public func urlSession(
+        _: URLSession,
+        task _: URLSessionTask,
+        willPerformHTTPRedirection _: HTTPURLResponse,
+        newRequest: URLRequest
+    ) async -> URLRequest? {
+        return nil
+    }
+
+    public func urlSession(
+        _: URLSession,
+        didReceive challenge: URLAuthenticationChallenge,
+        completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void
+    ) {
+        #if DEBUG
+            if let trust = challenge.protectionSpace.serverTrust {
+                print("[*] allowing insecure networking @ DEBUG")
+                completionHandler(.useCredential, .init(trust: trust))
+                return
+            }
+        #endif
+        completionHandler(.performDefaultHandling, nil)
     }
 }

@@ -9,27 +9,23 @@ import ApplePackage
 import Kingfisher
 import SwiftUI
 
-enum EntityType: String, CaseIterable, Codable {
-    case iPhone
-    case iPad
-    case macOS
-    case watchOS
-    case tvOS
-}
-
 struct SearchView: View {
     @AppStorage("searchKey") var searchKey = ""
     @AppStorage("searchRegion") var searchRegion = "US"
     @FocusState var searchKeyFocused
-    @State var searchType = EntityType.iPhone
+
+    @State var task: Task<Void, Never>? = nil
 
     @State var searching = false
-    let regionKeys = Array(ApplePackage.storeFrontCodeMap.keys.sorted())
-
+    @State var searchType = EntityType.iPhone
     @State var searchInput: String = ""
-    @State var searchResult: [iTunesResponse.iTunesArchive] = []
+    @State var searchResult: (String, [AppPackage]) = ("", [])
 
     @StateObject var vm = AppStore.this
+
+    var regionKeys: [String] {
+        Array(vm.service.storefront.codeMap.keys).sorted()
+    }
 
     var possibleReigon: Set<String> {
         Set(vm.accounts.map(\.countryCode))
@@ -58,18 +54,18 @@ struct SearchView: View {
 
                 TextField("Keyword", text: $searchKey)
                     .focused($searchKeyFocused)
-                    .onSubmit { search() }
+                    .onSubmit { submit() }
             } header: {
                 Text("Metadata")
             }
             Section {
-                Button(searching ? "Searching..." : "Search") { search() }
+                Button(searching ? "Searching..." : "Search") { submit() }
                     .disabled(searchKey.isEmpty)
                     .disabled(searching)
             }
             Section {
-                ForEach(searchResult) { item in
-                    NavigationLink(destination: ProductView(archive: item, region: searchRegion)) {
+                ForEach(searchResult.1) { item in
+                    NavigationLink(destination: ProductView(archive: item, region: searchResult.0)) {
                         ArchivePreviewView(archive: item)
                     }
                     .transition(.opacity)
@@ -78,7 +74,8 @@ struct SearchView: View {
                 Text(searchInput)
             }
         }
-        .animation(.spring, value: searchResult)
+        .animation(.spring, value: searchResult.0)
+        .animation(.spring, value: searchResult.1)
     }
 
     func buildRegionView() -> some View {
@@ -94,7 +91,7 @@ struct SearchView: View {
                 }
             } label: {
                 HStack {
-                    Text("\(searchRegion) - \(ApplePackage.storeFrontCodeMap[searchRegion] ?? NSLocalizedString("Unknown", comment: ""))")
+                    Text("\(searchRegion) - \(vm.service.storefront.codeMap[searchRegion] ?? NSLocalizedString("Unknown", comment: ""))")
                     Image(systemName: "arrow.up.arrow.down")
                 }
             }
@@ -103,63 +100,49 @@ struct SearchView: View {
 
     func buildPickView(for keys: [String]) -> some View {
         ForEach(keys, id: \.self) { key in
-            Button("\(key) - \(ApplePackage.storeFrontCodeMap[key] ?? NSLocalizedString("Unknown", comment: ""))") {
+            Button("\(key) - \(vm.service.storefront.codeMap[key] ?? NSLocalizedString("Unknown", comment: ""))") {
                 searchRegion = key
             }
         }
     }
 
-    func search() {
-        searchKeyFocused = false
-        searching = true
-        searchInput = "\(searchRegion) - \(searchKey)" + " ..."
-        Task {
-            // 创建服务实例
-            let appStoreService = AppStoreService(guid: vm.deviceSeedAddress)
+    func submit() {
+        task = Task {
+            await search()
+            task = nil
+        }
+    }
 
-            do {
-                // 构建一个临时账户用于搜索
-                let storefront = ApplePackage.storeFrontCodeMap[searchRegion] ?? ""
+    nonisolated
+    func search() async {
+        await MainActor.run {
+            searchKeyFocused = false
+            searching = true
+            searchInput = "\(searchRegion) - \(searchKey)" + " ..."
+        }
 
-                let tempAccount = Account(
-                    email: "",
-                    passwordToken: "",
-                    directoryServicesID: "",
-                    name: "",
-                    storeFront: storefront,
-                    password: ""
-                )
+        let region = await searchRegion
+        let type = await searchType
+        let keyword = await searchKey
 
-                // 使用搜索服务
-                let apps = try await appStoreService.search(
-                    account: tempAccount,
-                    term: searchKey,
-                    limit: 32
-                )
+        do {
+            let apps = try await vm.service.search(
+                countryCode: region,
+                entityType: type,
+                term: keyword,
+                limit: 50
+            )
 
-                // 转换为 iTunesResponse.iTunesArchive
-                let results = apps.map { app -> iTunesResponse.iTunesArchive in
-                    // 构建缩略图URL
-                    let artworkUrl = "https://is1-ssl.mzstatic.com/image/thumb/Purple128/v4/\(String(app.id))/100x100bb.jpg"
-
-                    return iTunesResponse.iTunesArchive(
-                        from: app,
-                        artworkUrl: artworkUrl,
-                        entityType: searchType
-                    )
-                }
-
-                DispatchQueue.main.async {
-                    searching = false
-                    searchResult = results
-                    searchInput = "\(searchRegion) - \(searchKey)"
-                }
-            } catch {
-                DispatchQueue.main.async {
-                    searching = false
-                    searchResult = []
-                    searchInput = "\(searchRegion) - \(searchKey) (错误: \(error.localizedDescription))"
-                }
+            await MainActor.run {
+                searching = false
+                searchResult = (region, apps)
+                searchInput = "\(region) - \(keyword)"
+            }
+        } catch {
+            await MainActor.run {
+                searching = false
+                searchResult = ("", [])
+                searchInput = "\(region) - \(keyword) \(error.localizedDescription)"
             }
         }
     }

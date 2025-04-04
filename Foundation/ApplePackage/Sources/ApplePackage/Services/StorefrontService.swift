@@ -1,7 +1,11 @@
 import Foundation
 
 public class StorefrontService {
-    public let storeFronts: [String: String] = [
+    public static let shared = StorefrontService()
+
+    private init() {}
+
+    public let codeMap: [String: String] = [
         "AE": "143481", "AG": "143540", "AI": "143538", "AL": "143575",
         "AM": "143524", "AO": "143564", "AR": "143505", "AT": "143445",
         "AU": "143460", "AZ": "143568", "BB": "143541", "BD": "143490",
@@ -38,19 +42,20 @@ public class StorefrontService {
         "ZA": "143472",
     ]
 
-    public func countryCodeFromStoreFront(storeFront: String) throws -> String {
-        let parts = storeFront.split(separator: "-")
-
-        if let firstPart = parts.first {
-            for (key, value) in storeFronts {
-                if value == String(firstPart) {
-                    return key
-                }
-            }
-        }
-
-        throw AppStoreError.custom(String(localized: "country_code_not_found_format").replacingOccurrences(of: "{storefront}", with: storeFront))
+    public var countryCodes: Set<String> {
+        .init(codeMap.keys)
     }
 
-    public init() {}
+    public func countryCodeLookup(storeFront: String) throws -> String {
+        let read = storeFront.components(separatedBy: "-").first
+
+        for (key, value) in codeMap {
+            if value == read { return key }
+        }
+
+        throw AppStoreError.custom(
+            String(localized: "country_code_not_found_format", bundle: .module)
+                .replacingOccurrences(of: "{storefront}", with: storeFront)
+        )
+    }
 }

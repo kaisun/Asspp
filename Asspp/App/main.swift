@@ -50,7 +50,7 @@ try? FileManager.default.createDirectory(
 
 _ = ProcessInfo.processInfo.hostName
 
-AppStore.this.setupGUID()
+_ = AppStore.this
 _ = Downloads.this
 
 App.main()

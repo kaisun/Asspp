@@ -137,8 +137,8 @@ class Downloads: ObservableObject {
                 withIntermediateDirectories: true
             )
             try FileManager.default.moveItem(at: url, to: targetLocation)
-            let data = try JSONEncoder().encode(request.metadata)
-            let object = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] ?? [:]
+//            let data = try JSONEncoder().encode(request.metadata)
+//            let object = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] ?? [:]
 
             print("[*] sending metadata into \(targetLocation.path)")
 
@@ -147,9 +147,9 @@ class Downloads: ObservableObject {
                 Sinf(id: .init(signature.hashValue), data: signature.data, provider: signature.provider)
             }
 
-            let signatureClient = SignatureClient(fileManager: .default, filePath: targetLocation.path)
-            try signatureClient.appendMetadata(email: request.account.email, metadata: .init(object))
-            try signatureClient.appendSignatures(sinfs: sinfs)
+//            let signatureClient = SignatureClient(fileManager: .default, filePath: targetLocation.path)
+//            try signatureClient.appendMetadata(email: request.account.email, metadata: .init(object))
+//            try signatureClient.appendSignatures(sinfs: sinfs)
 
             reportSuccess(reqId: request.id)
         } catch {
@@ -184,7 +184,7 @@ class Downloads: ObservableObject {
         }
     }
 
-    func downloadRequest(forArchive archive: iTunesResponse.iTunesArchive) -> Request? {
+    func downloadRequest(forArchive archive: AppPackage) -> Request? {
         for req in requests {
             if req.package == archive {
                 return req

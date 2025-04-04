@@ -19,12 +19,18 @@ struct AddAccountView: View {
     @State var code: String = ""
 
     @State var error: Error?
-    @State var openProgress: Bool = false
+    @State var doingSomething: Bool = false
+
+    @FocusState var emailFocus
+
+    @State var task: Task<Void, Error>?
 
     var body: some View {
         List {
             Section {
                 TextField("Email (Apple ID)", text: $email)
+                    .focused($emailFocus)
+                    .onAppear { emailFocus = true }
                     .disableAutocorrection(true)
                     .autocapitalization(.none)
                 SecureField("Password", text: $password)
@@ -47,15 +53,18 @@ struct AddAccountView: View {
                 .transition(.opacity)
             }
             Section {
-                if openProgress {
+                if doingSomething {
                     ForEach([UUID()], id: \.self) { _ in
                         ProgressView()
                     }
                 } else {
                     Button("Authenticate") {
-                        authenticate()
+                        task = Task {
+                            await authenticate()
+                            task = nil
+                        }
                     }
-                    .disabled(openProgress)
+                    .disabled(doingSomething)
                     .disabled(email.isEmpty || password.isEmpty)
                 }
             } footer: {
@@ -74,33 +83,35 @@ struct AddAccountView: View {
         .navigationTitle("Add Account")
     }
 
-    func authenticate() {
-        openProgress = true
-        Task {
-            do {
-                let appStoreService = AppStoreService(guid: UUID().uuidString)
-                let account = try await appStoreService.login(
-                    email: email,
-                    password: password,
-                    authCode: code.isEmpty ? "" : code
-                )
+    nonisolated
+    func authenticate() async {
+        await MainActor.run { doingSomething = true }
+        do {
+            let service = await AppStore.this.service
+            let account = try await service.login(
+                email: email,
+                password: password,
+                authCode: code.isEmpty ? "" : code
+            )
+            let countryCode = try service.storefront.countryCodeLookup(
+                storeFront: account.storeFront
+            )
 
-                await MainActor.run {
-                    vm.save(email: email, password: password, account: .init(
-                        email: account.email,
-                        password: account.password,
-                        countryCode: account.storeFront,
-                        storeResponse: account
-                    ))
-                    dismiss()
-                    openProgress = false
-                }
-            } catch {
-                await MainActor.run {
-                    self.error = error
-                    codeRequired = true
-                    openProgress = false
-                }
+            await MainActor.run {
+                vm.save(email: email, account: .init(
+                    email: account.email,
+                    password: account.password,
+                    countryCode: countryCode,
+                    storeResponse: account
+                ))
+                dismiss()
+                doingSomething = false
+            }
+        } catch {
+            await MainActor.run {
+                self.error = error
+                codeRequired = true
+                doingSomething = false
             }
         }
     }
