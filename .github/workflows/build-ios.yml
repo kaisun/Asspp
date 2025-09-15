@@ -13,13 +13,29 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v4
+    
+    - name: Install Procursus
+      uses: dhinakg/procursus-action@main
+      with:
+        packages: ldid findutils sed coreutils make
 
     - name: Build
       run: |
         chmod +x Resources/Scripts/compile.release.mobile.ci.sh
-        ./Resources/Scripts/compile.release.mobile.ci.sh "$(pwd)" "$(pwd)/Asspp.tipa"
-
+        ./Resources/Scripts/compile.release.mobile.ci.sh "$(pwd)" "$(pwd)/Asspp.ipa"
+    
     - name: Upload Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: Asspp.ipa
+        path: Asspp.ipa
+
+    - name: Build Troll
+      run: \
+        chmod +x Resources/Scripts/build.troll.ci.sh
+        ./Resources/Scripts/build.troll.ci.sh "$(pwd)/Asspp.ipa" "$(pwd)/Asspp.tipa"
+
+    - name: Upload Troll Artifact
       uses: actions/upload-artifact@v4
       with:
         name: Asspp.tipa
