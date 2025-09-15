@@ -55,7 +55,10 @@ extension Downloads: URLSessionDownloadDelegate {
         activeDownloads[requestID] = DownloadState(task: task, continuation: nil, lastBytes: 0, lastUpdate: Date())
 
         return try await withCheckedThrowingContinuation { continuation in
-            activeDownloads[requestID]?.continuation = continuation
+            if var state = activeDownloads[requestID] {
+                state.continuation = continuation
+                activeDownloads[requestID] = state
+            }
             task.resume()
         }
     }

@@ -23,8 +23,21 @@ extension Downloads {
             logger.warning("[!] no active download found for request id: \(requestID)")
             return
         }
+
+        // Resume continuation with cancellation error before canceling task
+        if let continuation = state.continuation {
+            continuation.resume(throwing: CancellationError())
+        }
+
         state.task.cancel()
         activeDownloads.removeValue(forKey: requestID)
+
+        // Also cancel and remove the async task
+        if let asyncTask = downloadTasks[requestID] {
+            asyncTask.cancel()
+            downloadTasks[requestID] = nil
+        }
+
         await updateRequestStatus(requestID, status: .paused, percent: requests.first(where: { $0.id == requestID })?.runtime.percent ?? 0, error: nil)
         logger.info("[+] download suspended for request id: \(requestID)")
     }

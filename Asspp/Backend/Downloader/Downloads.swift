@@ -31,6 +31,7 @@ class Downloads: NSObject, ObservableObject {
         var lastBytes: Int64 = 0
         var lastUpdate: Date = .init()
         var moveError: Error?
+        var isSuspended: Bool = false
     }
 
     var runningTaskCount: Int {

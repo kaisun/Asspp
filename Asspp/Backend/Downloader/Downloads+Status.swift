@@ -13,7 +13,7 @@ extension Downloads {
         if request.runtime.status == .paused {
             return
         }
-        
+
         let fileURL = request.targetLocation
 
         // Check if file exists

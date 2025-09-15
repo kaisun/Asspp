@@ -25,7 +25,7 @@ extension Downloads {
         }
         for i in requests.indices {
             if requests[i].runtime.status == .downloading {
-                requests[i].runtime.status = .failed
+                requests[i].runtime.status = .paused
             }
         }
         logger.info("[+] suspend all operation completed")
