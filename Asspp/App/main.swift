@@ -57,6 +57,14 @@ try? FileManager.default.createDirectory(
 
 _ = ProcessInfo.processInfo.hostName
 
+// Generate and store device identifier if not exists
+let deviceIdentifierKey = "com.asspp.device.identifier"
+if UserDefaults.standard.string(forKey: deviceIdentifierKey) == nil {
+    let deviceId = UUID().uuidString.replacingOccurrences(of: "-", with: "").uppercased()
+    UserDefaults.standard.set(deviceId, forKey: deviceIdentifierKey)
+    UserDefaults.standard.synchronize()
+}
+
 App.main()
 
 private struct App: SwiftUI.App {

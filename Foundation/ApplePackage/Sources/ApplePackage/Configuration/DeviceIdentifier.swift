@@ -9,6 +9,15 @@ import Foundation
 
 public enum DeviceIdentifier {
     static func read() -> String {
+        let deviceIdentifierKey = "com.asspp.device.identifier"
+        
+        // First try to read from UserDefaults
+        if let storedDeviceId = UserDefaults.standard.string(forKey: deviceIdentifierKey) {
+            return storedDeviceId
+        }
+        
+        // Fallback to original implementation
+        let deviceId: String
         #if os(macOS) && !DEBUG
             let MAC_ADDRESS_LENGTH = 6
             let bsds: [String] = ["en0", "en1"]
@@ -45,12 +54,18 @@ public enum DeviceIdentifier {
             let upper = lower + MAC_ADDRESS_LENGTH
             let macAddressData = infoData[lower ..< upper]
             let addressBytes = macAddressData.map { String(format: "%02x", $0) }
-            return addressBytes.joined().uppercased()
+            deviceId = addressBytes.joined().uppercased()
         #else
-            return "06:02:18:bb:0a:0a"
+            deviceId = "06:02:18:bb:0a:0a"
                 .trimmingCharacters(in: .whitespacesAndNewlines)
                 .replacingOccurrences(of: ":", with: "")
                 .uppercased()
         #endif
+        
+        // Store the fallback device ID for future use
+        UserDefaults.standard.set(deviceId, forKey: deviceIdentifierKey)
+        UserDefaults.standard.synchronize()
+        
+        return deviceId
     }
 }
