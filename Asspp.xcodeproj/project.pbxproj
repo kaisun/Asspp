@@ -8,8 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		5060B2FF2C412E730076A4EE /* FLEX in Frameworks */ = {isa = PBXBuildFile; productRef = 5060B2FE2C412E730076A4EE /* FLEX */; };
-		506367A32C42382900634EEA /* Digger in Frameworks */ = {isa = PBXBuildFile; productRef = 506367A22C42382900634EEA /* Digger */; };
 		50D0C8B82C40187800538F49 /* Vapor in Frameworks */ = {isa = PBXBuildFile; productRef = 50D0C8B72C40187800538F49 /* Vapor */; };
+		50D262942E77D63B00FF8813 /* Logging in Frameworks */ = {isa = PBXBuildFile; productRef = 50D262932E77D63B00FF8813 /* Logging */; };
 		50D44D192C3F92A100CF6A69 /* ApplePackage in Frameworks */ = {isa = PBXBuildFile; productRef = 50D44D182C3F92A100CF6A69 /* ApplePackage */; };
 		50D44D1C2C3F92BB00CF6A69 /* NIO in Frameworks */ = {isa = PBXBuildFile; productRef = 50D44D1B2C3F92BB00CF6A69 /* NIO */; };
 		50D44D1E2C3F92BB00CF6A69 /* NIOHTTP1 in Frameworks */ = {isa = PBXBuildFile; productRef = 50D44D1D2C3F92BB00CF6A69 /* NIOHTTP1 */; };
@@ -19,19 +19,20 @@
 		50D44D512C3FC85F00CF6A69 /* AnyCodable in Frameworks */ = {isa = PBXBuildFile; productRef = 50D44D502C3FC85F00CF6A69 /* AnyCodable */; };
 		50E28B812C40BA52007891E0 /* ColorfulX in Frameworks */ = {isa = PBXBuildFile; productRef = 50E28B802C40BA52007891E0 /* ColorfulX */; };
 		50E6C5682C40CB7500460DB5 /* Certificates in Resources */ = {isa = PBXBuildFile; fileRef = 50E6C5672C40CB7500460DB5 /* Certificates */; };
+		80CD64ED2C42AA2C0073E206 /* KeychainAccess in Frameworks */ = {isa = PBXBuildFile; productRef = 80CD64EC2C42AA2C0073E206 /* KeychainAccess */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		5006479E2D96CDCD007C9D65 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		50D44D022C3F91F700CF6A69 /* Asspp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Asspp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		50E6C5672C40CB7500460DB5 /* Certificates */ = {isa = PBXFileReference; lastKnownFileType = folder; name = Certificates; path = Resources/Certificates; sourceTree = SOURCE_ROOT; };
+		80CD64EA2C42A7E80073E206 /* Asspp.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Asspp.entitlements; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		500647A32D96D37D007C9D65 /* App */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = App; sourceTree = "<group>"; };
-		500647B42D96D37D007C9D65 /* Backend */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Backend; sourceTree = "<group>"; };
-		500647B62D96D37D007C9D65 /* Extension */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Extension; sourceTree = "<group>"; };
-		500647CB2D96D37D007C9D65 /* Interface */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Interface; sourceTree = "<group>"; };
+		5081AB832E77CD1800F6E9F0 /* App */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = App; sourceTree = "<group>"; };
+		5081AB952E77CD1800F6E9F0 /* Backend */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Backend; sourceTree = "<group>"; };
+		5081AB982E77CD1800F6E9F0 /* Extension */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Extension; sourceTree = "<group>"; };
+		5081ABAF2E77CD1800F6E9F0 /* Interface */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Interface; sourceTree = "<group>"; };
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -45,9 +46,10 @@
 				50D44D232C3F92C500CF6A69 /* NIOSSL in Frameworks */,
 				50D0C8B82C40187800538F49 /* Vapor in Frameworks */,
 				50D44D1E2C3F92BB00CF6A69 /* NIOHTTP1 in Frameworks */,
+				50D262942E77D63B00FF8813 /* Logging in Frameworks */,
 				50D44D512C3FC85F00CF6A69 /* AnyCodable in Frameworks */,
 				50D44D192C3F92A100CF6A69 /* ApplePackage in Frameworks */,
-				506367A32C42382900634EEA /* Digger in Frameworks */,
+				80CD64ED2C42AA2C0073E206 /* KeychainAccess in Frameworks */,
 				50D44D1C2C3F92BB00CF6A69 /* NIO in Frameworks */,
 				50D44D202C3F92BB00CF6A69 /* NIOTLS in Frameworks */,
 			);
@@ -76,11 +78,11 @@
 		50D44D042C3F91F700CF6A69 /* Asspp */ = {
 			isa = PBXGroup;
 			children = (
-				5006479E2D96CDCD007C9D65 /* Info.plist */,
-				500647A32D96D37D007C9D65 /* App */,
-				500647B42D96D37D007C9D65 /* Backend */,
-				500647B62D96D37D007C9D65 /* Extension */,
-				500647CB2D96D37D007C9D65 /* Interface */,
+				80CD64EA2C42A7E80073E206 /* Asspp.entitlements */,
+				5081AB832E77CD1800F6E9F0 /* App */,
+				5081AB952E77CD1800F6E9F0 /* Backend */,
+				5081AB982E77CD1800F6E9F0 /* Extension */,
+				5081ABAF2E77CD1800F6E9F0 /* Interface */,
 				50E6C5672C40CB7500460DB5 /* Certificates */,
 			);
 			path = Asspp;
@@ -109,10 +111,10 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
-				500647A32D96D37D007C9D65 /* App */,
-				500647B42D96D37D007C9D65 /* Backend */,
-				500647B62D96D37D007C9D65 /* Extension */,
-				500647CB2D96D37D007C9D65 /* Interface */,
+				5081AB832E77CD1800F6E9F0 /* App */,
+				5081AB952E77CD1800F6E9F0 /* Backend */,
+				5081AB982E77CD1800F6E9F0 /* Extension */,
+				5081ABAF2E77CD1800F6E9F0 /* Interface */,
 			);
 			name = Asspp;
 			packageProductDependencies = (
@@ -126,7 +128,8 @@
 				50D0C8B72C40187800538F49 /* Vapor */,
 				50E28B802C40BA52007891E0 /* ColorfulX */,
 				5060B2FE2C412E730076A4EE /* FLEX */,
-				506367A22C42382900634EEA /* Digger */,
+				80CD64EC2C42AA2C0073E206 /* KeychainAccess */,
+				50D262932E77D63B00FF8813 /* Logging */,
 			);
 			productName = Asspp;
 			productReference = 50D44D022C3F91F700CF6A69 /* Asspp.app */;
@@ -140,7 +143,7 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 1540;
-				LastUpgradeCheck = 1620;
+				LastUpgradeCheck = 2600;
 				TargetAttributes = {
 					50D44D012C3F91F700CF6A69 = {
 						CreatedOnToolsVersion = 15.4;
@@ -154,6 +157,7 @@
 			knownRegions = (
 				en,
 				"zh-Hans",
+				Base,
 			);
 			mainGroup = 50D44CF92C3F91F700CF6A69;
 			packageReferences = (
@@ -164,6 +168,8 @@
 				50D0C8B62C40187800538F49 /* XCRemoteSwiftPackageReference "vapor" */,
 				50E28B7F2C40BA52007891E0 /* XCRemoteSwiftPackageReference "ColorfulX" */,
 				5060B2FD2C412E730076A4EE /* XCRemoteSwiftPackageReference "FLEX" */,
+				80CD64EB2C42AA2C0073E206 /* XCRemoteSwiftPackageReference "KeychainAccess" */,
+				50D262922E77D63B00FF8813 /* XCRemoteSwiftPackageReference "swift-log" */,
 			);
 			productRefGroup = 50D44D032C3F91F700CF6A69 /* Products */;
 			projectDirPath = "";
@@ -232,6 +238,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = "";
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
@@ -255,6 +262,7 @@
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
@@ -296,6 +304,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = "";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
@@ -312,6 +321,7 @@
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				VALIDATE_PRODUCT = YES;
 			};
@@ -322,12 +332,12 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = Asspp/Asspp.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 10;
+				CURRENT_PROJECT_VERSION = 12;
 				DEVELOPMENT_TEAM = "";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = Asspp/Info.plist;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.developer-tools";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -339,9 +349,11 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.2;
+				MARKETING_VERSION = 2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = wiki.qaq.Asspp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -353,12 +365,12 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = Asspp/Asspp.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 10;
+				CURRENT_PROJECT_VERSION = 12;
 				DEVELOPMENT_TEAM = "";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = Asspp/Info.plist;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.developer-tools";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -370,9 +382,11 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.2;
+				MARKETING_VERSION = 2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = wiki.qaq.Asspp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -419,6 +433,14 @@
 				minimumVersion = 4.102.1;
 			};
 		};
+		50D262922E77D63B00FF8813 /* XCRemoteSwiftPackageReference "swift-log" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/apple/swift-log";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.6.4;
+			};
+		};
 		50D44D1A2C3F92BB00CF6A69 /* XCRemoteSwiftPackageReference "swift-nio" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/apple/swift-nio.git";
@@ -456,7 +478,15 @@
 			repositoryURL = "https://github.com/Lakr233/ColorfulX";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 4.1.4;
+				minimumVersion = 5.7.0;
+			};
+		};
+		80CD64EB2C42AA2C0073E206 /* XCRemoteSwiftPackageReference "KeychainAccess" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/kishikawakatsumi/KeychainAccess.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 4.2.2;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
@@ -467,14 +497,15 @@
 			package = 5060B2FD2C412E730076A4EE /* XCRemoteSwiftPackageReference "FLEX" */;
 			productName = FLEX;
 		};
-		506367A22C42382900634EEA /* Digger */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = Digger;
-		};
 		50D0C8B72C40187800538F49 /* Vapor */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 50D0C8B62C40187800538F49 /* XCRemoteSwiftPackageReference "vapor" */;
 			productName = Vapor;
+		};
+		50D262932E77D63B00FF8813 /* Logging */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 50D262922E77D63B00FF8813 /* XCRemoteSwiftPackageReference "swift-log" */;
+			productName = Logging;
 		};
 		50D44D182C3F92A100CF6A69 /* ApplePackage */ = {
 			isa = XCSwiftPackageProductDependency;
@@ -514,6 +545,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 50E28B7F2C40BA52007891E0 /* XCRemoteSwiftPackageReference "ColorfulX" */;
 			productName = ColorfulX;
+		};
+		80CD64EC2C42AA2C0073E206 /* KeychainAccess */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 80CD64EB2C42AA2C0073E206 /* XCRemoteSwiftPackageReference "KeychainAccess" */;
+			productName = KeychainAccess;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

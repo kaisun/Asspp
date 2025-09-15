@@ -15,8 +15,8 @@ extension Installer {
         return env
     }()
 
-    static func setupApp(port: Int) throws -> Application {
-        let app = Application(env)
+    static func setupApp(port: Int) async throws -> Application {
+        let app = try await Application.make()
 
         app.threadPool = .init(numberOfThreads: 1)
 

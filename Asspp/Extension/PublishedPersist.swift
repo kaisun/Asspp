@@ -7,6 +7,7 @@
 
 import Combine
 import Foundation
+import KeychainAccess
 
 protocol PersistProvider {
     func data(forKey: String) -> Data?
@@ -41,16 +42,38 @@ class FileStorage: PersistProvider {
     }
 }
 
+class KeychainStorage: PersistProvider {
+    private let keychain: Keychain
+
+    init(service: String) {
+        keychain = Keychain(service: service).synchronizable(true)
+    }
+
+    func data(forKey key: String) -> Data? {
+        try? keychain.getData(key)
+    }
+
+    func set(_ data: Data?, forKey key: String) {
+        if let data {
+            try? keychain.set(data, key: key)
+        } else {
+            try? keychain.remove(key)
+        }
+    }
+}
+
 @propertyWrapper
 struct Persist<Value: Codable> {
     private let subject: CurrentValueSubject<Value, Never>
     private let cancellables: Set<AnyCancellable>
+    private let engine: PersistProvider
 
-    public var projectedValue: AnyPublisher<Value, Never> {
+    var projectedValue: AnyPublisher<Value, Never> {
         subject.eraseToAnyPublisher()
     }
 
-    public init(key: String, defaultValue: Value, engine: PersistProvider) {
+    init(key: String, defaultValue: Value, engine: PersistProvider) {
+        self.engine = engine
         if let data = engine.data(forKey: key),
            let object = try? valueDecoder.decode(Value.self, from: data)
         {
@@ -69,9 +92,16 @@ struct Persist<Value: Codable> {
         self.cancellables = cancellables
     }
 
-    public var wrappedValue: Value {
+    var wrappedValue: Value {
         get { subject.value }
         set { subject.send(newValue) }
+    }
+}
+
+extension PublishedPersist {
+    init(key: String, defaultValue: Value, keychain: String) {
+        let keychainStorage = KeychainStorage(service: keychain)
+        self.init(key: key, defaultValue: defaultValue, engine: keychainStorage)
     }
 }
 
@@ -79,15 +109,15 @@ struct Persist<Value: Codable> {
 struct PublishedPersist<Value: Codable> {
     @Persist private var value: Value
 
-    public var projectedValue: AnyPublisher<Value, Never> { $value }
+    var projectedValue: AnyPublisher<Value, Never> { $value }
 
     @available(*, unavailable, message: "accessing wrappedValue will result undefined behavior")
-    public var wrappedValue: Value {
+    var wrappedValue: Value {
         get { value }
         set { value = newValue }
     }
 
-    public static subscript<EnclosingSelf: ObservableObject>(
+    static subscript<EnclosingSelf: ObservableObject>(
         _enclosingInstance object: EnclosingSelf,
         wrapped _: ReferenceWritableKeyPath<EnclosingSelf, Value>,
         storage storageKeyPath: ReferenceWritableKeyPath<EnclosingSelf, PublishedPersist<Value>>
@@ -99,7 +129,7 @@ struct PublishedPersist<Value: Codable> {
         }
     }
 
-    public init(key: String, defaultValue: Value, engine: PersistProvider) {
+    init(key: String, defaultValue: Value, engine: PersistProvider) {
         _value = .init(key: key, defaultValue: defaultValue, engine: engine)
     }
 }

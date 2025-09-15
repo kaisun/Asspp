@@ -33,7 +33,7 @@ extension Installer {
             certificateChain: NIOSSLCertificate
                 .fromPEMFile(crt.path)
                 .map { NIOSSLCertificateSource.certificate($0) },
-            privateKey: .file(pem.path)
+            privateKey: NIOSSLPrivateKeySource.privateKey(NIOSSLPrivateKey(file: pem.path, format: .pem))
         )
     }
 }

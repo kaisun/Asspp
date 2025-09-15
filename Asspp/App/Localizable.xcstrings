@@ -18,7 +18,6 @@
       }
     },
     "%@" : {
-      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -50,35 +49,18 @@
         }
       }
     },
-    "%@ - %@ - %@" : {
+    "%@ %@" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@ - %@ - %@"
+            "state" : "new",
+            "value" : "%1$@ %2$@"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@ - %@ - %@"
-          }
-        }
-      }
-    },
-    "%@ %@ %@" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@ %@ %@"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@ %@ %@"
+            "value" : "%1$@ %2$@"
           }
         }
       }
@@ -132,7 +114,6 @@
       }
     },
     "88888888888" : {
-      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -180,6 +161,26 @@
         }
       }
     },
+    "Account Details" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "账户详情"
+          }
+        }
+      }
+    },
+    "Accounts" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "账号"
+          }
+        }
+      }
+    },
     "Acquire License" : {
       "localizations" : {
         "en" : {
@@ -196,18 +197,18 @@
         }
       }
     },
-    "Acquire license is not available for paid apps. If so, make purchase from the real App Store before download from here. If you already purchased this app, this operation will fail." : {
+    "Acquiring a license is not available for paid apps. Purchase from the App Store first, then download here. If you've already purchased it, this may fail." : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Acquire license is not available for paid apps. If so, make purchase from the real App Store before download from here. If you already purchased this app, this operation will fail."
+            "value" : "Acquiring a license is not available for paid apps. Purchase from the App Store first, then download here. If you've already purchased it, this may fail."
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "获取许可的选项对于付费的软件不可用。请使用正版 App Store 获取付费软件的许可证。如果已拥有软件许可证，此操作会失败。"
+            "value" : "付费应用的许可证获取不可用。请先从 App Store 购买，然后在此下载。如果您已经购买，这可能会失败。"
           }
         }
       }
@@ -228,34 +229,54 @@
         }
       }
     },
-    "All Region" : {
+    "All Regions" : {
       "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "All Region"
-          }
-        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "所有地区"
+            "value" : "全部区域"
           }
         }
       }
     },
-    "Although 2FA code is marked as optional, that is because we dont know if you have it or just incorrect password, you should provide it if you have it enabled.\n\nhttps://support.apple.com/102606" : {
+    "Although the 2FA code is marked as optional, it's because we don't know if you have it enabled or just entered an incorrect password. Provide it if you have 2FA enabled.\n\nhttps://support.apple.com/102606" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Although 2FA code is marked as optional, that is because we dont know if you have it or just incorrect password, you should provide it if you have it enabled.\n\nhttps://support.apple.com/102606"
+            "value" : "Although the 2FA code is marked as optional, it's because we don't know if you have it enabled or just entered an incorrect password. Provide it if you have 2FA enabled.\n\nhttps://support.apple.com/102606"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "我们无法知晓你的账户是否启用了双重认证，因此无法确定是否需要填写验证码。尽管此处标记为可选，若你的账户已经开启这项功能，请务必提供验证码。\n\n如果没有收到验证码，请从系统设置中获取一个验证码。\n\nhttps://support.apple.com/zh-cn/102606"
+            "value" : "虽然 2FA 验证码标记为可选，但这是因为我们不知道您是否启用了它，或者只是输入了错误的密码。如果您启用了 2FA，请提供它。\n\nhttps://support.apple.com/102606"
+          }
+        }
+      }
+    },
+    "An unknown error occurred during the download process." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "下载过程遇到了未知错误。"
+          }
+        }
+      }
+    },
+    "Analysis" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Analysis"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "分析"
           }
         }
       }
@@ -288,6 +309,26 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "App Store 需要你的国家代码来确认软件包的所属区域。"
+          }
+        }
+      }
+    },
+    "Apple ID" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apple ID"
+          }
+        }
+      }
+    },
+    "Apple IDs" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apple ID"
           }
         }
       }
@@ -340,19 +381,18 @@
         }
       }
     },
-    "By enabling this, all your account will be redacted." : {
-      "extractionState" : "stale",
+    "By enabling this, all your accounts will be redacted." : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "By enabling this, all your account will be redacted."
+            "value" : "By enabling this, all your accounts will be redacted."
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "启用此选项会将你的敏感信息遮蔽或隐藏。部分选项将不可用或使用默认。"
+            "value" : "启用此功能后，所有账户将被遮蔽。"
           }
         }
       }
@@ -365,6 +405,16 @@
             "value" : "Cancel"
           }
         },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "取消"
+          }
+        }
+      }
+    },
+    "Cancelled" : {
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -401,6 +451,38 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "已完成"
+          }
+        }
+      }
+    },
+    "Content Viewer" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Content Viewer"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "内容检查器"
+          }
+        }
+      }
+    },
+    "Contents" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Contents"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "内容"
           }
         }
       }
@@ -501,14 +583,8 @@
         }
       }
     },
-    "Delete All Download" : {
+    "Delete All Downloads" : {
       "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Delete All Download"
-          }
-        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -518,7 +594,6 @@
       }
     },
     "Demo Mode" : {
-      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -535,7 +610,6 @@
       }
     },
     "Demo Mode Redacted" : {
-      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -551,50 +625,12 @@
         }
       }
     },
-    "Description" : {
+    "Developer options." : {
       "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Description"
-          }
-        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "描述"
-          }
-        }
-      }
-    },
-    "Detail" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Detail"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "详情"
-          }
-        }
-      }
-    },
-    "Device Seed" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Device Seed"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "设备随机数"
+            "value" : "开发者选项"
           }
         }
       }
@@ -615,18 +651,28 @@
         }
       }
     },
-    "Direct install may have limitations that is not able to bypass. Use AirDrop method if possible on another device." : {
+    "Direct install may have limitations that cannot be bypassed. Use AirDrop if possible on another device." : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Direct install may have limitations that is not able to bypass. Use AirDrop method if possible on another device."
+            "value" : "Direct install may have limitations that cannot be bypassed. Use AirDrop if possible on another device."
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "直接安装模式包含限制，无法覆盖安装，也无法升级软件。这可能无法满足你的需求。请考虑使用 AirDrop 来安装软件包。"
+            "value" : "直接安装可能有无法绕过的限制。如有可能，请在另一台设备上使用 AirDrop。"
+          }
+        }
+      }
+    },
+    "Directory Services ID" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "域服务标识符"
           }
         }
       }
@@ -691,6 +737,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "已请求下载"
+          }
+        }
+      }
+    },
+    "Download was cancelled." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "下载被取消。"
           }
         }
       }
@@ -775,22 +831,6 @@
         }
       }
     },
-    "Error: " : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Error:"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "错误："
-          }
-        }
-      }
-    },
     "Feedback & Contact" : {
       "localizations" : {
         "en" : {
@@ -823,6 +863,38 @@
         }
       }
     },
+    "Grant local network permission to install apps and communicate with system services." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Grant local network permission to install apps and communicate with system services."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "授予本地网络权限以安装应用并与系统服务通信。"
+          }
+        }
+      }
+    },
+    "Grant local network permission to install apps and communicate with system services. If hostname is empty, open Settings to grant permission." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Grant local network permission to install apps and communicate with system services. If hostname is empty, open Settings to grant permission."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "授予本地网络权限以安装应用并与系统服务通信。如果主机名为空，请打开设置以授予权限。"
+          }
+        }
+      }
+    },
     "Home" : {
       "localizations" : {
         "en" : {
@@ -839,18 +911,12 @@
         }
       }
     },
-    "Hope my app helps you out." : {
+    "Hope this app helps you!" : {
       "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Hope my app helps you out."
-          }
-        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "希望我的软件能给你带来快乐 🎉"
+            "value" : "希望你喜欢这个软件。"
           }
         }
       }
@@ -871,66 +937,18 @@
         }
       }
     },
-    "ID" : {
+    "If you fail to acquire a license for a product, rotating the password token may help. This will use the initial password to authenticate with the App Store again." : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "ID"
+            "value" : "If you fail to acquire a license for a product, rotating the password token may help. This will use the initial password to authenticate with the App Store again."
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "ID"
-          }
-        }
-      }
-    },
-    "ID combined with a random seed generated on this device can download package from App Store." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ID combined with a random seed generated on this device can download package from App Store."
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "你的 ID 与设备随机数将会被用于下载软件包。"
-          }
-        }
-      }
-    },
-    "IDs" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "IDs"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ID"
-          }
-        }
-      }
-    },
-    "If you failed to acquire license for product, rotate the password token may help. This will use the initial password to authenticate with App Store again." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "If you failed to acquire license for product, rotate the password token may help. This will use the initial password to authenticate with App Store again."
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "如果你无法获取软件许可证，可以在此处刷新你的账户信息。"
+            "value" : "如果您无法获取产品的许可证，轮换密码令牌可能会有帮助。这将使用初始密码再次向 App Store 进行身份验证。"
           }
         }
       }
@@ -1010,7 +1028,7 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "安装 @ AirDrop"
+            "value" : "通过 AirDrop 安装"
           }
         }
       }
@@ -1031,34 +1049,12 @@
         }
       }
     },
-    "License Not Found, please acquire license first." : {
+    "Manage downloads." : {
       "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "License Not Found, please acquire license first."
-          }
-        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "无法找到软件许可证，请先获取。"
-          }
-        }
-      }
-    },
-    "MD5 mismatch" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "MD5 mismatch"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "MD5 比对失败"
+            "value" : "管理下载"
           }
         }
       }
@@ -1095,14 +1091,28 @@
         }
       }
     },
-    "Open Setting" : {
+    "No accounts yet." : {
       "localizations" : {
-        "en" : {
+        "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Open Setting"
+            "value" : "暂无账号"
           }
-        },
+        }
+      }
+    },
+    "No downloads yet." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "暂无下载"
+          }
+        }
+      }
+    },
+    "Open Settings" : {
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1111,18 +1121,18 @@
         }
       }
     },
-    "Operating download manager." : {
+    "Operations" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Operating download manager."
+            "value" : "Operations"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "操作下载管理器"
+            "value" : "操作"
           }
         }
       }
@@ -1175,6 +1185,22 @@
         }
       }
     },
+    "Packages (%lld) - Active: %lld" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Packages (%1$lld) - Active: %2$lld"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "软件包 (%1$lld) - 活跃: %2$lld"
+          }
+        }
+      }
+    },
     "Password" : {
       "localizations" : {
         "en" : {
@@ -1207,18 +1233,12 @@
         }
       }
     },
-    "Password Token Expired, please re-authenticate within account page." : {
+    "Pause" : {
       "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Password Token Expired, please re-authenticate within account page."
-          }
-        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "密码凭证已过期，请重新验证账户。"
+            "value" : "暂停"
           }
         }
       }
@@ -1239,50 +1259,44 @@
         }
       }
     },
-    "Please add account in account page." : {
+    "Please add an account in the Accounts page." : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Please add account in account page."
+            "value" : "Please add an account in the Accounts page."
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "请在设置页面添加账户。"
+            "value" : "请在账户页面添加一个账户。"
           }
         }
       }
     },
-    "Pricing - %@" : {
+    "Preview" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Pricing - %@"
+            "value" : "Preview"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "价格 - %@"
+            "value" : "预览"
           }
         }
       }
     },
-    "Puase" : {
+    "Pricing" : {
       "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Puase"
-          }
-        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "暂停"
+            "value" : "价格"
           }
         }
       }
@@ -1363,6 +1377,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "重置"
+          }
+        }
+      }
+    },
+    "Restart Download" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Restart Download"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "重新开始下载"
           }
         }
       }
@@ -1527,34 +1557,28 @@
         }
       }
     },
-    "Services ID" : {
+    "Settings" : {
       "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Services ID"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "服务 ID"
-          }
-        }
-      }
-    },
-    "Setting" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Setting"
-          }
-        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "设置"
+          }
+        }
+      }
+    },
+    "Share File" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Share File"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "共享文件"
           }
         }
       }
@@ -1607,22 +1631,6 @@
         }
       }
     },
-    "Sorry, nothing here." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sorry, nothing here."
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "『僕らの手には何もないけど、』 🎵"
-          }
-        }
-      }
-    },
     "Success" : {
       "localizations" : {
         "en" : {
@@ -1655,82 +1663,150 @@
         }
       }
     },
-    "Tell us the bundle ID of the app to initial a direct download. Useful to download apps that are no longer available in App Store." : {
+    "Tell us the bundle ID of the app to initiate a direct download. Useful to download apps that are no longer available in App Store." : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tell us the bundle ID of the app to initial a direct download. Useful to download apps that are no longer available in App Store."
+            "value" : "Tell us the bundle ID of the app to initiate a direct download. Useful to download apps that are no longer available in App Store."
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "请输入软件的捆绑包 ID。此功能适用于下载已经下架的软件。"
+            "value" : "告诉我们应用的捆绑包 ID 以启动直接下载。有助于下载不再在 App Store 中可用的应用。"
           }
         }
       }
     },
-    "Temporarily Unavailable, please try again later." : {
+    "The downloaded file appears to be corrupted or incomplete." : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Temporarily Unavailable, please try again later."
+            "value" : "The downloaded file appears to be corrupted or incomplete."
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "服务暂不可用，请稍后再试。"
+            "value" : "下载的文件似乎已损坏或不完整。"
+          }
+        }
+      }
+    },
+    "The downloaded file is empty." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The downloaded file is empty."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "下载的文件为空。"
+          }
+        }
+      }
+    },
+    "The file size is invalid." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The file size is invalid."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "文件大小无效。"
+          }
+        }
+      }
+    },
+    "The file's checksum does not match the expected value." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The file's checksum does not match the expected value."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "文件的校验和与预期值不匹配。"
+          }
+        }
+      }
+    },
+    "The package can be installed later from the Downloads page." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The package can be installed later from the Downloads page."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "软件包稍后可以从下载页面安装。"
+          }
+        }
+      }
+    },
+    "The server returned an invalid response format." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The server returned an invalid response format."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "服务器返回了无效的响应格式。"
           }
         }
       }
     },
     "This account is used to download this package. If you choose to AirDrop, your target device must sign in or previously signed in to this account and have at least one app installed." : {
       "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "This account is used to download this package. If you choose to AirDrop, your target device must sign in or previously signed in to this account and have at least one app installed."
-          }
-        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "此账号被用于下载这个软件。如果你选择使用 AirDrop 安装该软件包，目标设备需要登录过此账号并且使用此账号安装最少一个软件。"
-          }
-        }
-      }
-    },
-    "This address is used to be a MAC address from your hardware to identify your device with Apple. Here we use a random one." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "This address is used to be a MAC address from your hardware to identify your device with Apple. Here we use a random one."
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "这个地址通常是你设备的网络硬件地址。由于无法获取到这个数据，我们使用随机生成的值来代替。"
+            "value" : "此账户用于下载此软件包。如果您选择使用隔空投送 (AirDrop)，您的目标设备必须登录或曾经登录此账户，并且至少安装一个应用程序。"
           }
         }
       }
     },
     "This email is used to sign in to Apple services." : {
       "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "此电子邮件用于登录 Apple 服务。"
+          }
+        }
+      }
+    },
+    "This ID, combined with a random seed generated on this device, can be used to download packages from the App Store." : {
+      "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "This email is used to sign in to Apple services."
+            "value" : "This ID, combined with a random seed generated on this device, can be used to download packages from the App Store."
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "这个邮箱地址通常是用于登录各个 Apple 服务的地址。"
+            "value" : "此 ID 与在此设备上生成的随机种子结合，可以用于从 App Store 下载软件包。"
           }
         }
       }
@@ -1746,39 +1822,7 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "这会删除所有设置和数据。请谨慎操作。"
-          }
-        }
-      }
-    },
-    "To install app, you need to grant local area network permission in order to communicate with system services." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "To install app, you need to grant local area network permission in order to communicate with system services."
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "若要安装软件，爱啪思道需要本地网络连接权限。请前往设置授予这个权限。"
-          }
-        }
-      }
-    },
-    "To install app, you need to grant local area network permission in order to communicate with system services. If your host name is empty, go to Settings.app to grant permission." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "To install app, you need to grant local area network permission in order to communicate with system services. If your host name is empty, go to Settings.app to grant permission."
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "若要安装软件，爱啪思道需要本地网络连接权限。若无法获取到主机名称，通常说明此权限缺失。请前往设置授予这个权限。"
+            "value" : "这会重置所有设置。"
           }
         }
       }
@@ -1799,6 +1843,22 @@
         }
       }
     },
+    "Unable to access the file: %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unable to access the file: %@"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "无法访问文件：%@"
+          }
+        }
+      }
+    },
     "Unable to retrieve download url, please try again later." : {
       "localizations" : {
         "en" : {
@@ -1811,6 +1871,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "无法获取下载链接，请稍后再试。"
+          }
+        }
+      }
+    },
+    "Unable to verify the integrity of the downloaded file." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unable to verify the integrity of the downloaded file."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "无法验证下载文件的完整性。"
           }
         }
       }
@@ -1863,22 +1939,6 @@
         }
       }
     },
-    "We will store your account and password on disk without encryption. Please do not connect your device to untrusted hardware or use this app on a open system like macOS." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "We will store your account and password on disk without encryption. Please do not connect your device to untrusted hardware or use this app on a open system like macOS."
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "你的账号和密码在储存中不会加密。请不要将你的设备连接到不信任的硬件上，亦不要在例如 macOS 的开放系统中使用此软件。"
-          }
-        }
-      }
-    },
     "Welcome to Asspp" : {
       "localizations" : {
         "en" : {
@@ -1911,18 +1971,34 @@
         }
       }
     },
-    "Your account is not encrypted on disk." : {
+    "Your account is saved in your Keychain and will be synced across devices with the same iCloud account signed in." : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Your account is not encrypted on disk."
+            "value" : "Your account is saved in your Keychain and will be synced across devices with the same iCloud account signed in."
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "你的账户在储存时不会加密，请不要让他人连接到这个设备。"
+            "value" : "您的账户保存在钥匙串中，并将在登录相同 iCloud 账户的设备之间同步。"
+          }
+        }
+      }
+    },
+    "Your accounts are saved in your Keychain and will be synced across devices with the same iCloud account signed in." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your accounts are saved in your Keychain and will be synced across devices with the same iCloud account signed in."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "您的账户保存在钥匙串中，并将在登录相同 iCloud 账户的设备之间同步。"
           }
         }
       }

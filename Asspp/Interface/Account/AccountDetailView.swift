@@ -9,66 +9,70 @@ import ApplePackage
 import SwiftUI
 
 struct AccountDetailView: View {
-    let account: Account
+    let accountId: AppStore.UserAccount.ID
 
     @StateObject var vm = AppStore.this
     @Environment(\.dismiss) var dismiss
 
+    private var account: AppStore.UserAccount? {
+        vm.accounts.first { $0.id == accountId }
+    }
+
     @State var rotating = false
     @State var rotatingHint = ""
-
-    @State var task: Task<Void, Never>?
 
     var body: some View {
         List {
             Section {
-                Text(account.email)
-                    .onTapGesture { UIPasteboard.general.string = account.email }
+                if vm.demoMode {
+                    Text("88888888888")
+                        .redacted(reason: .placeholder)
+                } else {
+                    Text(account?.account.email ?? "")
+                        .onTapGesture { UIPasteboard.general.string = account?.account.email }
+                }
             } header: {
-                Text("ID")
+                Text("Apple ID")
             } footer: {
                 Text("This email is used to sign in to Apple services.")
             }
             Section {
-                Text("\(account.countryCode) - \(StorefrontService.shared.codeMap[account.countryCode] ?? NSLocalizedString("Unknown", comment: ""))")
-                    .onTapGesture { UIPasteboard.general.string = account.email }
+                Text("\(account?.account.store ?? "") - \(ApplePackage.Configuration.countryCode(for: account?.account.store ?? "") ?? "Unknown")")
+                    .onTapGesture { UIPasteboard.general.string = account?.account.email }
             } header: {
                 Text("Country Code")
             } footer: {
                 Text("App Store requires this country code to identify your package region.")
             }
             Section {
-                Text(account.storeResponse.directoryServicesID)
-                    .font(.system(.body, design: .monospaced))
-                    .onTapGesture { UIPasteboard.general.string = account.email }
-                Text(AppStore.this.deviceSeedAddress)
-                    .font(.system(.body, design: .monospaced))
-                    .onTapGesture { UIPasteboard.general.string = account.email }
+                if vm.demoMode {
+                    Text("88888888888")
+                        .redacted(reason: .placeholder)
+                } else {
+                    Text(account?.account.directoryServicesIdentifier ?? "")
+                        .font(.system(.body, design: .monospaced))
+                        .onTapGesture { UIPasteboard.general.string = account?.account.email }
+                }
             } header: {
-                Text("Services ID")
+                Text("Directory Services ID")
             } footer: {
-                Text("ID combined with a random seed generated on this device can download package from App Store.")
+                Text("This ID, combined with a random seed generated on this device, can be used to download packages from the App Store.")
             }
             Section {
-                SecureField(text: .constant(account.storeResponse.passwordToken)) {
+                SecureField(text: .constant(account?.account.passwordToken ?? "")) {
                     Text("Password Token")
                 }
                 if rotating {
                     Button("Rotating...") {}
                         .disabled(true)
                 } else {
-                    Button("Rotate Token") {
-                        task = Task {
-                            await rotate()
-                            task = nil
-                        }
-                    }
+                    Button("Rotate Token") { rotate() }
                 }
             } header: {
                 Text("Password Token")
             } footer: {
                 if rotatingHint.isEmpty {
-                    Text("If you failed to acquire license for product, rotate the password token may help. This will use the initial password to authenticate with App Store again.")
+                    Text("If you fail to acquire a license for a product, rotating the password token may help. This will use the initial password to authenticate with the App Store again.")
                 } else {
                     Text(rotatingHint)
                         .foregroundStyle(.red)
@@ -76,28 +80,29 @@ struct AccountDetailView: View {
             }
             Section {
                 Button("Delete") {
-                    vm.delete(id: account.id)
+                    vm.delete(id: account?.id ?? "")
                     dismiss()
                 }
                 .foregroundStyle(.red)
             }
         }
-        .navigationTitle("Detail")
+        .navigationTitle("Account Details")
     }
 
-    nonisolated
-    func rotate() async {
-        await MainActor.run { rotating = true }
-        do {
-            try await vm.rotate(id: account.id)
-            await MainActor.run {
-                rotating = false
-                rotatingHint = NSLocalizedString("Success", comment: "")
-            }
-        } catch {
-            await MainActor.run {
-                rotating = false
-                rotatingHint = error.localizedDescription
+    func rotate() {
+        rotating = true
+        Task {
+            do {
+                try await vm.rotate(id: account?.id ?? "")
+                DispatchQueue.main.async {
+                    rotating = false
+                    rotatingHint = String(localized: "Success")
+                }
+            } catch {
+                DispatchQueue.main.async {
+                    rotating = false
+                    rotatingHint = error.localizedDescription
+                }
             }
         }
     }

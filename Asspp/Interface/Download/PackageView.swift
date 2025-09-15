@@ -11,7 +11,7 @@ import SwiftUI
 
 struct PackageView: View {
     let request: Downloads.Request
-    var archive: AppPackage {
+    var archive: AppStore.AppPackage {
         request.package
     }
 
@@ -22,34 +22,37 @@ struct PackageView: View {
     @State var error: String = ""
 
     @StateObject var vm = AppStore.this
+    @ObservedObject var downloads = Downloads.this
 
     var body: some View {
         List {
             Section {
                 VStack(alignment: .leading, spacing: 8) {
-                    KFImage(URL(string: archive.artworkURL ?? ""))
+                    KFImage(URL(string: archive.software.artworkUrl))
                         .antialiased(true)
                         .resizable()
                         .cornerRadius(8)
                         .frame(width: 50, height: 50, alignment: .center)
                         .frame(maxWidth: .infinity, alignment: .leading)
-                    Text(archive.name)
+                    Text(archive.software.name)
                         .bold()
                 }
                 .padding(.vertical, 4)
             } header: {
                 Text("Package")
             } footer: {
-                Text(archive.oneLineDescription)
+                Text("\(archive.software.bundleID) - \(archive.software.version)")
             }
 
-            if Downloads.this.isCompleted(for: request) {
+            if downloads.isCompleted(for: request) {
                 Section {
                     Button("Install") {
-                        do {
-                            installer = try Installer(archive: archive, path: url)
-                        } catch {
-                            self.error = error.localizedDescription
+                        Task {
+                            do {
+                                installer = try await Installer(archive: archive, path: url)
+                            } catch {
+                                self.error = error.localizedDescription
+                            }
                         }
                     }
                     .sheet(item: $installer) {
@@ -61,28 +64,38 @@ struct PackageView: View {
 
                     Button("Install via AirDrop") {
                         let newUrl = temporaryDirectory
-                            .appendingPathComponent("\(archive.bundleID)-\(archive.version)")
+                            .appendingPathComponent("\(archive.software.bundleID)-\(archive.software.version)")
                             .appendingPathExtension("ipa")
                         try? FileManager.default.removeItem(at: newUrl)
                         try? FileManager.default.copyItem(at: url, to: newUrl)
-                        share(items: [newUrl])
+                        AirDrop(items: [newUrl])
                     }
                 } header: {
                     Text("Control")
                 } footer: {
                     if error.isEmpty {
-                        Text("Direct install may have limitations that is not able to bypass. Use AirDrop method if possible on another device.")
+                        Text("Direct install may have limitations that cannot be bypassed. Use AirDrop if possible on another device.")
                     } else {
                         Text(error)
                             .foregroundStyle(.red)
                     }
+                }
+
+                Section {
+                    NavigationLink("Content Viewer") {
+                        FileListView(packageURL: request.targetLocation)
+                    }
+                } header: {
+                    Text("Analysis")
+                } footer: {
+                    Text("Developer options.")
                 }
             } else {
                 Section {
                     switch request.runtime.status {
                     case .stopped:
                         Button("Continue Download") {
-                            Downloads.this.resume(requestID: request.id)
+                            Task { await downloads.resume(requestID: request.id) }
                         }
                     case .downloading,
                          .pending:
@@ -91,6 +104,10 @@ struct PackageView: View {
                         Text("Verification In Progress...")
                     case .completed:
                         Group {}
+                    case .cancelled:
+                        Button("Restart Download") {
+                            Task { await downloads.resume(requestID: request.id) }
+                        }
                     }
                 } header: {
                     Text("Incomplete Package")
@@ -105,13 +122,20 @@ struct PackageView: View {
                         Text("\(Int(request.runtime.percent * 100))%...")
                     case .completed:
                         Group {}
+                    case .cancelled:
+                        Text("Download was cancelled.")
                     }
                 }
             }
 
             Section {
-                Text(request.account.email)
-                Text("\(request.account.countryCode) - \(StorefrontService.shared.codeMap[request.account.countryCode] ?? "-1")")
+                if vm.demoMode {
+                    Text("88888888888")
+                        .redacted(reason: .placeholder)
+                } else {
+                    Text(request.account.account.email)
+                }
+                Text("\(request.account.account.store) - \(ApplePackage.Configuration.countryCode(for: request.account.account.store) ?? "-1")")
             } header: {
                 Text("Account")
             } footer: {
@@ -120,7 +144,7 @@ struct PackageView: View {
 
             Section {
                 Button("Delete") {
-                    Downloads.this.delete(request: request)
+                    Task { await downloads.delete(request: request) }
                     dismiss()
                 }
                 .foregroundStyle(.red)
@@ -130,93 +154,6 @@ struct PackageView: View {
                 Text(url.path)
             }
         }
-        .navigationTitle(request.package.name)
-    }
-
-    @discardableResult
-    func share(
-        items: [Any],
-        excludedActivityTypes: [UIActivity.ActivityType]? = nil
-    ) -> Bool {
-        guard let source = UIWindow.mainWindow?.rootViewController?.topMostController else {
-            return false
-        }
-        let newView = UIView()
-        source.view.addSubview(newView)
-        newView.frame = .init(origin: .zero, size: .init(width: 10, height: 10))
-        newView.center = .init(
-            x: source.view.bounds.width / 2 - 5,
-            y: source.view.bounds.height / 2 - 5
-        )
-        let vc = UIActivityViewController(
-            activityItems: items,
-            applicationActivities: nil
-        )
-        vc.excludedActivityTypes = excludedActivityTypes
-        vc.popoverPresentationController?.sourceView = source.view
-        vc.popoverPresentationController?.sourceRect = newView.frame
-        source.present(vc, animated: true) {
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-                newView.removeFromSuperview()
-            }
-        }
-        return true
-    }
-}
-
-extension UIWindow {
-    static var mainWindow: UIWindow? {
-        if let keyWindow = UIApplication
-            .shared
-            .value(forKey: "keyWindow") as? UIWindow
-        {
-            return keyWindow
-        }
-        // if apple remove this shit, we fall back to ugly solution
-        let keyWindow = UIApplication
-            .shared
-            .connectedScenes
-            .filter { $0.activationState == .foregroundActive }
-            .compactMap { $0 as? UIWindowScene }
-            .first?
-            .windows
-            .filter(\.isKeyWindow)
-            .first
-        return keyWindow
-    }
-}
-
-extension UIViewController {
-    var topMostController: UIViewController? {
-        var result: UIViewController? = self
-        while true {
-            if let next = result?.presentedViewController,
-               !next.isBeingDismissed,
-               next as? UISearchController == nil
-            {
-                result = next
-                continue
-            }
-            if let tabBar = result as? UITabBarController,
-               let next = tabBar.selectedViewController
-            {
-                result = next
-                continue
-            }
-            if let split = result as? UISplitViewController,
-               let next = split.viewControllers.last
-            {
-                result = next
-                continue
-            }
-            if let navigator = result as? UINavigationController,
-               let next = navigator.viewControllers.last
-            {
-                result = next
-                continue
-            }
-            break
-        }
-        return result
+        .navigationTitle(request.package.software.name)
     }
 }

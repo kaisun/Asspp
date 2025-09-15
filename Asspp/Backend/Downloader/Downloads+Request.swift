@@ -1,11 +1,17 @@
-//
-//  Downloads+Request.swift
-//  Asspp
-//
-//  Created by 秋星桥 on 2024/7/13.
-//
+////
 
-import AnyCodable
+//  Downloads+Request.swift//  Downloads+Request.swift
+
+//  Asspp//  Asspp
+
+////
+
+//  Created by 秋星桥 on 2024/7/13.//  Created by 秋星桥 on 2024/7/13.
+
+////
+
+import AnyCodable // Moved to Request.swift
+
 import ApplePackage
 import Foundation
 
@@ -16,66 +22,82 @@ private let storeDir = {
 }()
 
 extension Downloads {
-    struct Request: Identifiable, Codable, Hashable {
-        var id: UUID = .init()
+    class Request: ObservableObject, Identifiable, Codable, Hashable, Equatable {
+        @Published var id: UUID = .init()
 
-        var account: Account
-        var package: AppPackage
+        @Published var account: AppStore.UserAccount
+        @Published var package: AppStore.AppPackage
 
-        var url: URL
-        var md5: String
-        var signatures: [Sinf]
+        @Published var url: URL
+        @Published var md5: String?
+        @Published var signatures: [ApplePackage.Sinf]
+        @Published var metadata: [String: AnyCodable]
 
-        var creation: Date
+        @Published var creation: Date
+        @Published var runtime: Runtime = .init()
+
         var targetLocation: URL {
             storeDir
-                .appendingPathComponent(package.bundleID)
-                .appendingPathComponent(package.version)
-                .appendingPathComponent("\(md5)_\(id.uuidString)")
+                .appendingPathComponent(package.software.bundleID)
+                .appendingPathComponent(package.software.version)
+                .appendingPathComponent("\(md5 ?? "unknown")_\(id.uuidString)")
                 .appendingPathExtension("ipa")
         }
 
-        var runtime: Runtime = .init()
-
-        init(
-            account: Account,
-            package: AppPackage,
-            url: URL,
-            md5: String,
-            sinfs: [Sinf]
-        ) {
+        init(account: AppStore.UserAccount, package: AppStore.AppPackage, downloadOutput: ApplePackage.DownloadOutput) {
             self.account = account
             self.package = package
-            self.url = url
-            self.md5 = md5
-            signatures = sinfs
+            url = URL(string: downloadOutput.downloadURL)!
+            md5 = downloadOutput.hashMD5
+            signatures = downloadOutput.sinfs
             creation = .init()
-        }
-    }
-}
-
-extension Downloads.Request {
-    struct Runtime: Codable, Hashable {
-        enum Status: String, Codable {
-            case stopped
-            case pending
-            case downloading
-            case verifying
-            case completed
+            metadata = [:] // Simplified
         }
 
-        var status: Status = .stopped {
-            didSet { if status != .downloading { speed = "" } }
+        required init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            id = try container.decode(UUID.self, forKey: .id)
+            account = try container.decode(AppStore.UserAccount.self, forKey: .account)
+            package = try container.decode(AppStore.AppPackage.self, forKey: .package)
+            url = try container.decode(URL.self, forKey: .url)
+            md5 = try container.decodeIfPresent(String.self, forKey: .md5)
+            signatures = try container.decode([ApplePackage.Sinf].self, forKey: .signatures)
+            metadata = try container.decode([String: AnyCodable].self, forKey: .metadata)
+            creation = try container.decode(Date.self, forKey: .creation)
+            runtime = try container.decode(Runtime.self, forKey: .runtime)
         }
 
-        var speed: String = ""
-        var percent: Double = 0
-        var error: String? = nil
+        func encode(to encoder: Encoder) throws {
+            var container = encoder.container(keyedBy: CodingKeys.self)
+            try container.encode(id, forKey: .id)
+            try container.encode(account, forKey: .account)
+            try container.encode(package, forKey: .package)
+            try container.encode(url, forKey: .url)
+            try container.encode(md5, forKey: .md5)
+            try container.encode(signatures, forKey: .signatures)
+            try container.encode(metadata, forKey: .metadata)
+            try container.encode(creation, forKey: .creation)
+            try container.encode(runtime, forKey: .runtime)
+        }
 
-        var progress: Progress {
-            let p = Progress(totalUnitCount: 100)
-            p.completedUnitCount = Int64(percent * 100)
-            return p
+        private enum CodingKeys: String, CodingKey {
+            case id, account, package, url, md5, signatures, metadata, creation, runtime
+        }
+
+        static func == (lhs: Request, rhs: Request) -> Bool {
+            lhs.hashValue == rhs.hashValue
+        }
+
+        func hash(into hasher: inout Hasher) {
+            hasher.combine(id)
+            hasher.combine(account)
+            hasher.combine(package)
+            hasher.combine(url)
+            hasher.combine(md5)
+            hasher.combine(signatures)
+            hasher.combine(metadata)
+            hasher.combine(creation)
+            hasher.combine(runtime)
         }
     }
 }

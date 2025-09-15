@@ -7,7 +7,4 @@
    <FileRef
       location = "group:Foundation/ApplePackage">
    </FileRef>
-   <FileRef
-      location = "group:Foundation/Digger">
-   </FileRef>
 </Workspace>

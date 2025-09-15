@@ -10,10 +10,10 @@ import Logging
 import UIKit
 import Vapor
 
-class Installer: Identifiable, ObservableObject {
+class Installer: Identifiable, ObservableObject, @unchecked Sendable {
     let id: UUID
     let app: Application
-    let archive: AppPackage
+    let archive: AppStore.AppPackage
     let port = Int.random(in: 4000 ... 8000)
 
     enum Status {
@@ -24,15 +24,15 @@ class Installer: Identifiable, ObservableObject {
         case broken(Error)
     }
 
+    @MainActor
     @Published var status: Status = .ready
 
-    var needsShutdown = false
-
-    init(archive: AppPackage, path packagePath: URL) throws {
+    init(archive: AppStore.AppPackage, path packagePath: URL) async throws {
         let id: UUID = .init()
         self.id = id
         self.archive = archive
-        app = try Self.setupApp(port: port)
+        app = try await Self.setupApp(port: port)
+        logger.info("Installer app setup completed for ID: \(id)")
 
         app.get("*") { [weak self] req in
             guard let self else { return Response(status: .badGateway) }
@@ -45,36 +45,51 @@ class Installer: Identifiable, ObservableObject {
                     "Content-Type": "text/html",
                 ], body: .init(string: indexHtml))
             case plistEndpoint.path:
-                DispatchQueue.main.async { self.status = .sendingManifest }
+                await MainActor.run { self.status = .sendingManifest }
+                logger.info("[*] sending manifest for installer id: \(self.id)")
                 return Response(status: .ok, version: req.version, headers: [
                     "Content-Type": "text/xml",
                 ], body: .init(data: installManifestData))
             case displayImageSmallEndpoint.path:
-                DispatchQueue.main.async { self.status = .sendingManifest }
+                await MainActor.run { self.status = .sendingManifest }
+                logger.info("[*] sending small display image for installer id: \(self.id)")
                 return Response(status: .ok, version: req.version, headers: [
                     "Content-Type": "image/png",
                 ], body: .init(data: displayImageSmallData))
             case displayImageLargeEndpoint.path:
-                DispatchQueue.main.async { self.status = .sendingManifest }
+                await MainActor.run { self.status = .sendingManifest }
+                logger.info("[*] sending large display image for installer id: \(self.id)")
                 return Response(status: .ok, version: req.version, headers: [
                     "Content-Type": "image/png",
                 ], body: .init(data: displayImageLargeData))
             case payloadEndpoint.path:
-                DispatchQueue.main.async { self.status = .sendingPayload }
-                return req.fileio.streamFile(
-                    at: packagePath.path
+                await MainActor.run { self.status = .sendingPayload }
+                logger.info("[*] starting payload transfer for installer id: \(self.id)")
+
+                let result = try await req.fileio.asyncStreamFile(
+                    at: packagePath.path,
+                    chunkSize: 64 * 1024,
                 ) { result in
-                    DispatchQueue.main.async { self.status = .completed(result) }
+                    await MainActor.run {
+                        self.status = .completed(result)
+                        if case .success = result {
+                            logger.info("[+] payload transfer completed for installer id: \(self.id)")
+                        } else {
+                            logger.error("[-] payload transfer failed for installer id: \(self.id)")
+                        }
+                    }
                 }
+                await MainActor.run { self.status = .completed(.success(())) }
+                return result
             default:
                 // 404
+                logger.warning("[!] unknown request path: \(req.url.path) for installer id: \(self.id)")
                 return Response(status: .notFound)
             }
         }
 
         try app.server.start()
-        needsShutdown = true
-        print("[*] installer init at port \(port) for sni \(Self.sni)")
+        logger.info("installer init at port \(port) for sni \(Self.sni)")
     }
 
     deinit {
@@ -82,11 +97,13 @@ class Installer: Identifiable, ObservableObject {
     }
 
     func destroy() {
-        print("[*] installer destroy")
-        if needsShutdown {
-            needsShutdown = false
-            app.server.shutdown()
-            app.shutdown()
+        guard !app.didShutdown else { return }
+        logger.info("installer destroy")
+        Task.detached {
+            await self.app.server.shutdown()
+            try await self.app.asyncShutdown()
+            withExtendedLifetime(self) { _ in }
+            withExtendedLifetime(self.app) { _ in }
         }
     }
 }

@@ -15,31 +15,30 @@ struct SettingView: View {
         NavigationView {
             List {
                 Section {
-                    Text(vm.deviceSeedAddress)
-                        .font(.system(.body, design: .monospaced))
+                    Toggle("Demo Mode", isOn: $vm.demoMode)
                 } header: {
-                    Text("Device Seed")
+                    Text("Demo Mode")
                 } footer: {
-                    Text("This address is used to be a MAC address from your hardware to identify your device with Apple. Here we use a random one.")
+                    Text("By enabling this, all your accounts will be redacted.")
                 }
                 Section {
-                    Button("Delete All Download", role: .destructive) {
-                        Downloads.this.removeAll()
+                    Button("Delete All Downloads", role: .destructive) {
+                        Task { await Downloads.this.removeAll() }
                     }
                 } header: {
                     Text("Downloads")
                 } footer: {
-                    Text("Operating download manager.")
+                    Text("Manage downloads.")
                 }
                 Section {
                     Text(ProcessInfo.processInfo.hostName)
-                    Button("Open Setting") {
+                    Button("Open Settings") {
                         UIApplication.shared.open(URL(string: UIApplication.openSettingsURLString)!)
                     }
                 } header: {
                     Text("Host Name")
                 } footer: {
-                    Text("To install app, you need to grant local area network permission in order to communicate with system services. If your host name is empty, go to Settings.app to grant permission.")
+                    Text("Grant local network permission to install apps and communicate with system services. If hostname is empty, open Settings to grant permission.")
                 }
                 Section {
                     Button("Show FLEX") {
@@ -63,7 +62,7 @@ struct SettingView: View {
                 } header: {
                     Text("About")
                 } footer: {
-                    Text("Hope my app helps you out.")
+                    Text("Hope this app helps you!")
                 }
                 Section {
                     Button("Reset", role: .destructive) {
@@ -80,7 +79,7 @@ struct SettingView: View {
                     Text("This will reset all your settings.")
                 }
             }
-            .navigationTitle("Setting")
+            .navigationTitle("Settings")
         }
         .navigationViewStyle(.stack)
     }

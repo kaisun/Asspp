@@ -35,7 +35,7 @@ struct WelcomeView: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(
-            ColorfulView(color: .constant(ColorfulPreset.winter.colors))
+            ColorfulView(color: .constant(.winter))
                 .opacity(0.25)
                 .ignoresSafeArea()
         )

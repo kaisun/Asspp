@@ -90,10 +90,10 @@ extension Installer {
                         ],
                     ],
                     "metadata": [
-                        "bundle-identifier": archive.bundleID,
-                        "bundle-version": archive.version,
+                        "bundle-identifier": archive.software.bundleID,
+                        "bundle-version": archive.software.version,
                         "kind": "software",
-                        "title": archive.name,
+                        "title": archive.software.name,
                     ],
                 ],
             ],

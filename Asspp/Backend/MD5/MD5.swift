@@ -8,6 +8,7 @@
 import CommonCrypto
 import CryptoKit
 import Foundation
+import Logging
 
 func md5File(url: URL) -> String? {
     do {
@@ -29,7 +30,7 @@ func md5File(url: URL) -> String? {
         let digest = hasher.finalize()
         return digest.map { String(format: "%02hhx", $0) }.joined()
     } catch {
-        print("[-] error reading file: \(error)")
+        logger.error("[-] error reading file: \(error)")
         return nil
     }
 }

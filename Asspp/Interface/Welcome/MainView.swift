@@ -15,16 +15,16 @@ struct MainView: View {
             WelcomeView()
                 .tabItem { Label("Home", systemImage: "house") }
             AccountView()
-                .tabItem { Label("Account", systemImage: "person") }
+                .tabItem { Label("Accounts", systemImage: "person") }
             SearchView()
                 .tabItem { Label("Search", systemImage: "magnifyingglass") }
             DownloadView()
                 .tabItem {
-                    Label("Download", systemImage: "arrow.down.circle")
+                    Label("Downloads", systemImage: "arrow.down.circle")
                         .badge(dvm.runningTaskCount)
                 }
             SettingView()
-                .tabItem { Label("Setting", systemImage: "gear") }
+                .tabItem { Label("Settings", systemImage: "gear") }
         }
     }
 }

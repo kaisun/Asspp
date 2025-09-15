@@ -2,28 +2,23 @@
 //  EntityType.swift
 //  ApplePackage
 //
-//  Created by 秋星桥 on 4/4/25.
+//  Created by qaq on 9/14/25.
 //
 
 import Foundation
 
-public enum EntityType: String, Identifiable, CaseIterable, Codable {
-    public var id: String { rawValue }
-
+public enum EntityType: String, Codable, CaseIterable, Hashable, Equatable {
     case iPhone
     case iPad
-    case macOS
 }
 
 extension EntityType {
-    var searchParameterValue: String {
+    var entityValue: String {
         switch self {
         case .iPhone:
             "software"
         case .iPad:
             "iPadSoftware"
-        case .macOS:
-            "macSoftware"
         }
     }
 }

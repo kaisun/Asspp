@@ -5,7 +5,14 @@
 //  Created by 秋星桥 on 2024/7/11.
 //
 
+import Logging
 import SwiftUI
+
+let logger = {
+    var logger = Logger(label: "wiki.qaq.asspp")
+    logger.logLevel = .debug
+    return logger
+}()
 
 let bundleIdentifier = Bundle.main.bundleIdentifier!
 let appVersion = "\(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "") (\(Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? ""))"
@@ -49,9 +56,6 @@ try? FileManager.default.createDirectory(
 )
 
 _ = ProcessInfo.processInfo.hostName
-
-_ = AppStore.this
-_ = Downloads.this
 
 App.main()
 

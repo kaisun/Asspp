@@ -16,20 +16,21 @@ struct AccountView: View {
     var body: some View {
         NavigationView {
             content
-                .navigationTitle("Account")
+                .background(
+                    NavigationLink(
+                        destination: AddAccountView(),
+                        isActive: $addAccount,
+                        label: { EmptyView() }
+                    )
+                )
+                .navigationTitle("Accounts")
                 .toolbar {
                     ToolbarItem {
-                        NavigationLink(
-                            destination: AddAccountView(),
-                            isActive: $addAccount,
-                            label: {
-                                Button {
-                                    addAccount.toggle()
-                                } label: {
-                                    Label("Add Account", systemImage: "plus")
-                                }
-                            }
-                        )
+                        Button {
+                            addAccount.toggle()
+                        } label: {
+                            Label("Add Account", systemImage: "plus")
+                        }
                     }
                 }
         }
@@ -40,17 +41,22 @@ struct AccountView: View {
         List {
             Section {
                 ForEach(vm.accounts) { account in
-                    NavigationLink(destination: AccountDetailView(account: account)) {
-                        Text(account.email)
+                    NavigationLink(destination: AccountDetailView(accountId: account.id)) {
+                        if vm.demoMode {
+                            Text("88888888888")
+                                .redacted(reason: .placeholder)
+                        } else {
+                            Text(account.account.email)
+                        }
                     }
                 }
                 if vm.accounts.isEmpty {
-                    Text("Sorry, nothing here.")
+                    Text("No accounts yet.")
                 }
             } header: {
-                Text("IDs")
+                Text("Apple IDs")
             } footer: {
-                Text("Your account is not encrypted on disk.")
+                Text("Your accounts are saved in your Keychain and will be synced across devices with the same iCloud account signed in.")
             }
         }
     }

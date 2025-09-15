@@ -13,22 +13,18 @@ struct SearchView: View {
     @AppStorage("searchKey") var searchKey = ""
     @AppStorage("searchRegion") var searchRegion = "US"
     @FocusState var searchKeyFocused
-
-    @State var task: Task<Void, Never>? = nil
+    @State var searchType = EntityType.iPhone
 
     @State var searching = false
-    @State var searchType = EntityType.iPhone
+    let regionKeys = Array(ApplePackage.Configuration.storeFrontValues.keys.sorted())
+
     @State var searchInput: String = ""
-    @State var searchResult: (String, [AppPackage]) = ("", [])
+    @State var searchResult: [AppStore.AppPackage] = []
 
     @StateObject var vm = AppStore.this
 
-    var regionKeys: [String] {
-        Array(vm.service.storefront.codeMap.keys).sorted()
-    }
-
-    var possibleReigon: Set<String> {
-        Set(vm.accounts.map(\.countryCode))
+    var possibleRegion: Set<String> {
+        vm.possibleRegions
     }
 
     var body: some View {
@@ -54,18 +50,18 @@ struct SearchView: View {
 
                 TextField("Keyword", text: $searchKey)
                     .focused($searchKeyFocused)
-                    .onSubmit { submit() }
+                    .onSubmit { search() }
             } header: {
                 Text("Metadata")
             }
             Section {
-                Button(searching ? "Searching..." : "Search") { submit() }
+                Button(searching ? "Searching..." : "Search") { search() }
                     .disabled(searchKey.isEmpty)
                     .disabled(searching)
             }
             Section {
-                ForEach(searchResult.1) { item in
-                    NavigationLink(destination: ProductView(archive: item, region: searchResult.0)) {
+                ForEach(searchResult) { item in
+                    NavigationLink(destination: ProductView(archive: item, region: searchRegion)) {
                         ArchivePreviewView(archive: item)
                     }
                     .transition(.opacity)
@@ -74,8 +70,7 @@ struct SearchView: View {
                 Text(searchInput)
             }
         }
-        .animation(.spring, value: searchResult.0)
-        .animation(.spring, value: searchResult.1)
+        .animation(.spring, value: searchResult)
     }
 
     func buildRegionView() -> some View {
@@ -84,14 +79,14 @@ struct SearchView: View {
             Spacer()
             Menu {
                 Section("Account") {
-                    buildPickView(for: regionKeys.filter { possibleReigon.contains($0) })
+                    buildPickView(for: regionKeys.filter { possibleRegion.contains($0) })
                 }
-                Menu("All Region") {
+                Menu("All Regions") {
                     buildPickView(for: regionKeys)
                 }
             } label: {
                 HStack {
-                    Text("\(searchRegion) - \(vm.service.storefront.codeMap[searchRegion] ?? NSLocalizedString("Unknown", comment: ""))")
+                    Text("\(searchRegion) - \(ApplePackage.Configuration.storeFrontValues[searchRegion] ?? String(localized: "Unknown"))")
                     Image(systemName: "arrow.up.arrow.down")
                 }
             }
@@ -100,49 +95,41 @@ struct SearchView: View {
 
     func buildPickView(for keys: [String]) -> some View {
         ForEach(keys, id: \.self) { key in
-            Button("\(key) - \(vm.service.storefront.codeMap[key] ?? NSLocalizedString("Unknown", comment: ""))") {
+            Button("\(key) - \(ApplePackage.Configuration.storeFrontValues[key] ?? String(localized: "Unknown"))") {
                 searchRegion = key
             }
         }
     }
 
-    func submit() {
-        task = Task {
-            await search()
-            task = nil
-        }
-    }
-
-    nonisolated
-    func search() async {
-        await MainActor.run {
-            searchKeyFocused = false
-            searching = true
-            searchInput = "\(searchRegion) - \(searchKey)" + " ..."
-        }
-
-        let region = await searchRegion
-        let type = await searchType
-        let keyword = await searchKey
-
-        do {
-            let apps = try await vm.service.search(
-                countryCode: region,
-                entityType: type,
-                term: keyword,
-                limit: 50
-            )
-
-            await MainActor.run {
-                searching = false
-                searchResult = (region, apps)
-                searchInput = "\(region) - \(keyword)"
-            }
-        } catch {
-            await MainActor.run {
-                searching = false
-                searchResult = ("", [])
-                searchInput = "\(region) - \(keyword) \(error.localizedDescription)"
+    func search() {
+        searchKeyFocused = false
+        searching = true
+        searchInput = "\(searchRegion) - \(searchKey)" + " ..."
+        Task {
+            do {
+                var result = try await ApplePackage.Searcher.search(
+                    term: searchKey,
+                    countryCode: searchRegion,
+                    limit: 32,
+                    entityType: searchType
+                )
+                if let app = try? await ApplePackage.Lookup.lookup(
+                    bundleID: searchKey,
+                    countryCode: searchRegion
+                ) {
+                    result.insert(app, at: 0)
+                }
+                await MainActor.run {
+                    searching = false
+                    searchResult = result.map { AppStore.AppPackage(software: $0) }
+                    searchInput = "\(searchRegion) - \(searchKey)"
+                }
+            } catch {
+                await MainActor.run {
+                    searching = false
+                    searchResult = []
+                    searchInput = "\(searchRegion) - \(searchKey) - Error: \(error.localizedDescription)"
+                }
             }
         }
     }

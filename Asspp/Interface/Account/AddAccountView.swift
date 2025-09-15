@@ -19,25 +19,19 @@ struct AddAccountView: View {
     @State var code: String = ""
 
     @State var error: Error?
-    @State var doingSomething: Bool = false
-
-    @FocusState var emailFocus
-
-    @State var task: Task<Void, Error>?
+    @State var openProgress: Bool = false
 
     var body: some View {
         List {
             Section {
                 TextField("Email (Apple ID)", text: $email)
-                    .focused($emailFocus)
-                    .onAppear { emailFocus = true }
                     .disableAutocorrection(true)
                     .autocapitalization(.none)
                 SecureField("Password", text: $password)
             } header: {
-                Text("ID")
+                Text("Apple ID")
             } footer: {
-                Text("We will store your account and password on disk without encryption. Please do not connect your device to untrusted hardware or use this app on a open system like macOS.")
+                Text("Your account is saved in your Keychain and will be synced across devices with the same iCloud account signed in.")
             }
             if codeRequired {
                 Section {
@@ -48,23 +42,20 @@ struct AddAccountView: View {
                 } header: {
                     Text("2FA Code")
                 } footer: {
-                    Text("Although 2FA code is marked as optional, that is because we dont know if you have it or just incorrect password, you should provide it if you have it enabled.\n\nhttps://support.apple.com/102606")
+                    Text("Although the 2FA code is marked as optional, it's because we don't know if you have it enabled or just entered an incorrect password. Provide it if you have 2FA enabled.\n\nhttps://support.apple.com/102606")
                 }
                 .transition(.opacity)
             }
             Section {
-                if doingSomething {
+                if openProgress {
                     ForEach([UUID()], id: \.self) { _ in
                         ProgressView()
                     }
                 } else {
                     Button("Authenticate") {
-                        task = Task {
-                            await authenticate()
-                            task = nil
-                        }
+                        authenticate()
                     }
-                    .disabled(doingSomething)
+                    .disabled(openProgress)
                     .disabled(email.isEmpty || password.isEmpty)
                 }
             } footer: {
@@ -83,35 +74,20 @@ struct AddAccountView: View {
         .navigationTitle("Add Account")
     }
 
-    nonisolated
-    func authenticate() async {
-        await MainActor.run { doingSomething = true }
-        do {
-            let service = await AppStore.this.service
-            let account = try await service.login(
-                email: email,
-                password: password,
-                authCode: code.isEmpty ? "" : code
-            )
-            let countryCode = try service.storefront.countryCodeLookup(
-                storeFront: account.storeFront
-            )
-
-            await MainActor.run {
-                vm.save(email: email, account: .init(
-                    email: account.email,
-                    password: account.password,
-                    countryCode: countryCode,
-                    storeResponse: account
-                ))
-                dismiss()
-                doingSomething = false
-            }
-        } catch {
-            await MainActor.run {
-                self.error = error
-                codeRequired = true
-                doingSomething = false
+    func authenticate() {
+        openProgress = true
+        Task {
+            defer { DispatchQueue.main.async { openProgress = false } }
+            do {
+                _ = try await vm.authenticate(email: email, password: password, code: code.isEmpty ? "" : code)
+                await MainActor.run {
+                    dismiss()
+                }
+            } catch {
+                await MainActor.run {
+                    self.error = error
+                    codeRequired = true
+                }
             }
         }
     }

@@ -32,13 +32,13 @@ struct InstallerView: View {
 
     var text: String {
         switch installer.status {
-        case .ready: NSLocalizedString("Ready To Install", comment: "")
-        case .sendingManifest: NSLocalizedString("Sending Manifest...", comment: "")
-        case .sendingPayload: NSLocalizedString("Sending Payload...", comment: "")
+        case .ready: String(localized: "Ready To Install")
+        case .sendingManifest: String(localized: "Sending Manifest...")
+        case .sendingPayload: String(localized: "Sending Payload...")
         case let .completed(result):
             switch result {
             case .success:
-                NSLocalizedString("Install Completed", comment: "")
+                String(localized: "Install Completed")
             case let .failure(failure):
                 failure.localizedDescription
             }
@@ -73,7 +73,7 @@ struct InstallerView: View {
                 }
             }
             VStack {
-                Text("To install app, you need to grant local area network permission in order to communicate with system services.")
+                Text("Grant local network permission to install apps and communicate with system services.")
             }
             .font(.system(.footnote, design: .rounded))
             .foregroundStyle(.secondary)

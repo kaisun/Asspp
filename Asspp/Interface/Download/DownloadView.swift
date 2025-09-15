@@ -13,7 +13,7 @@ struct DownloadView: View {
     var body: some View {
         NavigationView {
             content
-                .navigationTitle("Download")
+                .navigationTitle("Downloads")
         }
         .navigationViewStyle(.stack)
     }
@@ -22,12 +22,17 @@ struct DownloadView: View {
         List {
             if vm.requests.isEmpty {
                 Section("Packages") {
-                    Text("Sorry, nothing here.")
+                    Text("No downloads yet.")
                 }
             } else {
-                Section("Packages") {
+                Section("Packages (\(vm.requests.count)) - Active: \(vm.runningTaskCount)") {
                     packageList
                 }
+            }
+        }
+        .refreshable {
+            for req in vm.requests {
+                Task { await vm.checkAndUpdateDownloadStatus(for: req) }
             }
         }
         .toolbar {
@@ -41,9 +46,9 @@ struct DownloadView: View {
         ForEach(vm.requests) { req in
             NavigationLink(destination: PackageView(request: req)) {
                 VStack(spacing: 8) {
-//                    ArchivePreviewView(archive: req.package)
+                    ArchivePreviewView(archive: req.package)
                     SimpleProgress(progress: req.runtime.progress)
-                        .animation(.interactiveSpring, value: req.runtime.progress)
+                        .animation(.interactiveSpring, value: req.runtime.percent)
                     HStack {
                         Text(req.hint)
                         Spacer()
@@ -53,31 +58,34 @@ struct DownloadView: View {
                     .foregroundStyle(.secondary)
                 }
             }
-            .swipeActions(edge: .leading, allowsFullSwipe: true) {
+            .contextMenu {
                 if vm.isCompleted(for: req) {
+                    Button(role: .destructive) {
+                        Task { await vm.delete(request: req) }
+                    } label: {
+                        Label("Delete", systemImage: "trash")
+                    }
                 } else {
                     switch req.runtime.status {
                     case .stopped:
                         Button {
-                            vm.resume(requestID: req.id)
+                            Task { await vm.resume(requestID: req.id) }
                         } label: {
                             Label("Resume", systemImage: "play.fill")
                         }
                     case .pending, .downloading:
                         Button {
-                            vm.suspend(requestID: req.id)
+                            Task { await vm.suspend(requestID: req.id) }
                         } label: {
-                            Label("Puase", systemImage: "stop.fill")
+                            Label("Pause", systemImage: "stop.fill")
                         }
                     default: Group {}
                     }
-                }
-            }
-            .swipeActions(edge: .trailing, allowsFullSwipe: true) {
-                Button(role: .destructive) {
-                    vm.delete(request: req)
-                } label: {
-                    Label("Cancel", systemImage: "trash")
+                    Button(role: .destructive) {
+                        Task { await vm.delete(request: req) }
+                    } label: {
+                        Label("Cancel", systemImage: "trash")
+                    }
                 }
             }
         }
@@ -91,9 +99,9 @@ extension Downloads.Request {
         }
         return switch runtime.status {
         case .stopped:
-            NSLocalizedString("Suspended", comment: "")
+            String(localized: "Suspended")
         case .pending:
-            NSLocalizedString("Pending...", comment: "")
+            String(localized: "Pending...")
         case .downloading:
             [
                 String(Int(runtime.progress.fractionCompleted * 100)) + "%",
@@ -102,9 +110,11 @@ extension Downloads.Request {
             .compactMap(\.self)
             .joined(separator: " ")
         case .verifying:
-            NSLocalizedString("Verifying...", comment: "")
+            String(localized: "Verifying...")
         case .completed:
-            NSLocalizedString("Completed", comment: "")
+            String(localized: "Completed")
+        case .cancelled:
+            String(localized: "Cancelled")
         }
     }
 }

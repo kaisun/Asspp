@@ -9,34 +9,45 @@ import ApplePackage
 import Combine
 import Foundation
 
-@MainActor
 class AppStore: ObservableObject {
-    static let this = AppStore()
     var cancellables: Set<AnyCancellable> = .init()
 
-    @PublishedPersist(key: "DeviceSeedAddress", defaultValue: "")
-    var deviceSeedAddress: String
+    @MainActor
+    @PublishedPersist(
+        key: "Accounts",
+        defaultValue: [],
+        keychain: "wiki.qaq.Asspp.Accounts"
+    )
+    var accounts: [UserAccount]
 
-    @PublishedPersist(key: "Accounts", defaultValue: [])
-    var accounts: [Account]
+    @MainActor
+    @PublishedPersist(key: "DemoMode", defaultValue: false)
+    var demoMode: Bool
 
-    var service: AppStoreService {
-        AppStoreService(guid: deviceSeedAddress)
+    static let this = AppStore()
+    private init() {}
+
+    @MainActor
+    @discardableResult
+    func save(email: String, account: ApplePackage.Account) -> UserAccount {
+        let account = UserAccount(account: account)
+        accounts = (accounts.filter { $0.account.email != email } + [account])
+            .sorted { $0.account.email < $1.account.email }
+        return account
     }
 
-    private init() {
-        if deviceSeedAddress.isEmpty { deviceSeedAddress = Self.createSeed() }
-        assert(!deviceSeedAddress.isEmpty)
-        deviceSeedAddress = deviceSeedAddress
-    }
-
-    func save(email: String, account: Account) {
-        accounts = accounts
-            .filter { $0.email.lowercased() != email.lowercased() }
-            + [account]
-    }
-
-    func delete(id: Account.ID) {
+    @MainActor
+    func delete(id: UserAccount.ID) {
         accounts = accounts.filter { $0.id != id }
+    }
+
+    @MainActor
+    var possibleRegions: Set<String> {
+        Set(accounts.compactMap { ApplePackage.Configuration.countryCode(for: $0.account.store) })
+    }
+
+    @MainActor
+    func eligibleAccounts(for region: String) -> [UserAccount] {
+        accounts.filter { ApplePackage.Configuration.countryCode(for: $0.account.store) == region }
     }
 }
