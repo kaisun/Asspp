@@ -9,6 +9,7 @@
 *.dSYM.zip
 *.hmap
 *.ipa
+*.tipa
 *.lcov
 *.lock
 *.log

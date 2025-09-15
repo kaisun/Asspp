@@ -20,9 +20,6 @@ struct PackageView: View {
 
     @Environment(\.dismiss) var dismiss
     @State var installer: Installer?
-    @State var systemInstallerInProgress = false
-    @State var systemInstallerSuccess: Bool = false
-    @State var systemInstallerError: String? = nil
     @State var error: String = ""
 
     @StateObject var vm = AppStore.this
@@ -64,35 +61,6 @@ struct PackageView: View {
                         installer = nil
                     } content: {
                         InstallerView(installer: $0)
-                    }
-
-                    Button("Install via Troll Root") {
-                        systemInstallerInProgress = true
-                        SystemInstaller().installApp(
-                            from: url,
-                            appIdentifier: archive.software.bundleID
-                        ) { result in
-                            systemInstallerInProgress = false
-                            switch result {
-                            case .success:
-                                systemInstallerSuccess = true
-                            case let .failure(error):
-                                systemInstallerError = error.localizedDescription
-                            }
-                        }
-                    }
-                    .alert(isPresented: $systemInstallerInProgress) {
-                        Alert(title: Text("System Installer in Progress"))
-                    }
-                    .alert(isPresented: $systemInstallerSuccess) {
-                        Alert(title: Text("System Installer Succeeded"), dismissButton: .default(Text("OK")))
-                    }
-                    .alert(isPresented: .init(get: { systemInstallerError != nil }, set: { _ in })) {
-                        Alert(
-                            title: Text("System Installer Failed"),
-                            message: Text(error),
-                            dismissButton: .default(Text("OK"))
-                        )
                     }
 
                     Button("Install via AirDrop") {

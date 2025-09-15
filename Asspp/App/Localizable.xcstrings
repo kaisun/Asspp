@@ -942,6 +942,7 @@
       }
     },
     "Install via Troll Root" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -1030,6 +1031,7 @@
       }
     },
     "OK" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -1568,16 +1570,18 @@
       }
     },
     "System Installer Failed" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "系统安装起出错"
+            "value" : "系统安装器出错"
           }
         }
       }
     },
     "System Installer in Progress" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -1588,6 +1592,7 @@
       }
     },
     "System Installer Succeeded" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {

@@ -29,15 +29,4 @@ jobs:
       with:
         name: Asspp.ipa
         path: Asspp.ipa
-
-    - name: Build Troll
-      run: \
-        chmod +x Resources/Scripts/build.troll.ci.sh
-        ./Resources/Scripts/build.troll.ci.sh "$(pwd)/Asspp.ipa" "$(pwd)/Asspp.tipa"
-
-    - name: Upload Troll Artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: Asspp.tipa
-        path: Asspp.tipa
         
