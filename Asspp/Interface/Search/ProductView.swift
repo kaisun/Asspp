@@ -143,12 +143,12 @@ struct ProductView: View {
                     app: archive.software
                 )
                 archive.downloadOutput = downloadOutput
-                let request = await Downloads.this.add(request: .init(
+                let request = Downloads.this.add(request: .init(
                     account: account,
                     package: archive,
                     downloadOutput: downloadOutput
                 ))
-                await Downloads.this.resume(request: request)
+                Downloads.this.resume(request: request)
                 await MainActor.run {
                     obtainDownloadURL = false
                     hint = String(localized: "Download Requested")

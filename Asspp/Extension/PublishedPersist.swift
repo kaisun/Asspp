@@ -96,6 +96,10 @@ struct Persist<Value: Codable> {
         get { subject.value }
         set { subject.send(newValue) }
     }
+
+    func save() {
+        subject.send(subject.value)
+    }
 }
 
 extension PublishedPersist {
@@ -131,6 +135,10 @@ struct PublishedPersist<Value: Codable> {
 
     init(key: String, defaultValue: Value, engine: PersistProvider) {
         _value = .init(key: key, defaultValue: defaultValue, engine: engine)
+    }
+
+    func save() {
+        _value.save()
     }
 }
 

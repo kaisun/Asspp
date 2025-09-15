@@ -10,7 +10,8 @@ import Kingfisher
 import SwiftUI
 
 struct PackageView: View {
-    let pkg: PackageManifest
+    @StateObject var pkg: PackageManifest
+
     var archive: AppStore.AppPackage {
         pkg.package
     }
@@ -96,7 +97,7 @@ struct PackageView: View {
                     ForEach(actions.filter { $0 != .delete }, id: \.self) { action in
                         let label = downloads.getActionLabel(for: action)
                         Button(label.title) {
-                            Task { await downloads.performDownloadAction(for: pkg, action: action) }
+                            downloads.performDownloadAction(for: pkg, action: action)
                         }
                         .foregroundStyle(label.isDestructive ? .red : .primary)
                     }
@@ -136,7 +137,7 @@ struct PackageView: View {
                 let deleteAction = DownloadAction.delete
                 let label = downloads.getActionLabel(for: deleteAction)
                 Button(label.title) {
-                    Task { await downloads.performDownloadAction(for: pkg, action: deleteAction) }
+                    Task { downloads.performDownloadAction(for: pkg, action: deleteAction) }
                     dismiss()
                 }
                 .foregroundStyle(label.isDestructive ? .red : .primary)

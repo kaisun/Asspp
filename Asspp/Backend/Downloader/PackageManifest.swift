@@ -17,16 +17,23 @@ private let packagesDir = {
 }()
 
 class PackageManifest: ObservableObject, Identifiable, Codable, Hashable, Equatable {
-    @Published var id: UUID = .init()
+    private(set) var id: UUID = .init()
 
-    @Published var account: AppStore.UserAccount
-    @Published var package: AppStore.AppPackage
+    private(set) var account: AppStore.UserAccount
+    private(set) var package: AppStore.AppPackage
 
-    @Published var url: URL
-    @Published var signatures: [ApplePackage.Sinf]
+    private(set) var url: URL
+    private(set) var signatures: [ApplePackage.Sinf]
 
-    @Published var creation: Date
-    @Published var state: DownloadState = .init()
+    private(set) var creation: Date
+
+    var state: PackageState = .init() {
+        didSet {
+            DispatchQueue.main.async {
+                self.objectWillChange.send()
+            }
+        }
+    }
 
     var targetLocation: URL {
         packagesDir
@@ -54,7 +61,7 @@ class PackageManifest: ObservableObject, Identifiable, Codable, Hashable, Equata
         url = try container.decode(URL.self, forKey: .url)
         signatures = try container.decode([ApplePackage.Sinf].self, forKey: .signatures)
         creation = try container.decode(Date.self, forKey: .creation)
-        state = try container.decode(DownloadState.self, forKey: .runtime)
+        state = try container.decode(PackageState.self, forKey: .runtime)
     }
 
     func encode(to encoder: Encoder) throws {

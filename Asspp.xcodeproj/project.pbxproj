@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		507974632E784D4E0016F540 /* Digger in Frameworks */ = {isa = PBXBuildFile; productRef = 507974622E784D4E0016F540 /* Digger */; };
 		50D0C8B82C40187800538F49 /* Vapor in Frameworks */ = {isa = PBXBuildFile; productRef = 50D0C8B72C40187800538F49 /* Vapor */; };
 		50D262942E77D63B00FF8813 /* Logging in Frameworks */ = {isa = PBXBuildFile; productRef = 50D262932E77D63B00FF8813 /* Logging */; };
 		50D44D192C3F92A100CF6A69 /* ApplePackage in Frameworks */ = {isa = PBXBuildFile; productRef = 50D44D182C3F92A100CF6A69 /* ApplePackage */; };
@@ -43,6 +44,7 @@
 				50E28B812C40BA52007891E0 /* ColorfulX in Frameworks */,
 				50D44D232C3F92C500CF6A69 /* NIOSSL in Frameworks */,
 				50D0C8B82C40187800538F49 /* Vapor in Frameworks */,
+				507974632E784D4E0016F540 /* Digger in Frameworks */,
 				50D44D1E2C3F92BB00CF6A69 /* NIOHTTP1 in Frameworks */,
 				50D262942E77D63B00FF8813 /* Logging in Frameworks */,
 				50D44D512C3FC85F00CF6A69 /* AnyCodable in Frameworks */,
@@ -127,6 +129,7 @@
 				50E28B802C40BA52007891E0 /* ColorfulX */,
 				80CD64EC2C42AA2C0073E206 /* KeychainAccess */,
 				50D262932E77D63B00FF8813 /* Logging */,
+				507974622E784D4E0016F540 /* Digger */,
 			);
 			productName = Asspp;
 			productReference = 50D44D022C3F91F700CF6A69 /* Asspp.app */;
@@ -166,6 +169,7 @@
 				50E28B7F2C40BA52007891E0 /* XCRemoteSwiftPackageReference "ColorfulX" */,
 				80CD64EB2C42AA2C0073E206 /* XCRemoteSwiftPackageReference "KeychainAccess" */,
 				50D262922E77D63B00FF8813 /* XCRemoteSwiftPackageReference "swift-log" */,
+				507974612E784D4E0016F540 /* XCRemoteSwiftPackageReference "Digger" */,
 			);
 			productRefGroup = 50D44D032C3F91F700CF6A69 /* Products */;
 			projectDirPath = "";
@@ -439,6 +443,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		507974612E784D4E0016F540 /* XCRemoteSwiftPackageReference "Digger" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/Lakr233/Digger";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.0.5;
+			};
+		};
 		50D0C8B62C40187800538F49 /* XCRemoteSwiftPackageReference "vapor" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/vapor/vapor";
@@ -506,6 +518,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		507974622E784D4E0016F540 /* Digger */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 507974612E784D4E0016F540 /* XCRemoteSwiftPackageReference "Digger" */;
+			productName = Digger;
+		};
 		50D0C8B72C40187800538F49 /* Vapor */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 50D0C8B62C40187800538F49 /* XCRemoteSwiftPackageReference "vapor" */;

@@ -6,6 +6,7 @@
 //
 
 import ApplePackage
+import Digger
 import Logging
 import SwiftUI
 
@@ -74,6 +75,9 @@ do {
     logger.info("using device identifier: \(identifier)")
     ApplePackage.Configuration.deviceIdentifier = identifier
 }
+
+DiggerManager.shared.maxConcurrentTasksCount = 3
+DiggerManager.shared.startDownloadImmediately = true
 
 App.main()
 

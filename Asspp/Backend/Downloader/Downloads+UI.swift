@@ -1,5 +1,5 @@
 //
-//  Downloads+UIHelpers.swift
+//  Downloads+UI.swift
 //  Asspp
 //
 //  Created by 秋星桥 on 2024/7/13.
@@ -17,16 +17,16 @@ enum DownloadAction: Hashable {
 
 @MainActor
 extension Downloads {
-    func performDownloadAction(for request: PackageManifest, action: DownloadAction) async {
+    func performDownloadAction(for request: PackageManifest, action: DownloadAction) {
         switch action {
         case .suspend:
-            await suspend(request: request)
+            suspend(request: request)
         case .resume:
-            await resume(request: request)
+            resume(request: request)
         case .restart:
-            await restart(request: request)
+            restart(request: request)
         case .delete:
-            await delete(request: request)
+            delete(request: request)
         }
     }
 

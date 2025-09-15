@@ -20,12 +20,12 @@ struct DownloadView: View {
 
     var content: some View {
         List {
-            if vm.requests.isEmpty {
+            if vm.manifests.isEmpty {
                 Section("Packages") {
                     Text("No downloads yet.")
                 }
             } else {
-                Section("Packages (\(vm.requests.count)) - Active: \(vm.runningTaskCount)") {
+                Section("Packages (\(vm.manifests.count)) - Active: \(vm.runningTaskCount)") {
                     packageList
                 }
             }
@@ -38,7 +38,7 @@ struct DownloadView: View {
     }
 
     var packageList: some View {
-        ForEach(vm.requests, id: \.id) { req in
+        ForEach(vm.manifests, id: \.id) { req in
             NavigationLink(destination: PackageView(pkg: req)) {
                 VStack(spacing: 8) {
                     ArchivePreviewView(archive: req.package)
@@ -58,7 +58,7 @@ struct DownloadView: View {
                 ForEach(actions, id: \.self) { action in
                     let label = vm.getActionLabel(for: action)
                     Button {
-                        Task { await vm.performDownloadAction(for: req, action: action) }
+                        Task { vm.performDownloadAction(for: req, action: action) }
                     } label: {
                         Label(label.title, systemImage: label.systemImage)
                     }

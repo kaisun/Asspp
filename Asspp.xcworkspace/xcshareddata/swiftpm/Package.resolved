@@ -55,6 +55,15 @@
       }
     },
     {
+      "identity" : "digger",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/Lakr233/Digger",
+      "state" : {
+        "revision" : "265c84aa4a447564628d2788e63efc3ab7779d7e",
+        "version" : "0.0.5"
+      }
+    },
+    {
       "identity" : "keychainaccess",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/kishikawakatsumi/KeychainAccess.git",
