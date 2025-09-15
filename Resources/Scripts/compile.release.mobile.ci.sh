@@ -1,7 +1,7 @@
 #!/bin/zsh
 
 SRCROOT=$(realpath "$1")
-TARGET_IPA=$(realpath "$2")
+TARGET_IPA=$2
 
 WORKSPACE="$SRCROOT/Asspp.xcworkspace"
 SCHEME="Asspp"
