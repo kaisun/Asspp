@@ -259,17 +259,6 @@
         }
       }
     },
-    "An unknown error occurred during the download process." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "下载过程遇到了未知错误。"
-          }
-        }
-      }
-    },
     "Analysis" : {
       "localizations" : {
         "en" : {
@@ -952,6 +941,16 @@
         }
       }
     },
+    "Install via Troll Root" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "使用特权安装"
+          }
+        }
+      }
+    },
     "Keyword" : {
       "localizations" : {
         "en" : {
@@ -1026,6 +1025,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "暂无下载"
+          }
+        }
+      }
+    },
+    "OK" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "好的"
           }
         }
       }
@@ -1558,6 +1567,36 @@
         }
       }
     },
+    "System Installer Failed" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "系统安装起出错"
+          }
+        }
+      }
+    },
+    "System Installer in Progress" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "正在使用系统安装器安装"
+          }
+        }
+      }
+    },
+    "System Installer Succeeded" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "安装成功"
+          }
+        }
+      }
+    },
     "Tell us the bundle ID of the app to initiate a direct download. Useful to download apps that are no longer available in App Store." : {
       "localizations" : {
         "en" : {
@@ -1574,74 +1613,6 @@
         }
       }
     },
-    "The downloaded file appears to be corrupted or incomplete." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "The downloaded file appears to be corrupted or incomplete."
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "下载的文件似乎已损坏或不完整。"
-          }
-        }
-      }
-    },
-    "The downloaded file is empty." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "The downloaded file is empty."
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "下载的文件为空。"
-          }
-        }
-      }
-    },
-    "The file size is invalid." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "The file size is invalid."
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "文件大小无效。"
-          }
-        }
-      }
-    },
-    "The file's checksum does not match the expected value." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "The file's checksum does not match the expected value."
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "文件的校验和与预期值不匹配。"
-          }
-        }
-      }
-    },
     "The package can be installed later from the Downloads page." : {
       "localizations" : {
         "en" : {
@@ -1654,23 +1625,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "软件包稍后可以从下载页面安装。"
-          }
-        }
-      }
-    },
-    "The server returned an invalid response format." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "The server returned an invalid response format."
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "服务器返回了无效的响应格式。"
           }
         }
       }
@@ -1743,23 +1697,6 @@
         }
       }
     },
-    "Unable to access the file: %@" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Unable to access the file: %@"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "无法访问文件：%@"
-          }
-        }
-      }
-    },
     "Unable to retrieve download url, please try again later." : {
       "localizations" : {
         "en" : {
@@ -1772,23 +1709,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "无法获取下载链接，请稍后再试。"
-          }
-        }
-      }
-    },
-    "Unable to verify the integrity of the downloaded file." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Unable to verify the integrity of the downloaded file."
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "无法验证下载文件的完整性。"
           }
         }
       }
