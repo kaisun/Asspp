@@ -123,8 +123,6 @@ extension Downloads {
             return
         }
 
-        try? FileManager.default.removeItem(at: request.targetLocation)
-        logger.info("[+] removed partial file for cancelled request id: \(requestID)")
         logger.info("[+] download cancelled for request id: \(requestID)")
     }
 
