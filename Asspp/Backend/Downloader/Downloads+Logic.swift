@@ -13,10 +13,13 @@ extension Downloads: URLSessionDownloadDelegate {
         logger.info("[*] finalizing download for request id: \(request.id)")
         let targetLocation = request.targetLocation
 
+        // If url is the same as targetLocation, no need to move
+        let finalURL = (url == targetLocation) ? targetLocation : url
+
         do {
             if let md5 = request.md5 {
                 logger.info("[*] verifying md5 checksum for request id: \(request.id)")
-                let fileMD5 = md5File(url: url)
+                let fileMD5 = md5File(url: finalURL)
                 guard md5.lowercased() == fileMD5?.lowercased() else {
                     logger.error("[-] md5 checksum mismatch for request id: \(request.id)")
                     await report(error: NSError(domain: "MD5", code: 1, userInfo: [
@@ -27,12 +30,14 @@ extension Downloads: URLSessionDownloadDelegate {
                 logger.info("[+] md5 checksum verified for request id: \(request.id)")
             }
 
-            try? FileManager.default.removeItem(at: targetLocation)
-            try? FileManager.default.createDirectory(
-                at: targetLocation.deletingLastPathComponent(),
-                withIntermediateDirectories: true
-            )
-            try FileManager.default.moveItem(at: url, to: targetLocation)
+            // Only move if it's a temp file, don't remove existing target file for resume support
+            if url != targetLocation {
+                try? FileManager.default.createDirectory(
+                    at: targetLocation.deletingLastPathComponent(),
+                    withIntermediateDirectories: true
+                )
+                try FileManager.default.moveItem(at: url, to: targetLocation)
+            }
 
             await reportSuccess(reqId: request.id)
             logger.info("[+] download finalized successfully for request id: \(request.id)")
@@ -45,14 +50,35 @@ extension Downloads: URLSessionDownloadDelegate {
     func downloadWithProgress(from url: URL, to fileURL: URL, requestID: Request.ID) async throws {
         logger.info("[*] starting download with progress for url: \(url.host ?? "unknown")/\(url.lastPathComponent), request id: \(requestID)")
 
+        // Check if file exists and get its size for resume
+        var existingFileSize: Int64 = 0
+        var shouldResume = false
+
         if FileManager.default.fileExists(atPath: fileURL.path) {
-            try? FileManager.default.removeItem(at: fileURL)
+            do {
+                let attributes = try FileManager.default.attributesOfItem(atPath: fileURL.path)
+                existingFileSize = attributes[.size] as? Int64 ?? 0
+                shouldResume = existingFileSize > 0
+                logger.info("[*] found existing file with size: \(existingFileSize) bytes, attempting resume")
+            } catch {
+                logger.warning("[!] failed to get file attributes: \(error.localizedDescription)")
+                try? FileManager.default.removeItem(at: fileURL)
+                existingFileSize = 0
+                shouldResume = false
+            }
         }
 
         let session = URLSession(configuration: .default, delegate: self, delegateQueue: .main)
-        let request = URLRequest(url: url)
+        var request = URLRequest(url: url)
+
+        // Add Range header for resume if file exists
+        if shouldResume {
+            request.addValue("bytes=\(existingFileSize)-", forHTTPHeaderField: "Range")
+            logger.info("[*] resuming download from byte: \(existingFileSize)")
+        }
+
         let task = session.downloadTask(with: request)
-        activeDownloads[requestID] = DownloadState(task: task, continuation: nil, lastBytes: 0, lastUpdate: Date())
+        activeDownloads[requestID] = DownloadState(task: task, continuation: nil, lastBytes: existingFileSize, lastUpdate: Date())
 
         return try await withCheckedThrowingContinuation { continuation in
             if var state = activeDownloads[requestID] {
@@ -64,45 +90,66 @@ extension Downloads: URLSessionDownloadDelegate {
     }
 
     func urlSession(_: URLSession, downloadTask: URLSessionDownloadTask, didWriteData _: Int64, totalBytesWritten: Int64, totalBytesExpectedToWrite: Int64) {
-        guard let requestID = activeDownloads.first(where: { $0.value.task == downloadTask })?.key else { return }
+        guard let requestID = activeDownloads.first(where: { $0.value.task == downloadTask })?.key,
+              let state = activeDownloads[requestID] else { return }
 
         Task { @MainActor in
             if totalBytesExpectedToWrite > 0 {
-                let progress = Progress(totalUnitCount: totalBytesExpectedToWrite)
-                progress.completedUnitCount = totalBytesWritten
+                // For resume downloads, add existing file size to get correct progress
+                let existingFileSize = state.lastBytes
+                let totalProgress = existingFileSize + totalBytesWritten
+                let totalExpected = existingFileSize + totalBytesExpectedToWrite
+
+                let progress = Progress(totalUnitCount: totalExpected)
+                progress.completedUnitCount = totalProgress
                 await report(progress: progress, reqId: requestID)
             }
 
             let now = Date()
-            guard var state = activeDownloads[requestID] else { return }
-            let elapsed = now.timeIntervalSince(state.lastUpdate)
+            guard var currentState = activeDownloads[requestID] else { return }
+            let elapsed = now.timeIntervalSince(currentState.lastUpdate)
 
             if elapsed >= 0.5 {
-                let speed = Int64(Double(totalBytesWritten - state.lastBytes) / elapsed)
+                let speed = Int64(Double(totalBytesWritten - (currentState.lastBytes - state.lastBytes)) / elapsed)
                 let speedStr = byteFormat(bytes: speed)
                 await report(speed: speedStr, reqId: requestID)
-                state.lastBytes = totalBytesWritten
-                state.lastUpdate = now
-                activeDownloads[requestID] = state
+                currentState.lastBytes = state.lastBytes + totalBytesWritten
+                currentState.lastUpdate = now
+                activeDownloads[requestID] = currentState
             }
         }
     }
 
     func urlSession(_: URLSession, downloadTask: URLSessionDownloadTask, didFinishDownloadingTo location: URL) {
         guard let requestID = activeDownloads.first(where: { $0.value.task == downloadTask })?.key,
+              let request = requests.first(where: { $0.id == requestID }),
               var state = activeDownloads[requestID] else { return }
 
-        let tempURL = FileManager.default.temporaryDirectory.appendingPathComponent("AssppDownload_\(requestID.uuidString).ipa")
+        let targetURL = request.targetLocation
 
         do {
-            if FileManager.default.fileExists(atPath: tempURL.path) {
-                try FileManager.default.removeItem(at: tempURL)
+            // For resume downloads, we need to append the downloaded data to existing file
+            if FileManager.default.fileExists(atPath: targetURL.path) {
+                // Read existing file data
+                let existingData = try Data(contentsOf: targetURL)
+                // Read downloaded data
+                let downloadedData = try Data(contentsOf: location)
+                // Combine and write back
+                let combinedData = existingData + downloadedData
+                try combinedData.write(to: targetURL)
+                logger.info("[+] appended downloaded data to existing file: \(targetURL.path)")
+            } else {
+                // First time download, just move the file
+                try? FileManager.default.createDirectory(
+                    at: targetURL.deletingLastPathComponent(),
+                    withIntermediateDirectories: true
+                )
+                try FileManager.default.moveItem(at: location, to: targetURL)
+                logger.info("[+] moved downloaded file to target location: \(targetURL.path)")
             }
-            try FileManager.default.moveItem(at: location, to: tempURL)
-            logger.info("[+] moved downloaded file to temp location: \(tempURL.path)")
             state.moveError = nil
         } catch {
-            logger.error("[-] failed to move downloaded file to temp location: \(error.localizedDescription)")
+            logger.error("[-] failed to handle downloaded file: \(error.localizedDescription)")
             state.moveError = error
         }
 

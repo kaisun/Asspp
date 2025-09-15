@@ -49,9 +49,9 @@ extension Downloads {
             while retryCount < maxRetries {
                 do {
                     logger.info("[*] starting download task for request id: \(requestID) (attempt \(retryCount + 1)/\(maxRetries))")
-                    let tempURL = FileManager.default.temporaryDirectory.appendingPathComponent("AssppDownload_\(requestID.uuidString).ipa")
-                    try await downloadWithProgress(from: request.url, to: tempURL, requestID: requestID)
-                    await finalize(request: request, url: tempURL)
+                    // Use target location directly instead of temp file for resume support
+                    try await downloadWithProgress(from: request.url, to: request.targetLocation, requestID: requestID)
+                    await finalize(request: request, url: request.targetLocation)
                     logger.info("[+] download completed successfully for request id: \(requestID)")
                     break
                 } catch is CancellationError {
