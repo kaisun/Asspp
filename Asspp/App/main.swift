@@ -64,10 +64,10 @@ do {
     if UserDefaults.standard.string(forKey: deviceIdentifierKey) == nil {
         do {
             #if os(macOS)
-            let systemIdentifier = try ApplePackage.DeviceIdentifier.system()
-            UserDefaults.standard.set(systemIdentifier, forKey: deviceIdentifierKey)
+                let systemIdentifier = try ApplePackage.DeviceIdentifier.system()
+                UserDefaults.standard.set(systemIdentifier, forKey: deviceIdentifierKey)
             #else
-            throw NSError()
+                throw NSError()
             #endif
         } catch {
             logger.info("[?] failed to read system device identifier, using a random one")

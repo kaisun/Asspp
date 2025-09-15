@@ -59,9 +59,10 @@ public enum DeviceIdentifier {
             "0", "1", "2", "3", "4", "5", "6", "7", "8", "9",
             "A", "B", "C", "D", "E", "F",
         ]
-        return [0 ..< 12]
-            .map { _ in chars.randomElement()! }
-            .joined()
-            .uppercased()
+        var ans = ""
+        while ans.count < 12 {
+            ans.append(chars.randomElement()!)
+        }
+        return ans
     }
 }
