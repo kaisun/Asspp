@@ -63,8 +63,12 @@ do {
     let deviceIdentifierKey = "wiki.qaq.asspp.device.identifier"
     if UserDefaults.standard.string(forKey: deviceIdentifierKey) == nil {
         do {
+            #if os(macOS)
             let systemIdentifier = try ApplePackage.DeviceIdentifier.system()
             UserDefaults.standard.set(systemIdentifier, forKey: deviceIdentifierKey)
+            #else
+            throw NSError()
+            #endif
         } catch {
             logger.info("[?] failed to read system device identifier, using a random one")
             let randomIdentifier = ApplePackage.DeviceIdentifier.random()
