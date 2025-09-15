@@ -133,13 +133,13 @@ struct ProductView: View {
     }
 
     func startDownload() {
-        guard let account else { return }
+        guard var account else { return }
         obtainDownloadURL = true
         Task {
             do {
-                var appleAccount = try account.toAppleAccount()
+                defer { vm.save(email: account.account.email, account: account.account) }
                 let downloadOutput = try await ApplePackage.Download.download(
-                    account: &appleAccount,
+                    account: &account.account,
                     app: archive.software
                 )
                 archive.downloadOutput = downloadOutput
@@ -163,13 +163,14 @@ struct ProductView: View {
     }
 
     func acquireLicense() {
-        guard let account else { return }
+        guard var account else { return }
         acquiringLicense = true
         Task {
             do {
-                var appleAccount = try account.toAppleAccount()
+                defer { vm.save(email: account.account.email, account: account.account) }
+                try await ApplePackage.Authenticator.rotatePasswordToken(for: &account.account)
                 try await ApplePackage.Purchase.purchase(
-                    account: &appleAccount,
+                    account: &account.account,
                     app: archive.software
                 )
                 DispatchQueue.main.async {

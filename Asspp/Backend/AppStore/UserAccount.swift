@@ -17,10 +17,6 @@ extension AppStore {
             self.account = account
         }
 
-        func toAppleAccount() throws -> ApplePackage.Account {
-            account
-        }
-
         static func == (lhs: UserAccount, rhs: UserAccount) -> Bool {
             lhs.id == rhs.id
         }

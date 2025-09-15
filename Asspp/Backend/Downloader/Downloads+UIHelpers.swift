@@ -27,7 +27,7 @@ enum DownloadAction: Hashable {
 
 // MARK: - UI Helper Extension
 
-extension Downloads: DownloadActionHandler {
+extension Downloads: @MainActor DownloadActionHandler {
     // MARK: - UI Helper Methods
 
     func performDownloadAction(for request: Request, action: DownloadAction) async {
@@ -65,13 +65,13 @@ extension Downloads: DownloadActionHandler {
     func getActionLabel(for action: DownloadAction) -> (title: String, systemImage: String, isDestructive: Bool) {
         switch action {
         case .suspend:
-            ("Pause", "stop.fill", false)
+            (String(localized: "Pause"), "stop.fill", false)
         case .resume:
-            ("Resume", "play.fill", false)
+            (String(localized: "Resume"), "play.fill", false)
         case .restart:
-            ("Retry", "arrow.clockwise", false)
+            (String(localized: "Restart Download"), "arrow.clockwise", false)
         case .delete:
-            ("Delete", "trash", true)
+            (String(localized: "Delete"), "trash", true)
         }
     }
 }

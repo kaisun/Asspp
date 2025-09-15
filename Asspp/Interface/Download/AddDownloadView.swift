@@ -87,15 +87,15 @@ struct AddDownloadView: View {
     }
 
     func startDownload() {
-        guard let account else { return }
+        guard var account else { return }
         searchKeyFocused = false
         obtainDownloadURL = true
         Task {
             do {
+                defer { AppStore.this.save(email: account.account.email, account: account.account) }
                 let software = try await ApplePackage.Lookup.lookup(bundleID: bundleID, countryCode: account.account.store)
-                var appleAccount = try account.toAppleAccount()
                 let downloadOutput = try await ApplePackage.Download.download(
-                    account: &appleAccount,
+                    account: &account.account,
                     app: software
                 )
                 let appPackage = AppStore.AppPackage(software: software)

@@ -32,11 +32,9 @@ extension Downloads {
             return
         }
 
-        // Update status and progress with early return pattern
         let initialPercent = resetProgress ? 0 : request.runtime.percent
         await updateRequestStatus(requestID, status: .pending, percent: initialPercent, error: nil)
 
-        // Remove partial file if resetting
         if resetProgress {
             try? FileManager.default.removeItem(at: request.targetLocation)
         }
@@ -63,7 +61,12 @@ extension Downloads {
                     retryCount += 1
                     if retryCount >= maxRetries {
                         logger.error("[-] download failed after \(maxRetries) retries for request id: \(requestID), error: \(error.localizedDescription)")
-                        await updateRequestStatus(requestID, status: .failed, percent: resetProgress ? 0 : request.runtime.percent, error: error.localizedDescription)
+                        await updateRequestStatus(
+                            requestID,
+                            status: .failed,
+                            percent: resetProgress ? 0 : request.runtime.percent,
+                            error: error.localizedDescription
+                        )
                     } else {
                         logger.warning("[!] download failed, retrying (\(retryCount)/\(maxRetries)) for request id: \(requestID), error: \(error.localizedDescription)")
                         try await Task.sleep(nanoseconds: 2_000_000_000) // 2 seconds delay

@@ -81,8 +81,6 @@ extension Downloads: URLSessionDownloadDelegate {
                 let speed = Int64(Double(totalBytesWritten - state.lastBytes) / elapsed)
                 let speedStr = byteFormat(bytes: speed)
                 await report(speed: speedStr, reqId: requestID)
-                logger.debug("[?] progress update: \(totalBytesExpectedToWrite > 0 ? String(format: "%.1f%%", Double(totalBytesWritten) / Double(totalBytesExpectedToWrite) * 100) : "unknown"), speed: \(speedStr), request id: \(requestID)")
-
                 state.lastBytes = totalBytesWritten
                 state.lastUpdate = now
                 activeDownloads[requestID] = state

@@ -1319,22 +1319,22 @@
         }
       }
     },
+    "Restart Download" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "重新下载"
+          }
+        }
+      }
+    },
     "Resume" : {
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "继续"
-          }
-        }
-      }
-    },
-    "Retry" : {
-      "localizations" : {
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "重试"
           }
         }
       }
