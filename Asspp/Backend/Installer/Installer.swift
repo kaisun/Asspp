@@ -79,7 +79,6 @@ class Installer: Identifiable, ObservableObject, @unchecked Sendable {
                         }
                     }
                 }
-                await MainActor.run { self.status = .completed(.success(())) }
                 return result
             default:
                 // 404
