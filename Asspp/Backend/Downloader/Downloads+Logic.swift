@@ -65,7 +65,7 @@ extension Downloads: URLSessionDownloadDelegate {
     func urlSession(_: URLSession, downloadTask: URLSessionDownloadTask, didWriteData _: Int64, totalBytesWritten: Int64, totalBytesExpectedToWrite: Int64) {
         guard let requestID = downloadTaskToRequestID[downloadTask] else { return }
 
-        Task {
+        Task { @MainActor in
             let progress = Progress(totalUnitCount: totalBytesExpectedToWrite)
             progress.completedUnitCount = totalBytesWritten
             await report(progress: progress, reqId: requestID)
@@ -89,22 +89,27 @@ extension Downloads: URLSessionDownloadDelegate {
         guard let requestID = downloadTaskToRequestID[downloadTask] else { return }
         downloadTaskToRequestID.removeValue(forKey: downloadTask)
 
-        if let continuation = downloadContinuations[requestID] {
-            downloadContinuations.removeValue(forKey: requestID)
-            continuation.resume(returning: ())
+        Task { @MainActor in
+            if let continuation = downloadContinuations[requestID] {
+                downloadContinuations.removeValue(forKey: requestID)
+                continuation.resume(returning: ())
+            }
         }
     }
 
-    func urlSession(_: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
+    // Delegate method for errors
+    func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
         guard let downloadTask = task as? URLSessionDownloadTask, let requestID = downloadTaskToRequestID[downloadTask] else { return }
         downloadTaskToRequestID.removeValue(forKey: downloadTask)
 
-        if let continuation = downloadContinuations[requestID] {
-            downloadContinuations.removeValue(forKey: requestID)
-            if let error {
-                continuation.resume(throwing: error)
-            } else {
-                continuation.resume(returning: ())
+        Task { @MainActor in
+            if let continuation = downloadContinuations[requestID] {
+                downloadContinuations.removeValue(forKey: requestID)
+                if let error = error {
+                    continuation.resume(throwing: error)
+                } else {
+                    continuation.resume(returning: ())
+                }
             }
         }
     }
