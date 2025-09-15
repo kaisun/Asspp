@@ -10,27 +10,29 @@ import CryptoKit
 import Foundation
 import Logging
 
-func md5File(url: URL) -> String? {
-    do {
-        var hasher = Insecure.MD5()
-        let bufferSize = 1024 * 1024 * 32 // 32MB
+nonisolated enum MD5Calculator {
+    static func hashFile(url: URL) -> String? {
+        do {
+            var hasher = Insecure.MD5()
+            let bufferSize = 1024 * 1024 * 32 // 32MB
 
-        let fileHandler = try FileHandle(forReadingFrom: url)
-        fileHandler.seekToEndOfFile()
-        let size = fileHandler.offsetInFile
-        try fileHandler.seek(toOffset: 0)
+            let fileHandler = try FileHandle(forReadingFrom: url)
+            fileHandler.seekToEndOfFile()
+            let size = fileHandler.offsetInFile
+            try fileHandler.seek(toOffset: 0)
 
-        while fileHandler.offsetInFile < size {
-            autoreleasepool {
-                let data = fileHandler.readData(ofLength: bufferSize)
-                hasher.update(data: data)
+            while fileHandler.offsetInFile < size {
+                autoreleasepool {
+                    let data = fileHandler.readData(ofLength: bufferSize)
+                    hasher.update(data: data)
+                }
             }
-        }
 
-        let digest = hasher.finalize()
-        return digest.map { String(format: "%02hhx", $0) }.joined()
-    } catch {
-        logger.error("[-] error reading file: \(error)")
-        return nil
+            let digest = hasher.finalize()
+            return digest.map { String(format: "%02hhx", $0) }.joined()
+        } catch {
+            logger.error("[-] error reading file: \(error)")
+            return nil
+        }
     }
 }

@@ -81,9 +81,12 @@ public enum Download {
             try ensureFailed("missing metadata")
         }
 
-        let version = (metadata["bundleShortVersionString"] as? String) ?? "unknown"
+        let version = (metadata["bundleShortVersionString"] as? String)
         let bundleVersion = metadata["bundleVersion"] as? String
-        let hashMD5 = metadata["md5"] as? String
+
+        guard let version, let bundleVersion else {
+            try ensureFailed("missing required information")
+        }
 
         var sinfs: [Sinf] = []
         if let sinfData = item["sinfs"] as? [[String: Any]] {
@@ -102,7 +105,6 @@ public enum Download {
         return DownloadOutput(
             downloadURL: url,
             sinfs: sinfs,
-            hashMD5: hashMD5,
             bundleShortVersionString: version,
             bundleVersion: bundleVersion
         )

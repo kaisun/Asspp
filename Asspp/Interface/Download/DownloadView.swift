@@ -30,11 +30,6 @@ struct DownloadView: View {
                 }
             }
         }
-        .refreshable {
-            for req in vm.requests {
-                Task { await vm.checkAndUpdateDownloadStatus(for: req) }
-            }
-        }
         .toolbar {
             NavigationLink(destination: AddDownloadView()) {
                 Image(systemName: "plus")

@@ -14,6 +14,7 @@ private let byteFormatter: ByteCountFormatter = {
     return formatter
 }()
 
+@MainActor
 extension Downloads {
     func byteFormat(bytes: Int64) -> String {
         byteFormatter.string(fromByteCount: bytes)

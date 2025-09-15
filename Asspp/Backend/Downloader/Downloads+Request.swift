@@ -24,7 +24,6 @@ extension Downloads {
         @Published var package: AppStore.AppPackage
 
         @Published var url: URL
-        @Published var md5: String?
         @Published var signatures: [ApplePackage.Sinf]
         @Published var metadata: [String: AnyCodable]
 
@@ -35,7 +34,7 @@ extension Downloads {
             storeDir
                 .appendingPathComponent(package.software.bundleID)
                 .appendingPathComponent(package.software.version)
-                .appendingPathComponent("\(md5 ?? "unknown")_\(id.uuidString)")
+                .appendingPathComponent("\(id.uuidString)")
                 .appendingPathExtension("ipa")
         }
 
@@ -43,7 +42,6 @@ extension Downloads {
             self.account = account
             self.package = package
             url = URL(string: downloadOutput.downloadURL)!
-            md5 = downloadOutput.hashMD5
             signatures = downloadOutput.sinfs
             creation = .init()
             metadata = [:] // Simplified
@@ -55,7 +53,6 @@ extension Downloads {
             account = try container.decode(AppStore.UserAccount.self, forKey: .account)
             package = try container.decode(AppStore.AppPackage.self, forKey: .package)
             url = try container.decode(URL.self, forKey: .url)
-            md5 = try container.decodeIfPresent(String.self, forKey: .md5)
             signatures = try container.decode([ApplePackage.Sinf].self, forKey: .signatures)
             metadata = try container.decode([String: AnyCodable].self, forKey: .metadata)
             creation = try container.decode(Date.self, forKey: .creation)
@@ -68,7 +65,6 @@ extension Downloads {
             try container.encode(account, forKey: .account)
             try container.encode(package, forKey: .package)
             try container.encode(url, forKey: .url)
-            try container.encode(md5, forKey: .md5)
             try container.encode(signatures, forKey: .signatures)
             try container.encode(metadata, forKey: .metadata)
             try container.encode(creation, forKey: .creation)
@@ -88,7 +84,6 @@ extension Downloads {
             hasher.combine(account)
             hasher.combine(package)
             hasher.combine(url)
-            hasher.combine(md5)
             hasher.combine(signatures)
             hasher.combine(metadata)
             hasher.combine(creation)

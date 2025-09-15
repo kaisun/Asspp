@@ -8,16 +8,6 @@
 import Foundation
 import SwiftUI
 
-// MARK: - Download Action Protocol
-
-protocol DownloadActionHandler {
-    func performDownloadAction(for request: Downloads.Request, action: DownloadAction) async
-    func getAvailableActions(for request: Downloads.Request) -> [DownloadAction]
-    func getActionLabel(for action: DownloadAction) -> (title: String, systemImage: String, isDestructive: Bool)
-}
-
-// MARK: - Download Action Types
-
 enum DownloadAction: Hashable {
     case suspend
     case resume
@@ -25,11 +15,8 @@ enum DownloadAction: Hashable {
     case delete
 }
 
-// MARK: - UI Helper Extension
-
-extension Downloads: @MainActor DownloadActionHandler {
-    // MARK: - UI Helper Methods
-
+@MainActor
+extension Downloads {
     func performDownloadAction(for request: Request, action: DownloadAction) async {
         switch action {
         case .suspend:
@@ -44,21 +31,15 @@ extension Downloads: @MainActor DownloadActionHandler {
     }
 
     func getAvailableActions(for request: Request) -> [DownloadAction] {
-        // Early return for completed requests
-        guard !isCompleted(for: request) else {
-            return [.delete]
-        }
-
-        // Switch on status with single responsibility
         switch request.runtime.status {
         case .pending, .downloading:
-            return [.suspend, .delete]
+            [.suspend, .delete]
         case .paused:
-            return [.resume, .delete]
+            [.resume, .delete]
         case .failed:
-            return [.restart, .delete]
+            [.restart, .delete]
         case .completed:
-            return [.delete]
+            [.delete]
         }
     }
 
