@@ -1,5 +1,7 @@
 #!/bin/zsh
 
+set -euo pipefail
+
 SRCROOT=$(realpath "$1")
 TARGET_IPA=$2
 
@@ -9,12 +11,8 @@ BUILD_PRODUCT="Asspp.app"
 
 cd $SRCROOT
 
-echo "[+] cleaning..."
-
 git clean -fdx -f
 git reset --hard
-
-echo "[+] building..."
 
 xcodebuild -workspace "$WORKSPACE" \
     -scheme "$SCHEME" \
