@@ -10,7 +10,28 @@ import Foundation
 import NIOSSL
 
 public enum Configuration {
+    /*
+     DeviceIdentifier is a unique identifier for your device.
+
+     - On macOS, it is a MAC address and can be read by calling DeviceIdentifier.system.
+     - If that fails and throws an error, use DeviceIdentifier.random and **save it**
+
+     **It is a must set value before any network request**
+     **otherwise your account may be locked for security reason**
+     */
+    public static var deviceIdentifier: String = "" {
+        didSet {
+            assert(!deviceIdentifier.contains(":"))
+            assert(!deviceIdentifier.contains("-"))
+            assert(!deviceIdentifier.contains(" "))
+            assert(!deviceIdentifier.contains("\n"))
+        }
+    }
+
+    public static var userAgent: String = "Configurator/2.17 (Macintosh; OS X 15.2; 24C5089c) AppleWebKit/0620.1.16.11.6"
+
     public static var tlsConfiguration: TLSConfiguration = {
+        precondition(!deviceIdentifier.isEmpty, "deviceIdentifier must be set")
         #if DEBUG
             var conf = TLSConfiguration.makeClientConfiguration()
             conf.certificateVerification = .none
@@ -19,16 +40,6 @@ public enum Configuration {
             return TLSConfiguration.makeClientConfiguration()
         #endif
     }()
-
-    public static var userAgent: String = "Configurator/2.17 (Macintosh; OS X 15.2; 24C5089c) AppleWebKit/0620.1.16.11.6"
-    public static var deviceIdentifier: String = DeviceIdentifier.read() {
-        didSet {
-            assert(!deviceIdentifier.contains(":"))
-            assert(!deviceIdentifier.contains("-"))
-            assert(!deviceIdentifier.contains(" "))
-            assert(!deviceIdentifier.contains("\n"))
-        }
-    }
 
     public static var storeFrontValues: [String: String] = kCountryCodes
     public static var timeoutConnect: Int64 = 10
@@ -45,15 +56,6 @@ public enum Configuration {
             .appendingPathComponent(".ipatool", isDirectory: true)
         { didSet { assert(homePath.isFileURL) } }
     #endif
-
-    public static func initialize() {
-        _ = userAgent
-        _ = deviceIdentifier
-        _ = storeFrontValues
-        _ = timeoutConnect
-        _ = timeoutRead
-        _ = homePath
-    }
 
     public static func storeId(for countryCode: String) -> String? {
         storeFrontValues[countryCode]

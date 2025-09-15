@@ -5,6 +5,7 @@
 //  Created by 秋星桥 on 2024/7/11.
 //
 
+import ApplePackage
 import Logging
 import SwiftUI
 
@@ -57,12 +58,21 @@ try? FileManager.default.createDirectory(
 
 _ = ProcessInfo.processInfo.hostName
 
-// Generate and store device identifier if not exists
-let deviceIdentifierKey = "com.asspp.device.identifier"
-if UserDefaults.standard.string(forKey: deviceIdentifierKey) == nil {
-    let deviceId = UUID().uuidString.replacingOccurrences(of: "-", with: "").uppercased()
-    UserDefaults.standard.set(deviceId, forKey: deviceIdentifierKey)
-    UserDefaults.standard.synchronize()
+do {
+    let deviceIdentifierKey = "wiki.qaq.asspp.device.identifier"
+    if UserDefaults.standard.string(forKey: deviceIdentifierKey) == nil {
+        do {
+            let systemIdentifier = try ApplePackage.DeviceIdentifier.system()
+            UserDefaults.standard.set(systemIdentifier, forKey: deviceIdentifierKey)
+        } catch {
+            logger.info("[?] failed to read system device identifier, using a random one")
+            let randomIdentifier = ApplePackage.DeviceIdentifier.random()
+            UserDefaults.standard.set(randomIdentifier, forKey: deviceIdentifierKey)
+        }
+    }
+    let identifier = UserDefaults.standard.string(forKey: deviceIdentifierKey)!
+    logger.info("[i] using device identifier: \(identifier)")
+    ApplePackage.Configuration.deviceIdentifier = identifier
 }
 
 App.main()

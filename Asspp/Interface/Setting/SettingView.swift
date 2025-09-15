@@ -5,7 +5,7 @@
 //  Created by 秋星桥 on 2024/7/11.
 //
 
-import FLEX
+import ApplePackage
 import SwiftUI
 
 struct SettingView: View {
@@ -32,6 +32,8 @@ struct SettingView: View {
                 }
                 Section {
                     Text(ProcessInfo.processInfo.hostName)
+                    Text(ApplePackage.Configuration.deviceIdentifier)
+                        .font(.system(.body, design: .monospaced))
                     Button("Open Settings") {
                         UIApplication.shared.open(URL(string: UIApplication.openSettingsURLString)!)
                     }
@@ -40,15 +42,7 @@ struct SettingView: View {
                 } footer: {
                     Text("Grant local network permission to install apps and communicate with system services. If hostname is empty, open Settings to grant permission.")
                 }
-                Section {
-                    Button("Show FLEX") {
-                        FLEXManager.shared.showExplorer()
-                    }
-                } header: {
-                    Text("Debug")
-                } footer: {
-                    Text("FLEX is a set of in-app debugging and exploration tools for iOS development.")
-                }
+
                 Section {
                     Button("@Lakr233") {
                         UIApplication.shared.open(URL(string: "https://twitter.com/Lakr233")!)

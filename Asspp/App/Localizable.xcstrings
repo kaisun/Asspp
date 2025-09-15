@@ -551,22 +551,6 @@
         }
       }
     },
-    "Debug" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Debug"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "调试"
-          }
-        }
-      }
-    },
     "Delete" : {
       "localizations" : {
         "en" : {
@@ -843,22 +827,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "问题反馈"
-          }
-        }
-      }
-    },
-    "FLEX is a set of in-app debugging and exploration tools for iOS development." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "FLEX is a set of in-app debugging and exploration tools for iOS development."
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "使用工具调试应用程序及其运行环境。"
           }
         }
       }
@@ -1595,22 +1563,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "显示下载项"
-          }
-        }
-      }
-    },
-    "Show FLEX" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Show FLEX"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "显示调试工具"
           }
         }
       }

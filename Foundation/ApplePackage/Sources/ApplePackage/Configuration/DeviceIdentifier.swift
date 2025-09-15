@@ -8,64 +8,60 @@
 import Foundation
 
 public enum DeviceIdentifier {
-    static func read() -> String {
-        let deviceIdentifierKey = "com.asspp.device.identifier"
-        
-        // First try to read from UserDefaults
-        if let storedDeviceId = UserDefaults.standard.string(forKey: deviceIdentifierKey) {
-            return storedDeviceId
+    public static func system() throws -> String {
+        let MAC_ADDRESS_LENGTH = 6
+        let bsds: [String] = ["en0", "en1"]
+        var bsd: String = bsds[0]
+
+        var length: size_t = 0
+        var buffer: [CChar]
+
+        var bsdIndex = Int32(if_nametoindex(bsd))
+        if bsdIndex == 0 {
+            bsd = bsds[1]
+            bsdIndex = Int32(if_nametoindex(bsd))
+            guard bsdIndex != 0 else { try ensureFailed("unable to get interface") }
         }
-        
-        // Fallback to original implementation
-        let deviceId: String
-        #if os(macOS) && !DEBUG
-            let MAC_ADDRESS_LENGTH = 6
-            let bsds: [String] = ["en0", "en1"]
-            var bsd: String = bsds[0]
 
-            var length: size_t = 0
-            var buffer: [CChar]
+        let bsdData = Data(bsd.utf8)
+        var managementInfoBase = [CTL_NET, AF_ROUTE, 0, AF_LINK, NET_RT_IFLIST, bsdIndex]
 
-            var bsdIndex = Int32(if_nametoindex(bsd))
-            if bsdIndex == 0 {
-                bsd = bsds[1]
-                bsdIndex = Int32(if_nametoindex(bsd))
-                guard bsdIndex != 0 else { fatalError("Could not read MAC address") }
+        guard sysctl(&managementInfoBase, 6, nil, &length, nil, 0) >= 0 else {
+            try ensureFailed("unable to get interface info")
+        }
+
+        buffer = [CChar](unsafeUninitializedCapacity: length, initializingWith: { buffer, initializedCount in
+            for x in 0 ..< length {
+                buffer[x] = 0
             }
+            initializedCount = length
+        })
 
-            let bsdData = Data(bsd.utf8)
-            var managementInfoBase = [CTL_NET, AF_ROUTE, 0, AF_LINK, NET_RT_IFLIST, bsdIndex]
+        guard sysctl(&managementInfoBase, 6, &buffer, &length, nil, 0) >= 0 else {
+            try ensureFailed("unable to get interface info")
+        }
 
-            guard sysctl(&managementInfoBase, 6, nil, &length, nil, 0) >= 0 else { fatalError("Could not read MAC address") }
+        let infoData = Data(bytes: buffer, count: length)
+        let indexAfterMsghdr = MemoryLayout<if_msghdr>.stride + 1
+        let rangeOfToken = infoData[indexAfterMsghdr...].range(of: bsdData)!
+        let lower = rangeOfToken.upperBound
+        let upper = lower + MAC_ADDRESS_LENGTH
+        let macAddressData = infoData[lower ..< upper]
+        let addressBytes = macAddressData.map { String(format: "%02x", $0) }
+        let result = addressBytes.joined().uppercased().trimmingCharacters(in: .whitespacesAndNewlines)
+        try ensure(!result.isEmpty, "unable to get mac address")
 
-            buffer = [CChar](unsafeUninitializedCapacity: length, initializingWith: { buffer, initializedCount in
-                for x in 0 ..< length {
-                    buffer[x] = 0
-                }
-                initializedCount = length
-            })
+        return result
+    }
 
-            guard sysctl(&managementInfoBase, 6, &buffer, &length, nil, 0) >= 0 else { fatalError("Could not read MAC address") }
-
-            let infoData = Data(bytes: buffer, count: length)
-            let indexAfterMsghdr = MemoryLayout<if_msghdr>.stride + 1
-            let rangeOfToken = infoData[indexAfterMsghdr...].range(of: bsdData)!
-            let lower = rangeOfToken.upperBound
-            let upper = lower + MAC_ADDRESS_LENGTH
-            let macAddressData = infoData[lower ..< upper]
-            let addressBytes = macAddressData.map { String(format: "%02x", $0) }
-            deviceId = addressBytes.joined().uppercased()
-        #else
-            deviceId = "06:02:18:bb:0a:0a"
-                .trimmingCharacters(in: .whitespacesAndNewlines)
-                .replacingOccurrences(of: ":", with: "")
-                .uppercased()
-        #endif
-        
-        // Store the fallback device ID for future use
-        UserDefaults.standard.set(deviceId, forKey: deviceIdentifierKey)
-        UserDefaults.standard.synchronize()
-        
-        return deviceId
+    public static func random() -> String {
+        let chars = [
+            "0", "1", "2", "3", "4", "5", "6", "7", "8", "9",
+            "A", "B", "C", "D", "E", "F",
+        ]
+        return [0 ..< 12]
+            .map { _ in chars.randomElement()! }
+            .joined()
+            .uppercased()
     }
 }
