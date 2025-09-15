@@ -22,7 +22,6 @@ extension Downloads {
             return
         }
         requests[index] = req
-        logger.debug("[?] request altered: \(reqID)")
     }
 
     func reportValidating(reqId: Request.ID) async {
@@ -54,7 +53,6 @@ extension Downloads {
     }
 
     func report(progress: Progress, reqId: Request.ID) async {
-        logger.debug("[?] reporting progress for request id: \(reqId): \(progress.fractionCompleted * 100)%")
         await alter(reqID: reqId) { req in
             req.runtime.percent = progress.fractionCompleted
             req.runtime.status = .downloading
@@ -63,9 +61,6 @@ extension Downloads {
     }
 
     func report(speed: String, reqId: Request.ID) async {
-        logger.debug("[?] reporting speed for request id: \(reqId): \(speed)")
-        await alter(reqID: reqId) { req in
-            req.runtime.speed = speed
-        }
+        await alter(reqID: reqId) { $0.runtime.speed = speed }
     }
 }

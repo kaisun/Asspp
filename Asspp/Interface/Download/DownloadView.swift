@@ -59,33 +59,15 @@ struct DownloadView: View {
                 }
             }
             .contextMenu {
-                if vm.isCompleted(for: req) {
-                    Button(role: .destructive) {
-                        Task { await vm.delete(request: req) }
+                let actions = vm.getAvailableActions(for: req)
+                ForEach(actions, id: \.self) { action in
+                    let label = vm.getActionLabel(for: action)
+                    Button {
+                        Task { await vm.performDownloadAction(for: req, action: action) }
                     } label: {
-                        Label("Delete", systemImage: "trash")
+                        Label(label.title, systemImage: label.systemImage)
                     }
-                } else {
-                    switch req.runtime.status {
-                    case .pending, .downloading:
-                        Button {
-                            Task { await vm.suspend(requestID: req.id) }
-                        } label: {
-                            Label("Pause", systemImage: "stop.fill")
-                        }
-                    case .paused:
-                        Button {
-                            Task { await vm.resume(requestID: req.id) }
-                        } label: {
-                            Label("Resume", systemImage: "play.fill")
-                        }
-                    default: Group {}
-                    }
-                    Button(role: .destructive) {
-                        Task { await vm.delete(request: req) }
-                    } label: {
-                        Label("Cancel", systemImage: "trash")
-                    }
+                    .foregroundStyle(label.isDestructive ? .red : .primary)
                 }
             }
         }

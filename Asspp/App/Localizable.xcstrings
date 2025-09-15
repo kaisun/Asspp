@@ -65,18 +65,22 @@
         }
       }
     },
-    "%lld%%..." : {
+    "%d items" : {
       "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%lld%%..."
-          }
-        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%lld%%..."
+            "value" : "%d 个项目"
+          }
+        }
+      }
+    },
+    "%lld%%..." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld%%…"
           }
         }
       }
@@ -397,22 +401,6 @@
         }
       }
     },
-    "Cancel" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Cancel"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "取消"
-          }
-        }
-      }
-    },
     "Communicating with Apple..." : {
       "localizations" : {
         "en" : {
@@ -441,6 +429,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "已完成"
+          }
+        }
+      }
+    },
+    "Content - %@" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "内容 - %@"
           }
         }
       }
@@ -673,22 +671,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "下载失败。"
-          }
-        }
-      }
-    },
-    "Download In Progress..." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Download In Progress..."
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "正在下载..."
           }
         }
       }
@@ -1337,22 +1319,6 @@
         }
       }
     },
-    "Restart Download" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Restart Download"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "重新开始下载"
-          }
-        }
-      }
-    },
     "Resume" : {
       "localizations" : {
         "zh-Hans" : {
@@ -1363,12 +1329,12 @@
         }
       }
     },
-    "Resume Download" : {
+    "Retry" : {
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "继续下载"
+            "value" : "重试"
           }
         }
       }

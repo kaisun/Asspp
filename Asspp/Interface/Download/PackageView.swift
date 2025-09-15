@@ -92,21 +92,13 @@ struct PackageView: View {
                 }
             } else {
                 Section {
-                    switch request.runtime.status {
-                    case .pending:
-                        Text("Download In Progress...")
-                    case .downloading:
-                        Text("Download In Progress...")
-                    case .paused:
-                        Button("Resume Download") {
-                            Task { await downloads.resume(requestID: request.id) }
+                    let actions = downloads.getAvailableActions(for: request)
+                    ForEach(actions.filter { $0 != .delete }, id: \.self) { action in
+                        let label = downloads.getActionLabel(for: action)
+                        Button(label.title) {
+                            Task { await downloads.performDownloadAction(for: request, action: action) }
                         }
-                    case .completed:
-                        Group {}
-                    case .failed:
-                        Button("Restart Download") {
-                            Task { await downloads.resume(requestID: request.id) }
-                        }
+                        .foregroundStyle(label.isDestructive ? .red : .primary)
                     }
                 } header: {
                     Text("Incomplete Package")
@@ -141,11 +133,13 @@ struct PackageView: View {
             }
 
             Section {
-                Button("Delete") {
-                    Task { await downloads.delete(request: request) }
+                let deleteAction = DownloadAction.delete
+                let label = downloads.getActionLabel(for: deleteAction)
+                Button(label.title) {
+                    Task { await downloads.performDownloadAction(for: request, action: deleteAction) }
                     dismiss()
                 }
-                .foregroundStyle(.red)
+                .foregroundStyle(label.isDestructive ? .red : .primary)
             } header: {
                 Text("Danger Zone")
             } footer: {

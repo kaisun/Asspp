@@ -103,7 +103,7 @@ struct ProductView: View {
         } header: {
             Text("Account")
         } footer: {
-            Text(String(format: String(localized: "You have searched this package with region %@"), region))
+            Text("You have searched this package with region \(region)")
         }
     }
 
