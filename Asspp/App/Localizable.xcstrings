@@ -413,16 +413,6 @@
         }
       }
     },
-    "Cancelled" : {
-      "localizations" : {
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "取消"
-          }
-        }
-      }
-    },
     "Communicating with Apple..." : {
       "localizations" : {
         "en" : {
@@ -483,22 +473,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "内容"
-          }
-        }
-      }
-    },
-    "Continue Download" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Continue Download"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "继续下载"
           }
         }
       }
@@ -693,6 +667,16 @@
         }
       }
     },
+    "Download failed." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "下载失败。"
+          }
+        }
+      }
+    },
     "Download In Progress..." : {
       "localizations" : {
         "en" : {
@@ -725,16 +709,6 @@
         }
       }
     },
-    "Download was cancelled." : {
-      "localizations" : {
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "下载被取消。"
-          }
-        }
-      }
-    },
     "Downloads" : {
       "localizations" : {
         "en" : {
@@ -747,22 +721,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "下载"
-          }
-        }
-      }
-    },
-    "Either connection is lost or the download is interrupted. Tap to continue." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Either connection is lost or the download is interrupted. Tap to continue."
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "下载被中断。点击以继续。"
           }
         }
       }
@@ -811,6 +769,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "错误"
+          }
+        }
+      }
+    },
+    "Failed" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "失败"
           }
         }
       }
@@ -1365,22 +1333,6 @@
         }
       }
     },
-    "Resume" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Resume"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "继续"
-          }
-        }
-      }
-    },
     "Rotate Token" : {
       "localizations" : {
         "en" : {
@@ -1595,22 +1547,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "成功"
-          }
-        }
-      }
-    },
-    "Suspended" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Suspended"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "已暂停"
           }
         }
       }
@@ -1855,38 +1791,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "未知"
-          }
-        }
-      }
-    },
-    "Verification In Progress..." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Verification In Progress..."
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "正在验证..."
-          }
-        }
-      }
-    },
-    "Verifying..." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Verifying..."
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "正在验证..."
           }
         }
       }

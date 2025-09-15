@@ -93,18 +93,13 @@ struct PackageView: View {
             } else {
                 Section {
                     switch request.runtime.status {
-                    case .stopped:
-                        Button("Continue Download") {
-                            Task { await downloads.resume(requestID: request.id) }
-                        }
-                    case .downloading,
-                         .pending:
+                    case .pending:
                         Text("Download In Progress...")
-                    case .verifying:
-                        Text("Verification In Progress...")
+                    case .downloading:
+                        Text("Download In Progress...")
                     case .completed:
                         Group {}
-                    case .cancelled:
+                    case .failed:
                         Button("Restart Download") {
                             Task { await downloads.resume(requestID: request.id) }
                         }
@@ -113,17 +108,14 @@ struct PackageView: View {
                     Text("Incomplete Package")
                 } footer: {
                     switch request.runtime.status {
-                    case .stopped:
-                        Text("Either connection is lost or the download is interrupted. Tap to continue.")
-                    case .downloading,
-                         .pending:
+                    case .pending:
                         Text("\(Int(request.runtime.percent * 100))%...")
-                    case .verifying:
+                    case .downloading:
                         Text("\(Int(request.runtime.percent * 100))%...")
                     case .completed:
                         Group {}
-                    case .cancelled:
-                        Text("Download was cancelled.")
+                    case .failed:
+                        Text("Download failed.")
                     }
                 }
             }

@@ -28,7 +28,7 @@ extension Downloads {
     func reportValidating(reqId: Request.ID) async {
         logger.info("[*] reporting validating status for request id: \(reqId)")
         await alter(reqID: reqId) { req in
-            req.runtime.status = .verifying
+            req.runtime.status = .downloading
         }
     }
 
@@ -49,7 +49,7 @@ extension Downloads {
         ])
         await alter(reqID: reqId) { req in
             req.runtime.error = error.localizedDescription
-            req.runtime.status = .stopped
+            req.runtime.status = .failed
         }
     }
 

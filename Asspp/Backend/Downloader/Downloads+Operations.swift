@@ -19,25 +19,27 @@ extension Downloads {
 
     func suspend(requestID: Request.ID) async {
         logger.info("[*] suspending download request id: \(requestID)")
-        guard let task = downloadTasks[requestID] else {
-            logger.warning("[!] no active task found for request id: \(requestID)")
+        guard let state = activeDownloads[requestID] else {
+            logger.warning("[!] no active download found for request id: \(requestID)")
             return
         }
-        task.cancel()
-        downloadTasks[requestID] = nil
-        await updateRequestStatus(requestID, status: .stopped, percent: requests.first(where: { $0.id == requestID })?.runtime.percent ?? 0, error: nil)
+        state.task.cancel()
+        activeDownloads.removeValue(forKey: requestID)
+        await updateRequestStatus(requestID, status: .failed, percent: requests.first(where: { $0.id == requestID })?.runtime.percent ?? 0, error: nil)
         logger.info("[+] download suspended for request id: \(requestID)")
     }
 
     func cancel(requestID: Request.ID) async {
         logger.info("[*] cancelling download request id: \(requestID)")
-        guard let task = downloadTasks[requestID] else {
-            logger.warning("[!] no active task found for request id: \(requestID)")
-            return
+        if let state = activeDownloads[requestID] {
+            state.task.cancel()
+            activeDownloads.removeValue(forKey: requestID)
         }
-        task.cancel()
-        downloadTasks[requestID] = nil
-        await updateRequestStatus(requestID, status: .cancelled, percent: 0, error: nil)
+        if let asyncTask = downloadTasks[requestID] {
+            asyncTask.cancel()
+            downloadTasks[requestID] = nil
+        }
+        await updateRequestStatus(requestID, status: .failed, percent: 0, error: nil)
         if let request = requests.first(where: { $0.id == requestID }) {
             try? FileManager.default.removeItem(at: request.targetLocation)
             logger.info("[+] removed partial file for cancelled request id: \(requestID)")
@@ -54,6 +56,7 @@ extension Downloads {
             return
         }
 
+        // Start a new download
         await updateRequestStatus(requestID, status: .pending, percent: request.runtime.percent, error: nil)
 
         let task = Task {
@@ -74,7 +77,7 @@ extension Downloads {
                     retryCount += 1
                     if retryCount >= maxRetries {
                         logger.error("[-] download failed after \(maxRetries) retries for request id: \(requestID), error: \(error.localizedDescription)")
-                        await updateRequestStatus(requestID, status: .stopped, percent: request.runtime.percent, error: error.localizedDescription)
+                        await updateRequestStatus(requestID, status: .failed, percent: request.runtime.percent, error: error.localizedDescription)
                     } else {
                         logger.warning("[!] download failed, retrying (\(retryCount)/\(maxRetries)) for request id: \(requestID), error: \(error.localizedDescription)")
                         try await Task.sleep(nanoseconds: 2_000_000_000) // 2 seconds delay

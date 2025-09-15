@@ -43,11 +43,11 @@ struct DownloadView: View {
     }
 
     var packageList: some View {
-        ForEach(vm.requests) { req in
+        ForEach(vm.requests, id: \.id) { req in
             NavigationLink(destination: PackageView(request: req)) {
                 VStack(spacing: 8) {
                     ArchivePreviewView(archive: req.package)
-                    SimpleProgress(progress: req.runtime.progress)
+                    SimpleProgress(progress: req.runtime.percent)
                         .animation(.interactiveSpring, value: req.runtime.percent)
                     HStack {
                         Text(req.hint)
@@ -67,12 +67,6 @@ struct DownloadView: View {
                     }
                 } else {
                     switch req.runtime.status {
-                    case .stopped:
-                        Button {
-                            Task { await vm.resume(requestID: req.id) }
-                        } label: {
-                            Label("Resume", systemImage: "play.fill")
-                        }
                     case .pending, .downloading:
                         Button {
                             Task { await vm.suspend(requestID: req.id) }
@@ -98,23 +92,19 @@ extension Downloads.Request {
             return error
         }
         return switch runtime.status {
-        case .stopped:
-            String(localized: "Suspended")
         case .pending:
             String(localized: "Pending...")
         case .downloading:
             [
-                String(Int(runtime.progress.fractionCompleted * 100)) + "%",
+                String(Int(runtime.percent * 100)) + "%",
                 runtime.speed.isEmpty ? "" : runtime.speed + "/s",
             ]
             .compactMap(\.self)
             .joined(separator: " ")
-        case .verifying:
-            String(localized: "Verifying...")
         case .completed:
             String(localized: "Completed")
-        case .cancelled:
-            String(localized: "Cancelled")
+        case .failed:
+            String(localized: "Failed")
         }
     }
 }

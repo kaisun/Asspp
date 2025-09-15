@@ -13,7 +13,7 @@ extension Downloads {
 
         // Check if file exists
         guard FileManager.default.fileExists(atPath: fileURL.path) else {
-            await updateRequestStatus(request.id, status: .stopped, percent: 0, error: nil)
+            await updateRequestStatus(request.id, status: .failed, percent: 0, error: nil)
             return
         }
 
@@ -23,16 +23,16 @@ extension Downloads {
             case .valid:
                 await updateRequestStatus(request.id, status: .completed, percent: 1.0, error: nil)
             case .invalid:
-                await updateRequestStatus(request.id, status: .stopped, percent: 0, error: String(localized: "The downloaded file appears to be corrupted or incomplete."))
+                await updateRequestStatus(request.id, status: .failed, percent: 0, error: String(localized: "The downloaded file appears to be corrupted or incomplete."))
                 try? FileManager.default.removeItem(at: fileURL)
             case .unableToVerify:
-                await updateRequestStatus(request.id, status: .stopped, percent: 0, error: String(localized: "Unable to verify the integrity of the downloaded file."))
+                await updateRequestStatus(request.id, status: .failed, percent: 0, error: String(localized: "Unable to verify the integrity of the downloaded file."))
             case .empty:
-                await updateRequestStatus(request.id, status: .stopped, percent: 0, error: String(localized: "The downloaded file is empty."))
+                await updateRequestStatus(request.id, status: .failed, percent: 0, error: String(localized: "The downloaded file is empty."))
                 try? FileManager.default.removeItem(at: fileURL)
             }
         } catch {
-            await updateRequestStatus(request.id, status: .stopped, percent: 0, error: String(localized: "Unable to access the file: \(error.localizedDescription)"))
+            await updateRequestStatus(request.id, status: .failed, percent: 0, error: String(localized: "Unable to access the file: \(error.localizedDescription)"))
         }
     }
 

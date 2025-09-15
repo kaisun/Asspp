@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct SimpleProgress: View {
-    let progress: Progress
+    let progress: Double
     var body: some View {
         Rectangle()
             .foregroundStyle(.gray)
@@ -16,7 +16,7 @@ struct SimpleProgress: View {
                 GeometryReader { r in
                     Rectangle()
                         .foregroundStyle(.accent)
-                        .frame(width: CGFloat(progress.fractionCompleted) * r.size.width)
+                        .frame(width: progress * r.size.width)
                         .frame(maxWidth: .infinity, alignment: .leading)
                 }
             }

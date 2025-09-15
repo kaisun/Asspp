@@ -23,10 +23,15 @@ class Downloads: NSObject, ObservableObject {
     }
 
     // Add properties for URLSessionDownloadDelegate
-    var downloadTaskToRequestID: [URLSessionDownloadTask: Request.ID] = [:]
-    var downloadContinuations: [Request.ID: CheckedContinuation<Void, Error>] = [:]
-    var lastDownloadedBytes: [Request.ID: Int64] = [:]
-    var lastSpeedUpdate: [Request.ID: Date] = [:]
+    var activeDownloads: [Request.ID: DownloadState] = [:]
+
+    struct DownloadState {
+        var task: URLSessionDownloadTask
+        var continuation: CheckedContinuation<Void, Error>?
+        var lastBytes: Int64 = 0
+        var lastUpdate: Date = .init()
+        var moveError: Error?
+    }
 
     var runningTaskCount: Int {
         requests.count(where: { $0.runtime.status == .downloading })

@@ -52,60 +52,71 @@ extension Downloads: URLSessionDownloadDelegate {
         let session = URLSession(configuration: .default, delegate: self, delegateQueue: .main)
         let request = URLRequest(url: url)
         let task = session.downloadTask(with: request)
-        downloadTaskToRequestID[task] = requestID
-        lastDownloadedBytes[requestID] = 0
-        lastSpeedUpdate[requestID] = Date()
+        activeDownloads[requestID] = DownloadState(task: task, continuation: nil, lastBytes: 0, lastUpdate: Date())
 
         return try await withCheckedThrowingContinuation { continuation in
-            downloadContinuations[requestID] = continuation
+            activeDownloads[requestID]?.continuation = continuation
             task.resume()
         }
     }
 
     func urlSession(_: URLSession, downloadTask: URLSessionDownloadTask, didWriteData _: Int64, totalBytesWritten: Int64, totalBytesExpectedToWrite: Int64) {
-        guard let requestID = downloadTaskToRequestID[downloadTask] else { return }
+        guard let requestID = activeDownloads.first(where: { $0.value.task == downloadTask })?.key else { return }
 
         Task { @MainActor in
-            let progress = Progress(totalUnitCount: totalBytesExpectedToWrite)
-            progress.completedUnitCount = totalBytesWritten
-            await report(progress: progress, reqId: requestID)
+            if totalBytesExpectedToWrite > 0 {
+                let progress = Progress(totalUnitCount: totalBytesExpectedToWrite)
+                progress.completedUnitCount = totalBytesWritten
+                await report(progress: progress, reqId: requestID)
+            }
 
             let now = Date()
-            let lastBytes = lastDownloadedBytes[requestID] ?? 0
-            let lastUpdate = lastSpeedUpdate[requestID] ?? now
-            let elapsed = now.timeIntervalSince(lastUpdate)
-            if elapsed > 0 {
-                let speed = Int64(Double(totalBytesWritten - lastBytes) / elapsed)
+            guard var state = activeDownloads[requestID] else { return }
+            let elapsed = now.timeIntervalSince(state.lastUpdate)
+
+            if elapsed >= 0.5 {
+                let speed = Int64(Double(totalBytesWritten - state.lastBytes) / elapsed)
                 let speedStr = byteFormat(bytes: speed)
                 await report(speed: speedStr, reqId: requestID)
-                logger.debug("[?] progress update: \(progress.fractionCompleted * 100)%, speed: \(speedStr), request id: \(requestID)")
-            }
-            lastDownloadedBytes[requestID] = totalBytesWritten
-            lastSpeedUpdate[requestID] = now
-        }
-    }
+                logger.debug("[?] progress update: \(totalBytesExpectedToWrite > 0 ? String(format: "%.1f%%", Double(totalBytesWritten) / Double(totalBytesExpectedToWrite) * 100) : "unknown"), speed: \(speedStr), request id: \(requestID)")
 
-    func urlSession(_: URLSession, downloadTask: URLSessionDownloadTask, didFinishDownloadingTo _: URL) {
-        guard let requestID = downloadTaskToRequestID[downloadTask] else { return }
-        downloadTaskToRequestID.removeValue(forKey: downloadTask)
-
-        Task { @MainActor in
-            if let continuation = downloadContinuations[requestID] {
-                downloadContinuations.removeValue(forKey: requestID)
-                continuation.resume(returning: ())
+                state.lastBytes = totalBytesWritten
+                state.lastUpdate = now
+                activeDownloads[requestID] = state
             }
         }
     }
 
-    // Delegate method for errors
-    func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
-        guard let downloadTask = task as? URLSessionDownloadTask, let requestID = downloadTaskToRequestID[downloadTask] else { return }
-        downloadTaskToRequestID.removeValue(forKey: downloadTask)
+    func urlSession(_: URLSession, downloadTask: URLSessionDownloadTask, didFinishDownloadingTo location: URL) {
+        guard let requestID = activeDownloads.first(where: { $0.value.task == downloadTask })?.key,
+              var state = activeDownloads[requestID] else { return }
+
+        let tempURL = FileManager.default.temporaryDirectory.appendingPathComponent("AssppDownload_\(requestID.uuidString).ipa")
+
+        do {
+            if FileManager.default.fileExists(atPath: tempURL.path) {
+                try FileManager.default.removeItem(at: tempURL)
+            }
+            try FileManager.default.moveItem(at: location, to: tempURL)
+            logger.info("[+] moved downloaded file to temp location: \(tempURL.path)")
+            state.moveError = nil
+        } catch {
+            logger.error("[-] failed to move downloaded file to temp location: \(error.localizedDescription)")
+            state.moveError = error
+        }
+
+        activeDownloads[requestID] = state
+    }
+
+    func urlSession(_: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
+        guard let downloadTask = task as? URLSessionDownloadTask,
+              let requestID = activeDownloads.first(where: { $0.value.task == downloadTask })?.key,
+              let state = activeDownloads[requestID] else { return }
+        activeDownloads.removeValue(forKey: requestID)
 
         Task { @MainActor in
-            if let continuation = downloadContinuations[requestID] {
-                downloadContinuations.removeValue(forKey: requestID)
-                if let error = error {
+            if let continuation = state.continuation {
+                if let error = error ?? state.moveError {
                     continuation.resume(throwing: error)
                 } else {
                     continuation.resume(returning: ())

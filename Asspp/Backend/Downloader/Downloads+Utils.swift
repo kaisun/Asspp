@@ -16,7 +16,7 @@ private let byteFormatter: ByteCountFormatter = {
 
 extension Downloads {
     func byteFormat(bytes: Int64) -> String {
-        byteFormatter.string(fromByteCount: bytes) + "/s"
+        byteFormatter.string(fromByteCount: bytes)
     }
 
     func downloadRequest(forArchive archive: AppStore.AppPackage) -> Request? {
