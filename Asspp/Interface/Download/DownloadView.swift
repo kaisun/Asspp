@@ -73,6 +73,12 @@ struct DownloadView: View {
                         } label: {
                             Label("Pause", systemImage: "stop.fill")
                         }
+                    case .paused:
+                        Button {
+                            Task { await vm.resume(requestID: req.id) }
+                        } label: {
+                            Label("Resume", systemImage: "play.fill")
+                        }
                     default: Group {}
                     }
                     Button(role: .destructive) {
@@ -101,6 +107,8 @@ extension Downloads.Request {
             ]
             .compactMap(\.self)
             .joined(separator: " ")
+        case .paused:
+            String(localized: "Paused")
         case .completed:
             String(localized: "Completed")
         case .failed:

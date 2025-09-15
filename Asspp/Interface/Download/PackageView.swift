@@ -97,6 +97,10 @@ struct PackageView: View {
                         Text("Download In Progress...")
                     case .downloading:
                         Text("Download In Progress...")
+                    case .paused:
+                        Button("Resume Download") {
+                            Task { await downloads.resume(requestID: request.id) }
+                        }
                     case .completed:
                         Group {}
                     case .failed:
@@ -112,6 +116,8 @@ struct PackageView: View {
                         Text("\(Int(request.runtime.percent * 100))%...")
                     case .downloading:
                         Text("\(Int(request.runtime.percent * 100))%...")
+                    case .paused:
+                        Text("Paused at \(Int(request.runtime.percent * 100))%")
                     case .completed:
                         Group {}
                     case .failed:

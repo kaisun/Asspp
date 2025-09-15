@@ -12,6 +12,7 @@ extension Downloads {
         enum Status: String, Codable {
             case pending
             case downloading
+            case paused
             case completed
             case failed
         }

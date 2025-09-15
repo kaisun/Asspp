@@ -25,7 +25,7 @@ extension Downloads {
         }
         state.task.cancel()
         activeDownloads.removeValue(forKey: requestID)
-        await updateRequestStatus(requestID, status: .failed, percent: requests.first(where: { $0.id == requestID })?.runtime.percent ?? 0, error: nil)
+        await updateRequestStatus(requestID, status: .paused, percent: requests.first(where: { $0.id == requestID })?.runtime.percent ?? 0, error: nil)
         logger.info("[+] download suspended for request id: \(requestID)")
     }
 

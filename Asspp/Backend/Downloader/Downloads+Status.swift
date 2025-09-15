@@ -9,6 +9,11 @@ import Foundation
 
 extension Downloads {
     func checkAndUpdateDownloadStatus(for request: Downloads.Request) async {
+        // Skip status check for paused downloads
+        if request.runtime.status == .paused {
+            return
+        }
+        
         let fileURL = request.targetLocation
 
         // Check if file exists
