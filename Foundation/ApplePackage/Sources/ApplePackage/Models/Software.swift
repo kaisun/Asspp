@@ -12,7 +12,7 @@ public struct Software: Codable, Equatable, Hashable, Identifiable {
     public var bundleID: String
     public var name: String
     public var version: String
-    public var price: Double
+    public var price: Double?
     public var artistName: String
     public var sellerName: String
     public var description: String

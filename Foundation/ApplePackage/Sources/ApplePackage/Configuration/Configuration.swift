@@ -19,7 +19,7 @@ public enum Configuration {
      **It is a must set value before any network request**
      **otherwise your account may be locked for security reason**
      */
-    public static var deviceIdentifier: String = "" {
+    public static var deviceIdentifier: String = (try? DeviceIdentifier.system()) ?? "" {
         didSet {
             assert(!deviceIdentifier.contains(":"))
             assert(!deviceIdentifier.contains("-"))

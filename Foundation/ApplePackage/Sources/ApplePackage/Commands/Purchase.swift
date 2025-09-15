@@ -15,7 +15,7 @@ public enum Purchase {
     ) async throws {
         let deviceIdentifier = Configuration.deviceIdentifier
 
-        if app.price > 0 {
+        if (app.price ?? 0) > 0 {
             try ensureFailed("purchasing paid apps is not supported")
         }
 
