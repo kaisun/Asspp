@@ -12,7 +12,7 @@ import Foundation
 import Logging
 
 @MainActor
-class Downloads: ObservableObject {
+class Downloads: NSObject, ObservableObject {
     static let this = Downloads()
 
     @PublishedPersist(key: "DownloadRequests", defaultValue: [])
@@ -22,11 +22,18 @@ class Downloads: ObservableObject {
         didSet { objectWillChange.send() }
     }
 
+    // Add properties for URLSessionDownloadDelegate
+    var downloadTaskToRequestID: [URLSessionDownloadTask: Request.ID] = [:]
+    var downloadContinuations: [Request.ID: CheckedContinuation<Void, Error>] = [:]
+    var lastDownloadedBytes: [Request.ID: Int64] = [:]
+    var lastSpeedUpdate: [Request.ID: Date] = [:]
+
     var runningTaskCount: Int {
         requests.count(where: { $0.runtime.status == .downloading })
     }
 
-    init() {
+    override init() {
+        super.init()
         logger.info("[*] initializing downloads manager")
         let copy = requests
         Task {
