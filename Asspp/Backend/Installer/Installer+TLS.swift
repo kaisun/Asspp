@@ -11,16 +11,16 @@ import NIOTLS
 import Vapor
 
 extension Installer {
-    static let sni = "app.localhost.direct"
+    static let sni = "app.localhost.qaq.wiki"
     static let pem = Bundle.main.url(
-        forResource: "localhost.direct",
+        forResource: "localhost.qaq.wiki-key",
         withExtension: "pem",
-        subdirectory: "Certificates/localhost.direct"
+        subdirectory: "Certificates/localhost.qaq.wiki"
     )
     static let crt = Bundle.main.url(
-        forResource: "localhost.direct",
-        withExtension: "crt",
-        subdirectory: "Certificates/localhost.direct"
+        forResource: "localhost.qaq.wiki",
+        withExtension: "pem",
+        subdirectory: "Certificates/localhost.qaq.wiki"
     )
 
     static func setupTLS() throws -> TLSConfiguration {
