@@ -17,7 +17,7 @@ final class ApplePackageVersionLookupTests: XCTestCase {
             try await withAccount(email: "test@example.com") { account in
                 let app = try await Lookup.lookup(bundleID: testBundleID, countryCode: "CN")
                 let metadata = try await VersionLookup.getVersionMetadata(account: &account, app: app, versionID: testVersionID)
-                print("[+] version metadata test passed: \(metadata.displayVersion) - \(metadata.releaseDate)")
+                print("version metadata test passed: \(metadata.displayVersion) - \(metadata.releaseDate)")
             }
         } catch {
             XCTFail("get version metadata test failed: \(error)")

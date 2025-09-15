@@ -46,25 +46,25 @@ class Installer: Identifiable, ObservableObject, @unchecked Sendable {
                 ], body: .init(string: indexHtml))
             case plistEndpoint.path:
                 await MainActor.run { self.status = .sendingManifest }
-                logger.info("[*] sending manifest for installer id: \(self.id)")
+                logger.info("sending manifest for installer id: \(self.id)")
                 return Response(status: .ok, version: req.version, headers: [
                     "Content-Type": "text/xml",
                 ], body: .init(data: installManifestData))
             case displayImageSmallEndpoint.path:
                 await MainActor.run { self.status = .sendingManifest }
-                logger.info("[*] sending small display image for installer id: \(self.id)")
+                logger.info("sending small display image for installer id: \(self.id)")
                 return Response(status: .ok, version: req.version, headers: [
                     "Content-Type": "image/png",
                 ], body: .init(data: displayImageSmallData))
             case displayImageLargeEndpoint.path:
                 await MainActor.run { self.status = .sendingManifest }
-                logger.info("[*] sending large display image for installer id: \(self.id)")
+                logger.info("sending large display image for installer id: \(self.id)")
                 return Response(status: .ok, version: req.version, headers: [
                     "Content-Type": "image/png",
                 ], body: .init(data: displayImageLargeData))
             case payloadEndpoint.path:
                 await MainActor.run { self.status = .sendingPayload }
-                logger.info("[*] starting payload transfer for installer id: \(self.id)")
+                logger.info("starting payload transfer for installer id: \(self.id)")
 
                 let result = try await req.fileio.asyncStreamFile(
                     at: packagePath.path,
@@ -73,9 +73,9 @@ class Installer: Identifiable, ObservableObject, @unchecked Sendable {
                     await MainActor.run {
                         self.status = .completed(result)
                         if case .success = result {
-                            logger.info("[+] payload transfer completed for installer id: \(self.id)")
+                            logger.info("payload transfer completed for installer id: \(self.id)")
                         } else {
-                            logger.error("[-] payload transfer failed for installer id: \(self.id)")
+                            logger.error("payload transfer failed for installer id: \(self.id)")
                         }
                     }
                 }
@@ -83,7 +83,7 @@ class Installer: Identifiable, ObservableObject, @unchecked Sendable {
                 return result
             default:
                 // 404
-                logger.warning("[!] unknown request path: \(req.url.path) for installer id: \(self.id)")
+                logger.warning("unknown request path: \(req.url.path) for installer id: \(self.id)")
                 return Response(status: .notFound)
             }
         }

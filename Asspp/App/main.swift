@@ -71,7 +71,7 @@ do {
         }
     }
     let identifier = UserDefaults.standard.string(forKey: deviceIdentifierKey)!
-    logger.info("[i] using device identifier: \(identifier)")
+    logger.info("using device identifier: \(identifier)")
     ApplePackage.Configuration.deviceIdentifier = identifier
 }
 

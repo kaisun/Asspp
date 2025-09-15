@@ -10,12 +10,12 @@ import Kingfisher
 import SwiftUI
 
 struct PackageView: View {
-    let request: Downloads.Request
+    let pkg: PackageManifest
     var archive: AppStore.AppPackage {
-        request.package
+        pkg.package
     }
 
-    var url: URL { request.targetLocation }
+    var url: URL { pkg.targetLocation }
 
     @Environment(\.dismiss) var dismiss
     @State var installer: Installer?
@@ -44,7 +44,7 @@ struct PackageView: View {
                 Text("\(archive.software.bundleID) - \(archive.software.version)")
             }
 
-            if downloads.isCompleted(for: request) {
+            if pkg.completed {
                 Section {
                     Button("Install") {
                         Task {
@@ -83,7 +83,7 @@ struct PackageView: View {
 
                 Section {
                     NavigationLink("Content Viewer") {
-                        FileListView(packageURL: request.targetLocation)
+                        FileListView(packageURL: pkg.targetLocation)
                     }
                 } header: {
                     Text("Analysis")
@@ -92,24 +92,24 @@ struct PackageView: View {
                 }
             } else {
                 Section {
-                    let actions = downloads.getAvailableActions(for: request)
+                    let actions = downloads.getAvailableActions(for: pkg)
                     ForEach(actions.filter { $0 != .delete }, id: \.self) { action in
                         let label = downloads.getActionLabel(for: action)
                         Button(label.title) {
-                            Task { await downloads.performDownloadAction(for: request, action: action) }
+                            Task { await downloads.performDownloadAction(for: pkg, action: action) }
                         }
                         .foregroundStyle(label.isDestructive ? .red : .primary)
                     }
                 } header: {
                     Text("Incomplete Package")
                 } footer: {
-                    switch request.runtime.status {
+                    switch pkg.state.status {
                     case .pending:
-                        Text("\(Int(request.runtime.percent * 100))%...")
+                        Text("\(Int(pkg.state.percent * 100))%...")
                     case .downloading:
-                        Text("\(Int(request.runtime.percent * 100))%...")
+                        Text("\(Int(pkg.state.percent * 100))%...")
                     case .paused:
-                        Text("Paused at \(Int(request.runtime.percent * 100))%")
+                        Text("Paused at \(Int(pkg.state.percent * 100))%")
                     case .completed:
                         Group {}
                     case .failed:
@@ -123,9 +123,9 @@ struct PackageView: View {
                     Text("88888888888")
                         .redacted(reason: .placeholder)
                 } else {
-                    Text(request.account.account.email)
+                    Text(pkg.account.account.email)
                 }
-                Text("\(request.account.account.store) - \(ApplePackage.Configuration.countryCode(for: request.account.account.store) ?? "-1")")
+                Text("\(pkg.account.account.store) - \(ApplePackage.Configuration.countryCode(for: pkg.account.account.store) ?? "-1")")
             } header: {
                 Text("Account")
             } footer: {
@@ -136,7 +136,7 @@ struct PackageView: View {
                 let deleteAction = DownloadAction.delete
                 let label = downloads.getActionLabel(for: deleteAction)
                 Button(label.title) {
-                    Task { await downloads.performDownloadAction(for: request, action: deleteAction) }
+                    Task { await downloads.performDownloadAction(for: pkg, action: deleteAction) }
                     dismiss()
                 }
                 .foregroundStyle(label.isDestructive ? .red : .primary)
@@ -146,6 +146,6 @@ struct PackageView: View {
                 Text(url.path)
             }
         }
-        .navigationTitle(request.package.software.name)
+        .navigationTitle(pkg.package.software.name)
     }
 }

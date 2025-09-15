@@ -17,10 +17,10 @@ final class ApplePackagePurchaseTests: XCTestCase {
                 try await Authenticator.rotatePasswordToken(for: &account)
                 let app = try await Lookup.lookup(bundleID: testBundleID, countryCode: "US")
                 try await Purchase.purchase(account: &account, app: app)
-                print("[+] purchase test passed")
+                print("purchase test passed")
             }
         } catch {
-            print("[+] purchase test completed with expected result: \(error)")
+            print("purchase test completed with expected result: \(error)")
         }
     }
 
@@ -50,7 +50,7 @@ final class ApplePackagePurchaseTests: XCTestCase {
                 XCTFail("should fail with paid app")
             }
         } catch {
-            print("[+] paid app purchase test passed with expected error: \(error)")
+            print("paid app purchase test passed with expected error: \(error)")
         }
     }
 }

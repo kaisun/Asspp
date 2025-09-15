@@ -99,12 +99,12 @@ struct AddDownloadView: View {
                     app: software
                 )
                 let appPackage = AppStore.AppPackage(software: software)
-                let id = await Downloads.this.add(request: .init(
+                let request = await Downloads.this.add(request: .init(
                     account: account,
                     package: appPackage,
                     downloadOutput: downloadOutput
                 ))
-                await Downloads.this.resume(requestID: id)
+                await Downloads.this.resume(request: request)
                 await MainActor.run {
                     obtainDownloadURL = false
                     hint = "Download Requested"

@@ -260,6 +260,7 @@
       }
     },
     "An unknown error occurred during the download process." : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -1657,10 +1658,8 @@
         }
       }
     },
-    "The provided URL is invalid." : {
-
-    },
     "The server returned an invalid response format." : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {

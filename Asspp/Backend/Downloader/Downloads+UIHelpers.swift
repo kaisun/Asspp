@@ -17,21 +17,21 @@ enum DownloadAction: Hashable {
 
 @MainActor
 extension Downloads {
-    func performDownloadAction(for request: Request, action: DownloadAction) async {
+    func performDownloadAction(for request: PackageManifest, action: DownloadAction) async {
         switch action {
         case .suspend:
-            await suspend(requestID: request.id)
+            await suspend(request: request)
         case .resume:
-            await resume(requestID: request.id)
+            await resume(request: request)
         case .restart:
-            await restart(requestID: request.id)
+            await restart(request: request)
         case .delete:
             await delete(request: request)
         }
     }
 
-    func getAvailableActions(for request: Request) -> [DownloadAction] {
-        switch request.runtime.status {
+    func getAvailableActions(for request: PackageManifest) -> [DownloadAction] {
+        switch request.state.status {
         case .pending, .downloading:
             [.suspend, .delete]
         case .paused:

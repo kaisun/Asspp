@@ -40,8 +40,8 @@ struct Download: AsyncParsableCommand {
             let outputURL = URL(fileURLWithPath: output)
 
             let (contentLength, supportsRanges) = try await getContentInfo(from: url)
-            print("[+] downloading \(app.name) (\(app.bundleID)) version \(downloadOutput.bundleShortVersionString ?? "unknown")")
-            print("[+] content length: \(formatBytes(contentLength))")
+            print("downloading \(app.name) (\(app.bundleID)) version \(downloadOutput.bundleShortVersionString ?? "unknown")")
+            print("content length: \(formatBytes(contentLength))")
 
             let tempURL = FileManager.default.temporaryDirectory.appendingPathComponent(outputURL.lastPathComponent)
 
@@ -50,9 +50,9 @@ struct Download: AsyncParsableCommand {
                 let existingSize = try FileManager.default.attributesOfItem(atPath: tempURL.path)[.size] as? Int64 ?? 0
                 if existingSize > 0, existingSize < contentLength, supportsRanges {
                     startByte = existingSize
-                    print("[+] found partial download, resuming from \(formatBytes(startByte))")
+                    print("found partial download, resuming from \(formatBytes(startByte))")
                 } else if existingSize >= contentLength {
-                    print("[+] file already downloaded completely")
+                    print("file already downloaded completely")
                 } else {
                     try? FileManager.default.removeItem(at: tempURL)
                 }
@@ -62,7 +62,7 @@ struct Download: AsyncParsableCommand {
                 try await downloadWithProgress(from: url, to: tempURL, startByte: startByte, totalSize: contentLength)
             }
 
-            print("[+] writing signature...")
+            print("writing signature...")
             try await SignatureInjector.inject(sinfs: downloadOutput.sinfs, into: tempURL.path)
 
             if FileManager.default.fileExists(atPath: outputURL.path) {
@@ -70,7 +70,7 @@ struct Download: AsyncParsableCommand {
             }
             try FileManager.default.moveItem(at: tempURL, to: outputURL)
 
-            print("[+] saved to \(outputURL.path)")
+            print("saved to \(outputURL.path)")
         }
     }
 
@@ -146,7 +146,7 @@ struct Download: AsyncParsableCommand {
 
         let progressBar = String(repeating: "█", count: filledWidth) + String(repeating: "░", count: emptyWidth)
 
-        print("\r[+] progress: [\(progressBar)] \(String(format: "%.1f", percentage))% (\(formatBytes(downloaded))/\(formatBytes(total)))", terminator: "")
+        print("\rprogress: [\(progressBar)] \(String(format: "%.1f", percentage))% (\(formatBytes(downloaded))/\(formatBytes(total)))", terminator: "")
         fflush(stdout)
     }
 

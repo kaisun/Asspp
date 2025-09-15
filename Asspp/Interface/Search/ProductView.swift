@@ -110,7 +110,7 @@ struct ProductView: View {
     var buttons: some View {
         Section {
             if let req = dvm.downloadRequest(forArchive: archive) {
-                NavigationLink(destination: PackageView(request: req)) {
+                NavigationLink(destination: PackageView(pkg: req)) {
                     Text("Show Download")
                 }
             } else {
@@ -143,12 +143,12 @@ struct ProductView: View {
                     app: archive.software
                 )
                 archive.downloadOutput = downloadOutput
-                let id = await Downloads.this.add(request: .init(
+                let request = await Downloads.this.add(request: .init(
                     account: account,
                     package: archive,
                     downloadOutput: downloadOutput
                 ))
-                await Downloads.this.resume(requestID: id)
+                await Downloads.this.resume(request: request)
                 await MainActor.run {
                     obtainDownloadURL = false
                     hint = String(localized: "Download Requested")

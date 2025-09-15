@@ -39,11 +39,11 @@ struct DownloadView: View {
 
     var packageList: some View {
         ForEach(vm.requests, id: \.id) { req in
-            NavigationLink(destination: PackageView(request: req)) {
+            NavigationLink(destination: PackageView(pkg: req)) {
                 VStack(spacing: 8) {
                     ArchivePreviewView(archive: req.package)
-                    SimpleProgress(progress: req.runtime.percent)
-                        .animation(.interactiveSpring, value: req.runtime.percent)
+                    SimpleProgress(progress: req.state.percent)
+                        .animation(.interactiveSpring, value: req.state.percent)
                     HStack {
                         Text(req.hint)
                         Spacer()
@@ -69,18 +69,18 @@ struct DownloadView: View {
     }
 }
 
-extension Downloads.Request {
+extension PackageManifest {
     var hint: String {
-        if let error = runtime.error {
+        if let error = state.error {
             return error
         }
-        return switch runtime.status {
+        return switch state.status {
         case .pending:
             String(localized: "Pending...")
         case .downloading:
             [
-                String(Int(runtime.percent * 100)) + "%",
-                runtime.speed.isEmpty ? "" : runtime.speed + "/s",
+                String(Int(state.percent * 100)) + "%",
+                state.speed.isEmpty ? "" : state.speed + "/s",
             ]
             .compactMap(\.self)
             .joined(separator: " ")

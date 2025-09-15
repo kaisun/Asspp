@@ -31,7 +31,7 @@ nonisolated enum MD5Calculator {
             let digest = hasher.finalize()
             return digest.map { String(format: "%02hhx", $0) }.joined()
         } catch {
-            logger.error("[-] error reading file: \(error)")
+            logger.error("error reading file: \(error)")
             return nil
         }
     }

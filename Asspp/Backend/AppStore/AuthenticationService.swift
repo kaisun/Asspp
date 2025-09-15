@@ -16,7 +16,7 @@ extension AppStore {
 
     @MainActor
     func authenticate(email: String, password: String, code: String) async throws -> UserAccount {
-        logger.info("[*] starting authentication for user")
+        logger.info("starting authentication for user")
         do {
             let appleAccount = try await ApplePackage.Authenticator.authenticate(
                 email: email,
@@ -25,10 +25,10 @@ extension AppStore {
                 cookies: []
             )
             let userAccount = save(email: email, account: appleAccount)
-            logger.info("[+] authentication successful for user")
+            logger.info("authentication successful for user")
             return userAccount
         } catch {
-            logger.error("[-] authentication failed for user: \(error.localizedDescription)")
+            logger.error("authentication failed for user: \(error.localizedDescription)")
             throw error
         }
     }
@@ -36,9 +36,9 @@ extension AppStore {
     @MainActor
     @discardableResult
     func rotate(id: UserAccount.ID) async throws -> UserAccount? {
-        logger.info("[*] starting account rotation for user id: \(id)")
+        logger.info("starting account rotation for user id: \(id)")
         guard let account = accounts.first(where: { $0.id == id }) else {
-            logger.error("[-] account not found for rotation, id: \(id)")
+            logger.error("account not found for rotation, id: \(id)")
             throw AuthenticationError.accountNotFound
         }
         do {
@@ -49,10 +49,10 @@ extension AppStore {
                 cookies: account.account.cookie
             )
             let updatedAccount = save(email: account.account.email, account: newAppleAccount)
-            logger.info("[+] account rotation successful for user id: \(id)")
+            logger.info("account rotation successful for user id: \(id)")
             return updatedAccount
         } catch {
-            logger.error("[-] account rotation failed for user id: \(id): \(error.localizedDescription)")
+            logger.error("account rotation failed for user id: \(id): \(error.localizedDescription)")
             throw error
         }
     }

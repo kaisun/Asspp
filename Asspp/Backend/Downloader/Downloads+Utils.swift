@@ -20,7 +20,7 @@ extension Downloads {
         byteFormatter.string(fromByteCount: bytes)
     }
 
-    func downloadRequest(forArchive archive: AppStore.AppPackage) -> Request? {
+    func downloadRequest(forArchive archive: AppStore.AppPackage) -> PackageManifest? {
         requests.first(where: { $0.package.id == archive.id })
     }
 }

@@ -23,7 +23,7 @@ struct SettingView: View {
                 }
                 Section {
                     Button("Delete All Downloads", role: .destructive) {
-                        Task { await Downloads.this.removeAll() }
+                        Downloads.this.removeAll()
                     }
                 } header: {
                     Text("Downloads")

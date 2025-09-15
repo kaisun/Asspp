@@ -15,7 +15,7 @@ final class ApplePackageVersionFinderTests: XCTestCase {
         do {
             try await withAccount(email: "test@example.com") { account in
                 let versions = try await VersionFinder.list(account: &account, bundleIdentifier: testItem)
-                print("[+] versions test passed with \(versions.count) versions: \(versions)")
+                print("versions test passed with \(versions.count) versions: \(versions)")
             }
         } catch {
             XCTFail("list versions test failed: \(error)")

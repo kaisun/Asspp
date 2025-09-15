@@ -17,7 +17,7 @@ private func updateTestAccountInfo() {
     account = try! String(contentsOfFile: "/tmp/applepackage/account.txt").trimmingCharacters(in: .whitespacesAndNewlines)
     password = try! String(contentsOfFile: "/tmp/applepackage/password.txt").trimmingCharacters(in: .whitespacesAndNewlines)
     code = try! String(contentsOfFile: "/tmp/applepackage/code.txt").trimmingCharacters(in: .whitespacesAndNewlines)
-    print("[*] testing with account: \(account)")
+    print("testing with account: \(account)")
 }
 
 final class ApplePackageAuthenticateTests: XCTestCase {
@@ -31,7 +31,7 @@ final class ApplePackageAuthenticateTests: XCTestCase {
         let fileManager = FileManager.default
         let loginAccountPath = "/tmp/applepackage/login_account.txt"
         if fileManager.fileExists(atPath: loginAccountPath) {
-            print("[*] login account file exists at \(loginAccountPath), skipping login test")
+            print("login account file exists at \(loginAccountPath), skipping login test")
             return
         }
 
@@ -49,13 +49,13 @@ final class ApplePackageAuthenticateTests: XCTestCase {
             alert.runModal()
             updateTestAccountInfo()
             XCTAssert(!code.isEmpty)
-            print("[*] retrying with code: \(code)")
+            print("retrying with code: \(code)")
             do {
                 let result = try await Authenticator.authenticate(email: account, password: password, code: code)
                 print(result)
                 saveLoginAccount(result, for: account)
             } catch {
-                XCTFail("[-] second attempt failed: \(error)")
+                XCTFail("second attempt failed: \(error)")
             }
         }
     }

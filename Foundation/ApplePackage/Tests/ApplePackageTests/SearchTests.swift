@@ -19,7 +19,7 @@ final class ApplePackageSearchTests: XCTestCase {
                 XCTAssert(!software.bundleID.isEmpty, "Software bundleID should not be empty")
                 XCTAssert(software.id > 0, "Software ID should be positive")
             }
-            print("[+] Search test passed with \(results.count) results")
+            print("Search test passed with \(results.count) results")
         } catch {
             XCTFail("Search failed: \(error)")
         }
@@ -31,7 +31,7 @@ final class ApplePackageSearchTests: XCTestCase {
             XCTFail("Search should fail with invalid country code")
         } catch {
             // Expected to fail
-            print("[+] Search correctly failed with invalid country: \(error)")
+            print("Search correctly failed with invalid country: \(error)")
         }
     }
 
@@ -39,7 +39,7 @@ final class ApplePackageSearchTests: XCTestCase {
         do {
             let results = try await Searcher.search(term: "nonexistentapp123456789", countryCode: "US", limit: 5)
             XCTAssert(results.isEmpty, "Search should return empty for non-existent term")
-            print("[+] Search correctly returned no results")
+            print("Search correctly returned no results")
         } catch {
             // Some APIs might return error instead of empty
             print("[?] Search for non-existent term: \(error)")

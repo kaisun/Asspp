@@ -21,6 +21,6 @@ struct Logout: ParsableCommand {
     func run() throws {
         let fileURL = Configuration.accountPath(for: email)
         try FileManager.default.removeItem(at: fileURL)
-        print("[+] logged out \(email)")
+        print("logged out \(email)")
     }
 }

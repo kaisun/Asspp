@@ -18,7 +18,7 @@ final class ApplePackageDownloadTests: XCTestCase {
                 try await Authenticator.rotatePasswordToken(for: &account)
                 let app = try await Lookup.lookup(bundleID: testBundleID, countryCode: "US")
                 let output = try await Download.download(account: &account, app: app, externalVersionID: testVersionID)
-                print("[+] download with version test passed: \(output.downloadURL)")
+                print("download with version test passed: \(output.downloadURL)")
                 print("    Hash MD5: \(output.hashMD5 ?? "nil")")
                 print("    Bundle Short Version: \(output.bundleShortVersionString ?? "nil")")
                 print("    Bundle Version: \(output.bundleVersion ?? "nil")")

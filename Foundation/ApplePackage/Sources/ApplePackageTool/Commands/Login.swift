@@ -28,10 +28,10 @@ struct Login: AsyncParsableCommand {
         do {
             let account = try await Authenticator.authenticate(email: email, password: password, code: code ?? "")
             Configuration.saveLoginAccount(account, for: email)
-            print("[+] login successful for \(email)")
+            print("login successful for \(email)")
         } catch {
             if code == nil {
-                print("[-] login failed: \(error), provide 2FA code with --code option and try again")
+                print("login failed: \(error), provide 2FA code with --code option and try again")
             } else {
                 throw error
             }
