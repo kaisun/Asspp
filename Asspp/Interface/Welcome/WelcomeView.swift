@@ -21,6 +21,7 @@ struct WelcomeView: View {
                 inst
                     .font(.system(.footnote, design: .rounded))
                     .padding(.horizontal, 32)
+                    .fixedSize()
                 Spacer().frame(height: 0)
             }
 
