@@ -56,9 +56,7 @@ class AppStore: ObservableObject {
             var account = await accounts[idx]
             let result = try await body(&account)
             let updatedAccount = account
-            await MainActor.run {
-                accounts[idx] = updatedAccount
-            }
+            await MainActor.run { accounts[idx] = updatedAccount }
             return result
         } else {
             throw AuthenticationError.accountNotFound

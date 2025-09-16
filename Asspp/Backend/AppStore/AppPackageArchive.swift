@@ -9,37 +9,42 @@ import ApplePackage
 import Foundation
 import OrderedCollections
 
+@MainActor
 class AppPackageArchive: ObservableObject {
-    let accountID: String?
+    let accountIdentifier: String?
     let region: String
-    @MainActor @Published var package: AppStore.AppPackage
-    @MainActor @PublishedPersist var historyPackages: OrderedDictionary<String, VersionMetadata> {
-        didSet {
-            isLoadMoreAvailable = versionNumbers.count > historyPackages.count
-        }
+
+    @Published
+    var package: AppStore.AppPackage
+
+    typealias VersionIdentifier = String
+    @PublishedPersist
+    var versionIdentifiers: [VersionIdentifier]
+    @PublishedPersist
+    var versionItems: OrderedDictionary<VersionIdentifier, VersionMetadata>
+
+    var isVersionItemsFullyLoaded: Bool {
+        assert(versionItems.count <= versionIdentifiers.count)
+        return versionItems.count == versionIdentifiers.count
     }
 
-    @MainActor private var versionNumbers: [String] = [] {
-        didSet {
-            isLoadMoreAvailable = versionNumbers.count > historyPackages.count
-        }
-    }
-
-    @MainActor @Published var errorMessage: String?
-
-    @MainActor @Published var isLoadMoreAvailable = false
-    @MainActor @Published var isLoadingVersionDetails = false
+    @Published var error: String?
+    @Published var loading = false
 
     init(accountID: String?, region: String, package: AppStore.AppPackage) {
-        self.accountID = accountID
+        accountIdentifier = accountID
         self.region = region
         _package = .init(initialValue: package)
-        _historyPackages = .init(key: package.id + ".versions", defaultValue: [:])
+
+        let packageIdentifier = [package.id, package.software.bundleID.lowercased(), region]
+            .joined()
+            .lowercased()
+        _versionItems = .init(key: "\(packageIdentifier).versions", defaultValue: [:])
+        _versionIdentifiers = .init(key: "\(packageIdentifier).versionNumbers", defaultValue: [])
     }
 
-    @MainActor
     func package(for externalVersion: String) -> AppStore.AppPackage? {
-        if let metadata = historyPackages[externalVersion] {
+        if let metadata = versionItems[externalVersion] {
             var pkg = package
             pkg.software.version = metadata.displayVersion
             pkg.externalVersionID = externalVersion
@@ -49,89 +54,71 @@ class AppPackageArchive: ObservableObject {
         }
     }
 
-    func lookupHistoryVersions() {
-        guard let accountID else {
-            return
-        }
+    func clearVersionItems() {
+        assert(!loading)
+        error = nil
+        versionIdentifiers = []
+        versionItems.removeAll()
+    }
+
+    func populateVersionIdentifiers(_ completion: (() async -> Void)? = nil) {
+        guard let accountIdentifier, !loading else { return }
+        let bundleID = package.software.bundleID
+        loading = true
+        error = nil
+
         Task.detached {
             do {
-                let bundleID = await self.package.software.bundleID
-                let versions = try await AppStore.this.withAccount(id: accountID) { userAccount in
+                let versions = try await AppStore.this.withAccount(id: accountIdentifier) { userAccount in
                     try await VersionFinder.list(account: &userAccount.account, bundleIdentifier: bundleID)
                 }
-                await MainActor.run {
-                    self.versionNumbers = versions.reversed()
-                }
-                if await self.historyPackages.isEmpty {
-                    self.loadNextPageIfNeeded()
-                }
+                await MainActor.run { self.versionIdentifiers = versions.reversed() }
             } catch {
-                await MainActor.run { self.errorMessage = error.localizedDescription }
+                await MainActor.run { self.error = error.localizedDescription }
             }
+            await MainActor.run { self.loading = false }
+            await completion?()
         }
     }
 
-    func loadNextPageIfNeeded(count: Int = 5) {
-        guard let accountID else { return }
-        Task.detached {
-            guard await self.isLoadMoreAvailable else {
-                return
-            }
+    func populateNextVersionItems(count: Int = 3) {
+        guard let accountIdentifier, !loading, !isVersionItemsFullyLoaded else { return }
+        loading = true
+        error = nil
 
+        Task.detached {
             do {
-                await MainActor.run {
-                    self.isLoadingVersionDetails = true
-                }
-                for _ in 0 ..< count {
-                    let nextIdx = await self.historyPackages.count
-                    guard await self.versionNumbers.indices.contains(nextIdx) else {
-                        return
-                    }
-                    let version = await self.versionNumbers[nextIdx]
+                for _ in 0 ..< count where await !self.isVersionItemsFullyLoaded {
+                    let nextIdx = await self.versionItems.count
+                    let version = await self.versionIdentifiers[nextIdx]
                     let app = await self.package.software
 
-                    let metadata = try await AppStore.this.withAccount(id: accountID) { userAccount in
+                    let metadata = try await AppStore.this.withAccount(id: accountIdentifier) { userAccount in
                         try await VersionLookup.getVersionMetadata(account: &userAccount.account, app: app, versionID: version)
                     }
-                    await MainActor.run {
-                        self.historyPackages[version] = metadata
-                    }
-                }
-                await MainActor.run {
-                    self.isLoadingVersionDetails = false
+                    await MainActor.run { self.versionItems[version] = metadata }
                 }
             } catch {
-                await MainActor.run {
-                    self.isLoadingVersionDetails = false
-                    self.errorMessage = error.localizedDescription
-                }
+                await MainActor.run { self.error = error.localizedDescription }
             }
+            await MainActor.run { self.loading = false }
         }
     }
 }
 
+@MainActor
 extension AppPackageArchive {
-    @MainActor var version: String {
-        package.software.version
-    }
+    var version: String { package.software.version }
 
-    @MainActor var releaseDate: Date? {
-        package.releaseDate
-    }
+    var releaseDate: Date? { package.releaseDate }
 
-    @MainActor var releaseNotes: String? {
-        package.software.releaseNotes
-    }
+    var releaseNotes: String? { package.software.releaseNotes }
 
-    @MainActor var formattedPrice: String {
-        package.software.formattedPrice
-    }
+    var formattedPrice: String { package.software.formattedPrice }
 
-    @MainActor var price: Double? {
-        package.software.price
-    }
+    var price: Double? { package.software.price }
 
-    @MainActor var downloadOutput: DownloadOutput? {
+    var downloadOutput: DownloadOutput? {
         get { package.downloadOutput }
         set { package.downloadOutput = newValue }
     }

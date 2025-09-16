@@ -54,6 +54,7 @@ struct SearchView: View {
                     Label("Type", systemImage: searchType.iconName)
                 }
                 .pickerStyle(.menu)
+                Divider()
                 if !regionKeys.filter({ possibleRegion.contains($0) }).isEmpty {
                     buildPickView(
                         for: regionKeys.filter { possibleRegion.contains($0) }

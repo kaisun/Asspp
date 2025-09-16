@@ -13,38 +13,58 @@ struct ProductHistoryView: View {
     @State var showErrorAlert = false
 
     var body: some View {
-        List(vm.historyPackages.keys.elements, id: \.self) { key in
-            if let accountID = vm.accountID, let pkg = vm.package(for: key) {
-                ProductVersionView(accountID: accountID, package: pkg)
+        List(vm.versionIdentifiers, id: \.self) { key in
+            if let aid = vm.accountIdentifier, let pkg = vm.package(for: key) {
+                ProductVersionView(accountIdentifier: aid, package: pkg)
+                    .transition(.opacity)
             }
         }
+        .animation(.default, value: vm.versionIdentifiers)
+        .animation(.default, value: vm.versionItems)
         .navigationTitle("Version History")
-        .navigationBarItems(trailing: trailingItems)
-        .alert("Oops", isPresented: $showErrorAlert) {
-            Button("OK") {}
-        } message: {
-            if let error = vm.errorMessage {
-                Text(error)
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                if vm.loading {
+                    ProgressView()
+                } else {
+                    Menu {
+                        Button {
+                            vm.populateNextVersionItems()
+                        } label: {
+                            Label("Load More", systemImage: "arrow.down.circle")
+                        }
+                        .disabled(vm.isVersionItemsFullyLoaded)
+                        Divider()
+                        Button(role: .destructive) {
+                            vm.clearVersionItems()
+                            vm.populateVersionIdentifiers {
+                                await MainActor.run { vm.populateNextVersionItems() }
+                            }
+                        } label: {
+                            Label("Refresh", systemImage: "arrow.clockwise.circle")
+                        }
+                    } label: {
+                        Image(systemName: "ellipsis.circle")
+                    }
+                    .disabled(vm.loading) // just make sure
+                }
             }
         }
-        .onChange(of: vm.errorMessage) { newValue in
+        .alert(isPresented: $showErrorAlert) {
+            Alert(
+                title: Text("Oops"),
+                message: Text(vm.error ?? String(localized: "Unknown Error")),
+                dismissButton: .default(Text("OK"))
+            )
+        }
+        .onAppear {
+            guard vm.versionItems.isEmpty else { return }
+            vm.populateVersionIdentifiers {
+                await MainActor.run { vm.populateNextVersionItems() }
+            }
+        }
+        .onChange(of: vm.error) { newValue in
             showErrorAlert = newValue != nil
-        }
-        .task {
-            vm.lookupHistoryVersions()
-        }
-    }
-
-    @ViewBuilder
-    var trailingItems: some View {
-        Group {
-            if vm.isLoadingVersionDetails {
-                ProgressView()
-            }
-            Button("Load More") {
-                vm.loadNextPageIfNeeded()
-            }
-            .disabled(!vm.isLoadMoreAvailable)
         }
     }
 }

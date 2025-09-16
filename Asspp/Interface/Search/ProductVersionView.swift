@@ -9,13 +9,15 @@ import ApplePackage
 import SwiftUI
 
 struct ProductVersionView: View {
-    let accountID: String
+    let accountIdentifier: String
     let package: AppStore.AppPackage
+
     @StateObject var dvm = Downloads.this
     @State var obtainDownloadURL: Bool = false
     @State var showDownloadPage = false
     @State var hint: String = ""
     @State var hintColor: Color?
+
     var body: some View {
         if let req = dvm.downloadRequest(forArchive: package) {
             NavigationLink(destination: PackageView(pkg: req), isActive: $showDownloadPage) {
@@ -54,7 +56,7 @@ struct ProductVersionView: View {
         obtainDownloadURL = true
         Task {
             do {
-                try await AppStore.this.withAccount(id: accountID) { account in
+                try await AppStore.this.withAccount(id: accountIdentifier) { account in
                     let downloadOutput = try await ApplePackage.Download.download(
                         account: &account.account,
                         app: package.software,

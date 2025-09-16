@@ -89,7 +89,7 @@ struct ProductView: View {
     var packageDescription: some View {
         Section {
             NavigationLink {
-                Text("History View")
+                ProductHistoryView(vm: AppPackageArchive(accountID: selection, region: region, package: archive.package))
             } label: {
                 HStack {
                     Text("Version \(archive.package.software.version)")
