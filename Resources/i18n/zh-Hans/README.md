@@ -1,74 +1,69 @@
 # 爱啪思道
 
-就是有多账号支持的 App Store 辅助工具。不能替代 App Store 但是够你用了。
+轻松管理多个 App Store 账户。
 
-## 👀 预览
+[English 🇺🇸](../../../README.md)
+
+## 👀 概览
 
 ![截图](../../../Resources/Screenshots/Screenshot-0.png)
 
 ## 🌟 主要功能
 
-- [x] 支持多账户
-- [x] 支持指定应用商店的地区
-- [x] 搜索应用
-- [x] 下载应用
-- [x] 安装应用（无需越狱）
-- [x] 分享应用安装包
-- [x] 购买免费应用
-- [x] 支持巨魔商店（如果你已经安装的话能省下不少折腾的时间）
+- **多账户管理**: 支持多个 Apple ID
+- **跨区访问**: 选择您的 App Store 地区
+- **应用搜索**: 按关键词搜索应用
+- **应用下载**: 从 App Store 下载应用
+- **IPA 安装**: 在非越狱设备上安装 IPA
+- **IPA 分享**: 轻松分享 IPA 文件
+- **历史版本**: 下载应用的历史版本
+- **免费应用入库**: 一键将免费应用加入您的购买记录
 
-由于技术原因，此构建版本搭载的安装器将在 2025/5/20 后过期。后续等待更新即可。其他功能不受影响
+## 📝 使用须知
 
-## 📝 要求
+### 前提条件
 
-自己折腾吧 :)
+- [iOS App Signer](https://dantheman827.github.io/ios-app-signer/)
+- 用于 `app.localhost.qaq.wiki` 的自签名证书（在“设置”中安装）
 
-- [x] https://dantheman827.github.io/ios-app-signer/
+### 问题排查
 
-**如果你遇到了诸如 [#1](https://github.com/Lakr233/Asspp/issues/1) 之类的问题，请使用上面提供的签名工具进行安装。**
+- 对于类似 [#1](https://github.com/Lakr233/Asspp/issues/1) 的问题，请使用提供的签名工具。
+- 如果安装失败，请确保证书已正确安装。
+- 如果应用崩溃或退出，请确认您已登录 App Store 账户，并且您的设备系统版本受支持。
 
-### 本地安装
+### 安装方式对比
 
-**优点**
+| 项目 | 本地安装 | AirDrop 安装 |
+|---|---|---|
+| 设备要求 | 单台设备 | 两台设备 |
+| App Store 兼容性 | 无法检测* | 兼容 |
+| 自动更新 | 不支持 | 支持 |
+| 前提条件 | 手动安装并信任证书 | 目标设备需登录同一账户，且已安装至少一个 App |
+| 网络要求 | 需要 | 不需要 |
 
-- 单设备可用
-- 无法被 App Store 检测
-- 不可自动更新
+* 此安装方法不会在 App Store 中注册软件，因此无法自动更新。手动更新可以保留数据，但后续安装无法使用本软件，也无法覆盖现有应用。
 
-**缺点**
+## 🚀 快速上手
 
-- 无法被 App Store 检测 🤡
-- 不可自动更新 🤡
-- 需要联网
+前往 [Releases](https://github.com/Lakr233/Asspp/releases) 页面下载最新版本。
 
-### 使用 AirDrop 安装
+## 📋 已构建的包
 
-**优点**
+请查看 [Releases](https://github.com/Lakr233/Asspp/releases) 页面。
 
-- 与 App Store 兼容
-- 可以正常自动升级
+## 🧑‍⚖️ 开源许可
 
-**缺点**
+自 2.2.16 版本起，本项目采用 [MIT](../../../LICENSE) 许可证。
 
-- 需要两台设备
-- 目标设备需要登录过对应账户并且该账户至少安装有一个应用
+## 🥰 鸣谢
 
-## 🚀 使用方法
+- [ipatool](https://github.com/majd/ipatool)
+- [ipatool-ios](https://github.com/dlevi309/ipatool-ios)
+- [localhost.direct](https://get.localhost.direct/)
 
-从 [Releases](https://github.com/Lakr233/Asspp/releases) 下载最新版本。
-
-## 🧑‍⚖️ 许可证
-
-[GPLv3](../../../LICENSE)
-
-是的，这是我为数不多发布的使用 GPL 许可证的软件之一。
-
-## 🥰 致谢
-
-- [x] https://github.com/majd/ipatool
-- [x] https://github.com/dlevi309/ipatool-ios
-- [x] https://get.localhost.direct/
+*`ipatool-ios` 和 `localhost.direct` 已在当前项目中不再使用。*
 
 ---
 
-版权所有 © 2024 砍砍@标准件厂长。保留所有权利。
+Copyright © 2025 Lakr Aream. All Rights Reserved.
