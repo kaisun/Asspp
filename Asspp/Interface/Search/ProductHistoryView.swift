@@ -11,6 +11,7 @@ import SwiftUI
 struct ProductHistoryView: View {
     @StateObject var vm: AppPackageArchive
     @State var showErrorAlert = false
+    @Environment(\.dismiss) var dismiss
 
     var body: some View {
         List(vm.versionIdentifiers, id: \.self) { key in
@@ -54,7 +55,11 @@ struct ProductHistoryView: View {
             Alert(
                 title: Text("Oops"),
                 message: Text(vm.error ?? String(localized: "Unknown Error")),
-                dismissButton: .default(Text("OK"))
+                dismissButton: .default(Text("OK"), action: {
+                    if vm.shouldDismiss {
+                        dismiss()
+                    }
+                })
             )
         }
         .onAppear {

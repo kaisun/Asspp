@@ -30,6 +30,7 @@ class AppPackageArchive: ObservableObject {
 
     @Published var error: String?
     @Published var loading = false
+    @Published var shouldDismiss = false
 
     init(accountID: String?, region: String, package: AppStore.AppPackage) {
         accountIdentifier = accountID
@@ -74,7 +75,12 @@ class AppPackageArchive: ObservableObject {
                 }
                 await MainActor.run { self.versionIdentifiers = versions.reversed() }
             } catch {
-                await MainActor.run { self.error = error.localizedDescription }
+                await MainActor.run {
+                    if case .licenseRequired = error as? ApplePackageError {
+                        self.shouldDismiss = true
+                    }
+                    self.error = error.localizedDescription
+                }
             }
             await MainActor.run { self.loading = false }
             await completion?()
