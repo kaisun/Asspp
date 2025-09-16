@@ -57,12 +57,11 @@ struct DownloadView: View {
                 let actions = vm.getAvailableActions(for: req)
                 ForEach(actions, id: \.self) { action in
                     let label = vm.getActionLabel(for: action)
-                    Button {
+                    Button(role: label.isDestructive ? .destructive : .none) {
                         Task { vm.performDownloadAction(for: req, action: action) }
                     } label: {
                         Label(label.title, systemImage: label.systemImage)
                     }
-                    .foregroundStyle(label.isDestructive ? .red : .primary)
                 }
             }
         }
