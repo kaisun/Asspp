@@ -7,6 +7,7 @@
 
 import Foundation
 import SwiftUI
+import ApplePackage
 
 enum DownloadAction: Hashable {
     case suspend
@@ -53,6 +54,24 @@ extension Downloads {
             (String(localized: "Restart Download"), "arrow.clockwise", false)
         case .delete:
             (String(localized: "Delete"), "trash", true)
+        }
+    }
+}
+
+extension Downloads {
+    func startDownload(for package: AppStore.AppPackage, accountID: String) async throws {
+        try await AppStore.this.withAccount(id: accountID) { account in
+            let downloadOutput = try await ApplePackage.Download.download(
+                account: &account.account,
+                app: package.software,
+                externalVersionID: package.externalVersionID
+            )
+            let request = Downloads.this.add(request: .init(
+                account: account,
+                package: package,
+                downloadOutput: downloadOutput
+            ))
+            Downloads.this.resume(request: request)
         }
     }
 }

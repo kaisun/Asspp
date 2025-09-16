@@ -56,19 +56,7 @@ struct ProductVersionView: View {
         obtainDownloadURL = true
         Task {
             do {
-                try await AppStore.this.withAccount(id: accountIdentifier) { account in
-                    let downloadOutput = try await ApplePackage.Download.download(
-                        account: &account.account,
-                        app: package.software,
-                        externalVersionID: package.externalVersionID ?? ""
-                    )
-                    let request = Downloads.this.add(request: .init(
-                        account: account,
-                        package: package,
-                        downloadOutput: downloadOutput
-                    ))
-                    Downloads.this.resume(request: request)
-                }
+                try await dvm.startDownload(for: package, accountID: accountIdentifier)
 
                 await MainActor.run {
                     obtainDownloadURL = false

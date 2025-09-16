@@ -176,23 +176,11 @@ struct ProductView: View {
     }
 
     func startDownload() {
-        guard var account else { return }
+        guard let account else { return }
         obtainDownloadURL = true
         Task {
             do {
-                defer { vm.save(email: account.account.email, account: account.account) }
-                let downloadOutput = try await ApplePackage.Download.download(
-                    account: &account.account,
-                    app: archive.package.software,
-                    externalVersionID: archive.package.externalVersionID
-                )
-                archive.downloadOutput = downloadOutput
-                let request = Downloads.this.add(request: .init(
-                    account: account,
-                    package: archive.package,
-                    downloadOutput: downloadOutput
-                ))
-                Downloads.this.resume(request: request)
+                try await dvm.startDownload(for: archive.package, accountID: account.id)
                 await MainActor.run {
                     obtainDownloadURL = false
                     hint = String(localized: "Download Requested")
