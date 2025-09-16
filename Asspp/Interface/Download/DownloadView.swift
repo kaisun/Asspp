@@ -21,13 +21,9 @@ struct DownloadView: View {
     var content: some View {
         List {
             if vm.manifests.isEmpty {
-                Section("Packages") {
-                    Text("No downloads yet.")
-                }
+                Text("No downloads yet.")
             } else {
-                Section("Packages (\(vm.manifests.count)) - Active: \(vm.runningTaskCount)") {
-                    packageList
-                }
+                packageList
             }
         }
         .toolbar {

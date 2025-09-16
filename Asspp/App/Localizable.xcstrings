@@ -1371,22 +1371,6 @@
         }
       }
     },
-    "Packages (%lld) - Active: %lld" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Packages (%lld) - Active: %lld"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "软件包 (%1$lld) - 活跃: %2$lld"
-          }
-        }
-      }
-    },
     "Password" : {
       "localizations" : {
         "en" : {
