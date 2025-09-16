@@ -44,7 +44,7 @@ struct SearchView: View {
 
     var searchTypePicker: some View {
         Picker(selection: $searchType) {
-            ForEach(EntityType.allCases, id: \.self) { type in
+            ForEach(EntityType.allCases) { type in
                 Text(type.rawValue).tag(type)
             }
         } label: {
