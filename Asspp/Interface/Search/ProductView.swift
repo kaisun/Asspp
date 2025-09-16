@@ -184,7 +184,7 @@ struct ProductView: View {
                 let downloadOutput = try await ApplePackage.Download.download(
                     account: &account.account,
                     app: archive.package.software,
-                    externalVersionID: archive.version
+                    externalVersionID: archive.package.externalVersionID
                 )
                 archive.downloadOutput = downloadOutput
                 let request = Downloads.this.add(request: .init(

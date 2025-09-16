@@ -12,7 +12,7 @@ public enum Download {
     public nonisolated static func download(
         account: inout Account,
         app: Software,
-        externalVersionID: String = ""
+        externalVersionID: String? = nil
     ) async throws -> DownloadOutput {
         let deviceIdentifier = Configuration.deviceIdentifier
 
@@ -33,7 +33,7 @@ public enum Download {
             account: account,
             app: app,
             guid: deviceIdentifier,
-            externalVersionID: externalVersionID
+            externalVersionID: externalVersionID ?? ""
         )
         let response = try await client.execute(request: request).get()
 
