@@ -195,6 +195,11 @@ extension SearchView {
         .onSubmit(of: .search) { search() }
         .toolbarVisibility(navigationBarVisibility, for: .navigationBar)
         .navigationTitle(Text(searching ? "Searching..." : "Search"))
+        .toolbar {
+            if navigationBarVisibility != .hidden {
+                tools
+            }
+        }
         .safeAreaBar(edge: .top) {
             if navigationBarVisibility == .hidden {
                 HStack {
