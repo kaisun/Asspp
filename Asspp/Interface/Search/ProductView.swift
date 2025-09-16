@@ -203,16 +203,17 @@ struct ProductView: View {
     }
 
     func acquireLicense() {
-        guard var account else { return }
+        guard let account else { return }
         acquiringLicense = true
         Task {
             do {
-                defer { vm.save(email: account.account.email, account: account.account) }
-                try await ApplePackage.Authenticator.rotatePasswordToken(for: &account.account)
-                try await ApplePackage.Purchase.purchase(
-                    account: &account.account,
-                    app: archive.package.software
-                )
+                try await vm.withAccount(id: account.id) { userAccount in
+                    try await ApplePackage.Authenticator.rotatePasswordToken(for: &userAccount.account)
+                    try await ApplePackage.Purchase.purchase(
+                        account: &userAccount.account,
+                        app: archive.package.software
+                    )
+                }
                 DispatchQueue.main.async {
                     acquiringLicense = false
                     licenseHint = String(localized: "Request Successes")
