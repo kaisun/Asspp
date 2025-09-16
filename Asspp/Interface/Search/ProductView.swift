@@ -40,6 +40,20 @@ struct ProductView: View {
     @State var hint: String = ""
     @State var hintColor: Color?
 
+    let sizeFormatter: ByteCountFormatter = {
+        let formatter = ByteCountFormatter()
+        formatter.countStyle = .file
+        formatter.allowedUnits = [.useKB, .useMB, .useGB]
+        return formatter
+    }()
+
+    var formattedSize: String? {
+        guard let sizeBytes = archive.package.software.fileSizeBytes.flatMap(Int64.init(_:)) else {
+            return nil
+        }
+        return sizeFormatter.string(fromByteCount: sizeBytes)
+    }
+
     var body: some View {
         List {
             accountSelector
@@ -96,10 +110,26 @@ struct ProductView: View {
                     Spacer()
                     if let date = archive.releaseDate {
                         Text(date.formatted(.relative(presentation: .numeric)))
+                            .foregroundStyle(.secondary)
                     }
                 }
             }
 
+            if let formattedSize {
+                HStack {
+                    Text("Size")
+                    Spacer()
+                    Text(formattedSize)
+                        .foregroundStyle(.secondary)
+                }
+            }
+
+            HStack {
+                Text("Compatibility")
+                Spacer()
+                Text("\(archive.package.software.minimumOsVersion)+")
+                    .foregroundStyle(.secondary)
+            }
             Text(archive.package.software.releaseNotes ?? "")
         } header: {
             Text("What's New")
