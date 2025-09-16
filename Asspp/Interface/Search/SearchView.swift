@@ -42,25 +42,31 @@ struct SearchView: View {
         }
     }
 
-    @ToolbarContentBuilder
-    var tools: some ToolbarContent {
-        ToolbarItem(placement: .topBarTrailing) {
-            Menu {
-                Picker(selection: $searchType) {
-                    ForEach(EntityType.allCases, id: \.self) { type in
-                        Text(type.rawValue).tag(type)
-                    }
-                } label: {
-                    Label("Type", systemImage: searchType.iconName)
-                }
-                .pickerStyle(.menu)
-                Divider()
-                if !regionKeys.filter({ possibleRegion.contains($0) }).isEmpty {
-                    buildPickView(
-                        for: regionKeys.filter { possibleRegion.contains($0) }
-                    ) {
-                        Label("Available Regions", systemImage: "checkmark.seal")
-                    }
+    var searchTypePicker: some View {
+        Picker(selection: $searchType) {
+            ForEach(EntityType.allCases, id: \.self) { type in
+                Text(type.rawValue).tag(type)
+            }
+        } label: {
+            Label("Type", systemImage: searchType.iconName)
+        }
+        .onChange(of: searchType) { _ in
+            searchResult = []
+        }
+    }
+
+    var possibleRegionKeys: [String] {
+        regionKeys.filter { possibleRegion.contains($0) }
+    }
+
+    @ViewBuilder
+    var searchRegionView: some View {
+        Group {
+            if !possibleRegionKeys.isEmpty {
+                buildPickView(
+                    for: possibleRegionKeys
+                ) {
+                    Label("Available Regions", systemImage: "checkmark.seal")
                 }
                 Menu {
                     buildPickView(
@@ -71,6 +77,28 @@ struct SearchView: View {
                 } label: {
                     Label("All Regions", systemImage: "globe")
                 }
+            } else {
+                // Reduce one interaction
+                buildPickView(
+                    for: regionKeys
+                ) {
+                    EmptyView()
+                }
+            }
+        }
+        .onChange(of: searchRegion) { _ in
+            searchResult = []
+        }
+    }
+
+    @ToolbarContentBuilder
+    var tools: some ToolbarContent {
+        ToolbarItem(placement: .automatic) {
+            Menu {
+                searchTypePicker
+                    .pickerStyle(.menu)
+                Divider()
+                searchRegionView
             } label: {
                 Image(systemName: "ellipsis.circle")
             }
@@ -92,12 +120,6 @@ struct SearchView: View {
             }
         }
         .animation(.spring, value: searchResult)
-        .onChange(of: searchRegion) { _ in
-            searchResult = []
-        }
-        .onChange(of: searchType) { _ in
-            searchResult = []
-        }
     }
 
     func buildPickView(for keys: [String], label: () -> some View) -> some View {
