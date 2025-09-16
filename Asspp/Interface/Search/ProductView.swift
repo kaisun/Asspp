@@ -10,8 +10,15 @@ import Kingfisher
 import SwiftUI
 
 struct ProductView: View {
-    @State var archive: AppStore.AppPackage
-    let region: String
+    @StateObject var archive: AppPackageArchive
+
+    var region: String {
+        archive.region
+    }
+
+    init(archive: AppStore.AppPackage, region: String) {
+        _archive = .init(wrappedValue: AppPackageArchive(accountID: nil, region: region, package: archive))
+    }
 
     @StateObject var vm = AppStore.this
     @StateObject var dvm = Downloads.this
@@ -73,7 +80,7 @@ struct ProductView: View {
 
     var packageHeader: some View {
         Section {
-            PackageDisplayView(archive: archive)
+            PackageDisplayView(archive: archive.package)
         } header: {
             Text("Package")
         }
@@ -85,7 +92,7 @@ struct ProductView: View {
                 Text("History View")
             } label: {
                 HStack {
-                    Text("Version \(archive.software.version)")
+                    Text("Version \(archive.package.software.version)")
                     Spacer()
                     if let date = archive.releaseDate {
                         Text(date.formatted(.relative(presentation: .numeric)))
@@ -93,7 +100,7 @@ struct ProductView: View {
                 }
             }
 
-            Text(archive.software.releaseNotes ?? "")
+            Text(archive.package.software.releaseNotes ?? "")
         } header: {
             Text("What's New")
         }
@@ -101,9 +108,9 @@ struct ProductView: View {
 
     var pricing: some View {
         Section {
-            Text("\(archive.software.formattedPrice)")
+            Text("\(archive.formattedPrice)")
                 .font(.system(.body, design: .rounded))
-            if archive.software.price == 0 {
+            if archive.price == 0 {
                 Button("Acquire License") {
                     acquireLicense()
                 }
@@ -145,7 +152,7 @@ struct ProductView: View {
 
     var buttons: some View {
         Section {
-            if let req = dvm.downloadRequest(forArchive: archive) {
+            if let req = dvm.downloadRequest(forArchive: archive.package) {
                 NavigationLink(destination: PackageView(pkg: req), isActive: $showDownloadPage) {
                     Text("Show Download")
                 }
@@ -176,12 +183,13 @@ struct ProductView: View {
                 defer { vm.save(email: account.account.email, account: account.account) }
                 let downloadOutput = try await ApplePackage.Download.download(
                     account: &account.account,
-                    app: archive.software
+                    app: archive.package.software,
+                    externalVersionID: archive.version
                 )
                 archive.downloadOutput = downloadOutput
                 let request = Downloads.this.add(request: .init(
                     account: account,
-                    package: archive,
+                    package: archive.package,
                     downloadOutput: downloadOutput
                 ))
                 Downloads.this.resume(request: request)
@@ -191,7 +199,7 @@ struct ProductView: View {
                     hintColor = nil
                     showDownloadPage = true
                 }
-            } catch ApplePackageError.licenseRequired where archive.software.price == 0 && !acquiringLicense {
+            } catch ApplePackageError.licenseRequired where archive.package.software.price == 0 && !acquiringLicense {
                 DispatchQueue.main.async {
                     obtainDownloadURL = false
                     showLicenseAlert = true
@@ -215,7 +223,7 @@ struct ProductView: View {
                 try await ApplePackage.Authenticator.rotatePasswordToken(for: &account.account)
                 try await ApplePackage.Purchase.purchase(
                     account: &account.account,
-                    app: archive.software
+                    app: archive.package.software
                 )
                 DispatchQueue.main.async {
                     acquiringLicense = false
