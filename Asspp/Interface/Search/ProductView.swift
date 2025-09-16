@@ -26,13 +26,19 @@ struct ProductView: View {
 
     @State var selection: AppStore.UserAccount.ID = .init()
     @State var obtainDownloadURL = false
+    @State var showDownloadPage = false
     @State var licenseHint: String = ""
     @State var acquiringLicense = false
+    @State var showLicenseAlert = false
     @State var hint: String = ""
+    @State var hintColor: Color?
 
     var body: some View {
         List {
+            accountSelector
+            buttons
             packageHeader
+            packageDescription
             if account == nil {
                 Section {
                     Text("No account available for this region.")
@@ -44,22 +50,52 @@ struct ProductView: View {
                 }
             }
             pricing
-            accountSelector
-            buttons
         }
         .onAppear {
             selection = eligibleAccounts.first?.id ?? .init()
         }
         .navigationTitle("Select Account")
+        .alert("License Required", isPresented: $showLicenseAlert) {
+            var confirmRole: ButtonRole?
+            if #available(iOS 26.0, *) {
+                confirmRole = .confirm
+            }
+
+            return Group {
+                Button("Acquire License", role: confirmRole) {
+                    acquireLicense()
+                }
+
+                Button("Cancel", role: .cancel) {}
+            }
+        } message: {}
     }
 
     var packageHeader: some View {
         Section {
-            PackageDisplayView(archive: archive, style: .detail)
+            PackageDisplayView(archive: archive)
         } header: {
             Text("Package")
-        } footer: {
-            Label("\(archive.software.bundleID) - \(archive.software.version)", systemImage: "app")
+        }
+    }
+
+    var packageDescription: some View {
+        Section {
+            NavigationLink {
+                Text("History View")
+            } label: {
+                HStack {
+                    Text("Version \(archive.software.version)")
+                    Spacer()
+                    if let date = archive.releaseDate {
+                        Text(date.formatted(.relative(presentation: .numeric)))
+                    }
+                }
+            }
+
+            Text(archive.software.releaseNotes ?? "")
+        } header: {
+            Text("What's New")
         }
     }
 
@@ -110,7 +146,7 @@ struct ProductView: View {
     var buttons: some View {
         Section {
             if let req = dvm.downloadRequest(forArchive: archive) {
-                NavigationLink(destination: PackageView(pkg: req)) {
+                NavigationLink(destination: PackageView(pkg: req), isActive: $showDownloadPage) {
                     Text("Show Download")
                 }
             } else {
@@ -127,7 +163,7 @@ struct ProductView: View {
                 Text("Package can be installed later in download page.")
             } else {
                 Text(hint)
-                    .foregroundStyle(.red)
+                    .foregroundColor(hintColor)
             }
         }
     }
@@ -152,11 +188,19 @@ struct ProductView: View {
                 await MainActor.run {
                     obtainDownloadURL = false
                     hint = String(localized: "Download Requested")
+                    hintColor = nil
+                    showDownloadPage = true
+                }
+            } catch ApplePackageError.licenseRequired where archive.software.price == 0 && !acquiringLicense {
+                DispatchQueue.main.async {
+                    obtainDownloadURL = false
+                    showLicenseAlert = true
                 }
             } catch {
                 DispatchQueue.main.async {
                     obtainDownloadURL = false
                     hint = String(localized: "Unable to retrieve download url, please try again later.") + "\n" + error.localizedDescription
+                    hintColor = .red
                 }
             }
         }

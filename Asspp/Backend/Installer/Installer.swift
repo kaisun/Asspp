@@ -118,7 +118,7 @@ class Installer: Identifiable, ObservableObject, @unchecked Sendable {
         app = try await Self.setupApp(port: port, secured: false)
 
         app.get("*") { req in
-            return try await req.fileio.asyncStreamFile(
+            try await req.fileio.asyncStreamFile(
                 at: certificateAtPath,
                 chunkSize: 64 * 1024,
             )
