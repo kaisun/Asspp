@@ -44,14 +44,7 @@ struct PackageDisplayView: View {
     @ViewBuilder
     var _body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            KFImage(URL(string: archive.software.artworkUrl))
-                .antialiased(true)
-                .resizable()
-                .cornerRadius(8)
-                .frame(width: 50, height: 50, alignment: .center)
-                .frame(maxWidth: .infinity, alignment: .leading)
-            Text(archive.software.name)
-                .bold()
+            ArchivePreviewView(archive: archive, preferredIconSize: 70, lineLimit: nil)
             if !archive.software.description.isEmpty {
                 Group {
                     switch style {
