@@ -81,7 +81,21 @@ public enum VersionFinder {
         guard let dict = plist else { try ensureFailed("invalid response") }
 
         guard let items = dict["songList"] as? [[String: Any]], !items.isEmpty else {
-            try ensureFailed("no items in response")
+            if let failureType = dict["failureType"] as? String {
+                switch failureType {
+                case "2034":
+                    try ensureFailed("password token is expired")
+                case "9610":
+                    throw ApplePackageError.licenseRequired
+                default:
+                    if let customerMessage = dict["customerMessage"] as? String {
+                        try ensureFailed(customerMessage)
+                    }
+                    try ensureFailed("no items in response")
+                }
+            } else {
+                try ensureFailed("no items in response")
+            }
         }
 
         let item = items[0]
