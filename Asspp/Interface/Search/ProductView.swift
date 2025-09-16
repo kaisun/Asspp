@@ -241,7 +241,7 @@ struct ProductView: View {
 
 extension AppStore.AppPackage {
     var displaySupportedDevicesIcon: String {
-        // Simplified, assuming iPhone for now
+        // TODO: assuming iPhone for now
         "iphone"
     }
 }
