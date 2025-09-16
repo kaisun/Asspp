@@ -178,57 +178,36 @@ struct SearchView: View {
 @available(iOS 26.0, *)
 extension SearchView {
     var modernContent: some View {
-        List {
-            if !searchResult.isEmpty {
-                Section("\(searchResult.count) Results") {
-                    ForEach(searchResult) { item in
-                        NavigationLink(destination: ProductView(archive: item, region: searchRegion)) {
-                            ArchivePreviewView(archive: item)
-                        }
-                    }
-                    .transition(.opacity)
+        content
+            .searchable(text: $searchKey, placement: searchablePlacement, prompt: "Keyword")
+            .onSubmit(of: .search) { search() }
+            .toolbarVisibility(navigationBarVisibility, for: .navigationBar)
+            .navigationTitle(Text("Search - \(searchRegion.uppercased())"))
+            .toolbar {
+                if navigationBarVisibility != .hidden {
+                    tools
                 }
-                .transition(.opacity)
             }
-        }
-        .searchable(text: $searchKey, placement: searchablePlacement, prompt: "Keyword")
-        .onSubmit(of: .search) { search() }
-        .toolbarVisibility(navigationBarVisibility, for: .navigationBar)
-        .navigationTitle(Text(searching ? "Searching..." : "Search"))
-        .toolbar {
-            if navigationBarVisibility != .hidden {
-                tools
-            }
-        }
-        .safeAreaBar(edge: .top) {
-            if navigationBarVisibility == .hidden {
-                HStack {
-                    searchTypePicker
-                        .buttonStyle(.glass)
-                    Spacer()
+            .safeAreaBar(edge: .top) {
+                if navigationBarVisibility == .hidden {
+                    HStack {
+                        searchTypePicker
+                            .buttonStyle(.glass)
+                        Spacer()
 
-                    Menu {
-                        searchRegionView
-                    } label: {
-                        Label(searchRegion, systemImage: "globe")
-                    }
-                    .menuIndicator(.visible)
-                    .buttonStyle(.glass)
-                }
-                .overlay {
-                    HStack(spacing: 2) {
-                        if searching {
-                            ProgressView()
-                                .controlSize(.small)
+                        Menu {
+                            searchRegionView
+                        } label: {
+                            Label(searchRegion, systemImage: "globe")
                         }
-                        Text("Search").font(.headline)
+                        .menuIndicator(.visible)
+                        .buttonStyle(.glass)
                     }
+                    .padding([.bottom, .horizontal])
                 }
-                .padding([.bottom, .horizontal])
             }
-        }
-        .animation(.spring, value: searchResult)
-        .animation(.spring, value: searching)
+            .animation(.spring, value: searchResult)
+            .animation(.spring, value: searching)
     }
 
     var titleDisplayMode: NavigationBarItem.TitleDisplayMode {
