@@ -108,6 +108,12 @@ private struct App: SwiftUI.App {
     #endif
 
     var body: some Scene {
-        WindowGroup { MainView() }
+        WindowGroup {
+            if #available(iOS 26.0, *) {
+                NewMainView()
+            } else {
+                MainView()
+            }
+        }
     }
 }

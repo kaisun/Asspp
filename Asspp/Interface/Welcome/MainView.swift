@@ -28,3 +28,25 @@ struct MainView: View {
         }
     }
 }
+
+@available(iOS 26.0, *)
+struct NewMainView: View {
+    @StateObject var dvm = Downloads.this
+
+    var body: some View {
+        TabView {
+            Tab("Home", systemImage: "house") { WelcomeView() }
+            Tab("Accounts", systemImage: "person") { AccountView() }
+            Tab("Downloads", systemImage: "arrow.down.circle") { DownloadView() }
+                .badge(dvm.runningTaskCount)
+            Tab("Settings", systemImage: "gear") { SettingView() }
+
+            Tab(role: .search) {
+                SearchView()
+            }
+        }
+        .tabBarMinimizeBehavior(.never)
+        .tabViewSearchActivation(.searchTabSelection)
+        .tabViewStyle(.sidebarAdaptable)
+    }
+}
