@@ -4,6 +4,8 @@ Seamless multi-account App Store management.
 
 [简体中文 🇨🇳](./Resources/i18n/zh-Hans/README.md)
 
+For a command-line or library version of Asspp, check out [ApplePackage](https://github.com/Lakr233/ApplePackage).
+
 ## 👀 Preview
 
 ![Screenshot](./Resources/Screenshots/Screenshot-0.png)
@@ -34,15 +36,15 @@ Seamless multi-account App Store management.
 
 ### Installation Methods Comparison
 
-| Aspect | Local Installation | AirDrop Installation |
-|--------|---------------------|----------------------|
-| Devices Required | Single device | Two devices |
-| App Store Compatibility | Undetectable* | Compatible |
-| Auto-Updates | No | Yes |
-| Prerequisites | Install and trust certificate manually | Target device logged in with matching account, at least one app installed |
-| Internet Required | Yes | No |
+| Aspect                  | Local Installation                     | AirDrop Installation                                                      |
+| ----------------------- | -------------------------------------- | ------------------------------------------------------------------------- |
+| Devices Required        | Single device                          | Two devices                                                               |
+| App Store Compatibility | Undetectable\*                         | Compatible                                                                |
+| Auto-Updates            | No                                     | Yes                                                                       |
+| Prerequisites           | Install and trust certificate manually | Target device logged in with matching account, at least one app installed |
+| Internet Required       | Yes                                    | No                                                                        |
 
-* This installation method does not register the software with the App Store, so it cannot auto-update. Manual updates can retain data, but subsequent installations cannot use this software, and this method cannot overwrite existing apps.
+- This installation method does not register the software with the App Store, so it cannot auto-update. Manual updates can retain data, but subsequent installations cannot use this software, and this method cannot overwrite existing apps.
 
 ## 🚀 Usage
 
