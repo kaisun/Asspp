@@ -25,7 +25,7 @@ struct PackageDisplayView: View {
                     Button {
                         style = .detail
                     } label: {
-                        Text("more")
+                        Text("More")
                             .font(.system(.footnote, design: .rounded))
                             .padding(.leading, 10)
                     }

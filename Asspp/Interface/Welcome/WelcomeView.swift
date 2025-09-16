@@ -60,9 +60,15 @@ struct WelcomeView: View {
                 Text("Download and save the ipa file.")
             }
             .frame(maxWidth: .infinity, alignment: .leading)
-
+            
             HStack {
                 Image(systemName: "4.circle.fill")
+                Text("Install the certificate in settings page.")
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            
+            HStack {
+                Image(systemName: "5.circle.fill")
                 Text("Install or AirDrop to install.")
             }
             .frame(maxWidth: .infinity, alignment: .leading)
