@@ -13,7 +13,7 @@ final class ApplePackageVersionFinderTests: XCTestCase {
     @MainActor func testListVersions() async throws {
         let testItem = "com.tencent.xin"
         do {
-            try await withAccount(email: "test@example.com") { account in
+            try await withAccount(email: testAccountEmail) { account in
                 let versions = try await VersionFinder.list(account: &account, bundleIdentifier: testItem)
                 print("versions test passed with \(versions.count) versions: \(versions)")
             }
@@ -24,7 +24,7 @@ final class ApplePackageVersionFinderTests: XCTestCase {
 
     @MainActor func testListVersionsInvalidBundle() async throws {
         do {
-            try await withAccount(email: "test@example.com") { account in
+            try await withAccount(email: testAccountEmail) { account in
                 _ = try await VersionFinder.list(account: &account, bundleIdentifier: "invalid.bundle.id")
                 XCTFail("should fail with invalid bundle identifier")
             }

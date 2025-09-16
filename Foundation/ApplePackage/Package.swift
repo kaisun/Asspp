@@ -6,7 +6,7 @@ import PackageDescription
 let package = Package(
     name: "ApplePackage",
     platforms: [
-        .iOS(.v13),
+        .iOS(.v15),
         .macCatalyst(.v13),
         .macOS(.v12),
     ],

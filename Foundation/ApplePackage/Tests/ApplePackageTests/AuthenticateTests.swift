@@ -12,6 +12,7 @@ import XCTest
 private var account: String = ""
 private var password: String = ""
 private var code: String = ""
+private(set) var testAccountEmail: String = ""
 
 private func updateTestAccountInfo() {
     account = try! String(contentsOfFile: "/tmp/applepackage/account.txt").trimmingCharacters(in: .whitespacesAndNewlines)
@@ -23,6 +24,7 @@ private func updateTestAccountInfo() {
 final class ApplePackageAuthenticateTests: XCTestCase {
     override class func setUp() {
         updateTestAccountInfo()
+        testAccountEmail = account
     }
 
     @MainActor func testLogin() async throws {
@@ -32,6 +34,9 @@ final class ApplePackageAuthenticateTests: XCTestCase {
         let loginAccountPath = "/tmp/applepackage/login_account.txt"
         if fileManager.fileExists(atPath: loginAccountPath) {
             print("login account file exists at \(loginAccountPath), skipping login test")
+            try await withAccount(email: testAccountEmail) { account in
+                try await Authenticator.rotatePasswordToken(for: &account)
+            }
             return
         }
 

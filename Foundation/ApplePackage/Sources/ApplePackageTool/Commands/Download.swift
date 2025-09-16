@@ -40,7 +40,7 @@ struct Download: AsyncParsableCommand {
             let outputURL = URL(fileURLWithPath: output)
 
             let (contentLength, supportsRanges) = try await getContentInfo(from: url)
-            print("downloading \(app.name) (\(app.bundleID)) version \(downloadOutput.bundleShortVersionString ?? "unknown")")
+            print("downloading \(app.name) (\(app.bundleID)) version \(downloadOutput.bundleShortVersionString)")
             print("content length: \(formatBytes(contentLength))")
 
             let tempURL = FileManager.default.temporaryDirectory.appendingPathComponent(outputURL.lastPathComponent)

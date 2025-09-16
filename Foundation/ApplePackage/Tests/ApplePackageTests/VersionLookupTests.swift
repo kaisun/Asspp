@@ -14,7 +14,7 @@ final class ApplePackageVersionLookupTests: XCTestCase {
         let testBundleID = "com.tencent.xin"
         let testVersionID = "850481143"
         do {
-            try await withAccount(email: "test@example.com") { account in
+            try await withAccount(email: testAccountEmail) { account in
                 let app = try await Lookup.lookup(bundleID: testBundleID, countryCode: "CN")
                 let metadata = try await VersionLookup.getVersionMetadata(account: &account, app: app, versionID: testVersionID)
                 print("version metadata test passed: \(metadata.displayVersion) - \(metadata.releaseDate)")
@@ -27,7 +27,7 @@ final class ApplePackageVersionLookupTests: XCTestCase {
     @MainActor func testGetVersionMetadataInvalidVersion() async throws {
         let testBundleID = "com.tencent.xin"
         do {
-            try await withAccount(email: "test@example.com") { account in
+            try await withAccount(email: testAccountEmail) { account in
                 let app = try await Lookup.lookup(bundleID: testBundleID, countryCode: "CN")
                 _ = try await VersionLookup.getVersionMetadata(account: &account, app: app, versionID: "invalid")
                 XCTFail("should fail with invalid version ID")

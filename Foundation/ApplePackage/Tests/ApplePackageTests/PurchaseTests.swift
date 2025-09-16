@@ -13,7 +13,7 @@ final class ApplePackagePurchaseTests: XCTestCase {
     @MainActor func testPurchase() async throws {
         let testBundleID = "com.storytoys.duploworld.free.ios"
         do {
-            try await withAccount(email: "test@example.com") { account in
+            try await withAccount(email: testAccountEmail) { account in
                 try await Authenticator.rotatePasswordToken(for: &account)
                 let app = try await Lookup.lookup(bundleID: testBundleID, countryCode: "US")
                 try await Purchase.purchase(account: &account, app: app)
@@ -26,7 +26,7 @@ final class ApplePackagePurchaseTests: XCTestCase {
 
     @MainActor func testPurchasePaidApp() async throws {
         do {
-            try await withAccount(email: "test@example.com") { account in
+            try await withAccount(email: testAccountEmail) { account in
                 // Create a mock paid app
                 let paidApp = Software(
                     id: 123_456_789,
