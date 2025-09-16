@@ -95,13 +95,6 @@ struct ProductView: View {
     var packageHeader: some View {
         Section {
             PackageDisplayView(archive: archive.package)
-        } header: {
-            Text("Package")
-        }
-    }
-
-    var packageDescription: some View {
-        Section {
             NavigationLink {
                 ProductHistoryView(vm: AppPackageArchive(accountID: selection, region: region, package: archive.package))
             } label: {
@@ -130,6 +123,13 @@ struct ProductView: View {
                 Text("\(archive.package.software.minimumOsVersion)+")
                     .foregroundStyle(.secondary)
             }
+        } header: {
+            Text("Package")
+        }
+    }
+
+    var packageDescription: some View {
+        Section {
             Text(archive.package.software.releaseNotes ?? "")
         } header: {
             Text("What's New")
