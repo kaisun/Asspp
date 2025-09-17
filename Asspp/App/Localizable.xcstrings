@@ -762,6 +762,16 @@
         }
       }
     },
+    "Download %@" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "下载 %@"
+          }
+        }
+      }
+    },
     "Download and save the ipa file." : {
       "localizations" : {
         "en" : {
@@ -1172,16 +1182,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "需要获取许可证"
-          }
-        }
-      }
-    },
-    "Load" : {
-      "localizations" : {
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "加载"
           }
         }
       }

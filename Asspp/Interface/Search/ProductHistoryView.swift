@@ -17,28 +17,52 @@ struct ProductHistoryView: View {
         List {
             ForEach(vm.versionIdentifiers, id: \.self) { key in
                 if let aid = vm.accountIdentifier, let pkg = vm.package(for: key) {
-                    ProductVersionView(accountIdentifier: aid, package: pkg)
-                        .listRowBackground(Color.accentColor.opacity(0.1))
+                    Menu {
+                        Button("Download \(pkg.software.version)") {
+                            Task {
+                                do {
+                                    try await Downloads.this.startDownload(for: pkg, accountID: aid)
+                                } catch {
+                                    vm.error = error.localizedDescription
+                                }
+                            }
+                        }
+                    } label: {
+                        HStack {
+                            Text(pkg.software.version)
+                                .foregroundColor(.accentColor)
+                            Spacer()
+                        }
+                        .contentShape(Rectangle())
+                    }
                 } else {
                     Button {
                         vm.populateVersionItem(for: key)
                     } label: {
                         HStack {
-                            Text(key)
+                            Text(key).foregroundColor(.secondary)
                             Spacer()
-                            if vm.loading {
-                                ProgressView()
-                            } else {
-                                Text("Load")
-                            }
                         }
+                        .contentShape(Rectangle())
                     }
-                    .disabled(vm.loading)
                 }
             }
         }
+        .overlay {
+            ZStack {
+                Rectangle()
+                    .foregroundStyle(.clear)
+                    .background(.ultraThinMaterial)
+                ProgressView()
+                    .progressViewStyle(.circular)
+            }
+            .opacity(vm.loading ? 1 : 0)
+            .animation(.default, value: vm.loading)
+            .ignoresSafeArea()
+        }
         .animation(.default, value: vm.versionIdentifiers)
         .animation(.default, value: vm.versionItems)
+        .animation(.default, value: vm.loading)
         .navigationTitle("Version History")
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
@@ -84,9 +108,6 @@ struct ProductHistoryView: View {
             vm.populateVersionIdentifiers {
                 await MainActor.run { vm.populateNextVersionItems() }
             }
-        }
-        .onChange(of: vm.error) { newValue in
-            showErrorAlert = newValue != nil
         }
     }
 }
