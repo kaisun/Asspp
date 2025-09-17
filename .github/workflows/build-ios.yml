@@ -39,6 +39,8 @@ jobs:
           path: Asspp.ipa
 
       - name: Update SideStore Repo
+        # Only run for pushes or internal PRs (not forked PRs)
+        if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)
         run: |
           chmod +x Resources/Scripts/update.sidestore.ci.sh 
           ./Resources/Scripts/update.sidestore.ci.sh "$(pwd)" "$(pwd)/Asspp.ipa" "${{ steps.upload.outputs.artifact-url }}"

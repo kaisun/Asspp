@@ -9,22 +9,12 @@ git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 # Get the current branch name from environment or detect it
 CURRENT_BRANCH=""
 IS_PULL_REQUEST=false
-IS_FORKED_PR=false
 
 if [ -n "$GITHUB_HEAD_REF" ]; then
     # This is a pull request - use the source branch
     CURRENT_BRANCH="$GITHUB_HEAD_REF"
     IS_PULL_REQUEST=true
-    
-    # Check if this is a forked PR by comparing repository information
-    if [ "$GITHUB_REPOSITORY" != "$GITHUB_HEAD_REPO_FULL_NAME" ]; then
-        IS_FORKED_PR=true
-        echo "[+] Detected forked pull request from $GITHUB_HEAD_REPO_FULL_NAME"
-        echo "[+] Repository updates will be skipped for external contributions"
-        echo "[+] Only building and testing the changes"
-    else
-        echo "[+] Detected internal pull request, using source branch: $CURRENT_BRANCH"
-    fi
+    echo "[+] Detected pull request, using source branch: $CURRENT_BRANCH"
 elif [ -n "$GITHUB_REF_NAME" ]; then
     # This is a push to a branch
     CURRENT_BRANCH="$GITHUB_REF_NAME"
@@ -41,17 +31,10 @@ fi
 
 echo "[+] Working on branch: $CURRENT_BRANCH"
 
-# Skip repository updates for forked pull requests
-if [ "$IS_FORKED_PR" = true ]; then
-    echo "[+] Forked pull request detected - skipping repository updates"
-    echo "[+] Build and test completed successfully"
-    exit 0
-fi
-
 # For internal pull requests, we need to properly checkout the source branch
 if [ "$IS_PULL_REQUEST" = true ]; then
-    echo "[+] Setting up internal pull request branch..."
-    # Try to fetch the source branch - it should exist in origin
+    echo "[+] Setting up pull request branch..."
+    # Try to fetch the source branch - it should exist in origin since workflow already filtered forked PRs
     if git fetch origin "$CURRENT_BRANCH" 2>/dev/null; then
         # Check out the actual branch (not the merge commit)
         git checkout "$CURRENT_BRANCH"
@@ -59,7 +42,6 @@ if [ "$IS_PULL_REQUEST" = true ]; then
         git reset --hard "origin/$CURRENT_BRANCH"
     else
         echo "[-] Could not fetch branch $CURRENT_BRANCH from origin"
-        echo "[-] This might be a forked PR or the branch doesn't exist in origin"
         exit 1
     fi
 else
