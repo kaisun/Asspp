@@ -11,6 +11,8 @@ import SwiftUI
 
 struct ArchivePreviewView: View {
     let archive: AppStore.AppPackage
+    var preferredIconSize: CGFloat?
+    var lineLimit: Int? = 1
 
     var body: some View {
         HStack(spacing: 8) {
@@ -18,18 +20,17 @@ struct ArchivePreviewView: View {
                 .antialiased(true)
                 .resizable()
                 .cornerRadius(8)
-                .frame(width: 32, height: 32, alignment: .center)
+                .frame(width: preferredIconSize ?? 50, height: preferredIconSize ?? 50, alignment: .center)
+                .shadow(radius: 1)
             VStack(alignment: .leading, spacing: 2) {
-                HStack {
-                    Text(archive.software.name)
-                        .font(.system(.body, design: .rounded))
-                        .bold()
-                    Spacer()
-                    Text(archive.software.version)
-                }
+                Text(archive.software.name)
+                    .font(.system(.headline, design: .rounded))
+                    .lineLimit(lineLimit)
                 Group {
-                    Text("\(archive.software.bundleID)")
+                    Text(archive.software.version)
+                    Text(archive.software.sellerName)
                 }
+                .lineLimit(lineLimit)
                 .font(.system(.footnote, design: .rounded))
                 .foregroundStyle(.secondary)
             }

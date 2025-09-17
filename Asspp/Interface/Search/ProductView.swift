@@ -40,6 +40,20 @@ struct ProductView: View {
     @State var hint: String = ""
     @State var hintColor: Color?
 
+    let sizeFormatter: ByteCountFormatter = {
+        let formatter = ByteCountFormatter()
+        formatter.countStyle = .file
+        formatter.allowedUnits = [.useKB, .useMB, .useGB]
+        return formatter
+    }()
+
+    var formattedSize: String? {
+        guard let sizeBytes = archive.package.software.fileSizeBytes.flatMap(Int64.init(_:)) else {
+            return nil
+        }
+        return sizeFormatter.string(fromByteCount: sizeBytes)
+    }
+
     var body: some View {
         List {
             accountSelector
@@ -81,13 +95,6 @@ struct ProductView: View {
     var packageHeader: some View {
         Section {
             PackageDisplayView(archive: archive.package)
-        } header: {
-            Text("Package")
-        }
-    }
-
-    var packageDescription: some View {
-        Section {
             NavigationLink {
                 ProductHistoryView(vm: AppPackageArchive(accountID: selection, region: region, package: archive.package))
             } label: {
@@ -96,10 +103,33 @@ struct ProductView: View {
                     Spacer()
                     if let date = archive.releaseDate {
                         Text(date.formatted(.relative(presentation: .numeric)))
+                            .foregroundStyle(.secondary)
                     }
                 }
             }
 
+            if let formattedSize {
+                HStack {
+                    Text("Size")
+                    Spacer()
+                    Text(formattedSize)
+                        .foregroundStyle(.secondary)
+                }
+            }
+
+            HStack {
+                Text("Compatibility")
+                Spacer()
+                Text("\(archive.package.software.minimumOsVersion)+")
+                    .foregroundStyle(.secondary)
+            }
+        } header: {
+            Text("Package")
+        }
+    }
+
+    var packageDescription: some View {
+        Section {
             Text(archive.package.software.releaseNotes ?? "")
         } header: {
             Text("What's New")
@@ -176,23 +206,11 @@ struct ProductView: View {
     }
 
     func startDownload() {
-        guard var account else { return }
+        guard let account else { return }
         obtainDownloadURL = true
         Task {
             do {
-                defer { vm.save(email: account.account.email, account: account.account) }
-                let downloadOutput = try await ApplePackage.Download.download(
-                    account: &account.account,
-                    app: archive.package.software,
-                    externalVersionID: archive.version
-                )
-                archive.downloadOutput = downloadOutput
-                let request = Downloads.this.add(request: .init(
-                    account: account,
-                    package: archive.package,
-                    downloadOutput: downloadOutput
-                ))
-                Downloads.this.resume(request: request)
+                try await dvm.startDownload(for: archive.package, accountID: account.id)
                 await MainActor.run {
                     obtainDownloadURL = false
                     hint = String(localized: "Download Requested")
@@ -215,16 +233,17 @@ struct ProductView: View {
     }
 
     func acquireLicense() {
-        guard var account else { return }
+        guard let account else { return }
         acquiringLicense = true
         Task {
             do {
-                defer { vm.save(email: account.account.email, account: account.account) }
-                try await ApplePackage.Authenticator.rotatePasswordToken(for: &account.account)
-                try await ApplePackage.Purchase.purchase(
-                    account: &account.account,
-                    app: archive.package.software
-                )
+                try await vm.withAccount(id: account.id) { userAccount in
+                    try await ApplePackage.Authenticator.rotatePasswordToken(for: &userAccount.account)
+                    try await ApplePackage.Purchase.purchase(
+                        account: &userAccount.account,
+                        app: archive.package.software
+                    )
+                }
                 DispatchQueue.main.async {
                     acquiringLicense = false
                     licenseHint = String(localized: "Request Successes")

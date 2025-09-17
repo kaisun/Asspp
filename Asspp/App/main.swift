@@ -63,12 +63,8 @@ do {
     let deviceIdentifierKey = "wiki.qaq.asspp.device.identifier"
     if UserDefaults.standard.string(forKey: deviceIdentifierKey) == nil {
         do {
-            #if os(macOS)
-                let systemIdentifier = try ApplePackage.DeviceIdentifier.system()
-                UserDefaults.standard.set(systemIdentifier, forKey: deviceIdentifierKey)
-            #else
-                throw NSError()
-            #endif
+            let systemIdentifier = try ApplePackage.DeviceIdentifier.system()
+            UserDefaults.standard.set(systemIdentifier, forKey: deviceIdentifierKey)
         } catch {
             logger.info("[?] failed to read system device identifier, using a random one")
             let randomIdentifier = ApplePackage.DeviceIdentifier.random()
@@ -112,6 +108,12 @@ private struct App: SwiftUI.App {
     #endif
 
     var body: some Scene {
-        WindowGroup { MainView() }
+        WindowGroup {
+            if #available(iOS 26.0, *) {
+                NewMainView()
+            } else {
+                MainView()
+            }
+        }
     }
 }

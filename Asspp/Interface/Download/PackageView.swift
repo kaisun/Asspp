@@ -28,17 +28,7 @@ struct PackageView: View {
     var body: some View {
         List {
             Section {
-                VStack(alignment: .leading, spacing: 8) {
-                    KFImage(URL(string: archive.software.artworkUrl))
-                        .antialiased(true)
-                        .resizable()
-                        .cornerRadius(8)
-                        .frame(width: 50, height: 50, alignment: .center)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                    Text(archive.software.name)
-                        .bold()
-                }
-                .padding(.vertical, 4)
+                ArchivePreviewView(archive: archive)
             } header: {
                 Text("Package")
             } footer: {

@@ -27,40 +27,52 @@ struct SearchView: View {
     #endif
 
     @StateObject var vm = AppStore.this
-
+    @Environment(\.horizontalSizeClass) var horizontalSizeClass
     var possibleRegion: Set<String> {
         vm.possibleRegions
     }
 
     var body: some View {
-        NavigationView {
-            content
-                .searchable(text: $searchKey, prompt: "Keyword") {}
-                .onSubmit(of: .search) { search() }
-                .navigationTitle("Search - \(searchRegion.uppercased())")
-                .toolbar { tools }
+        if #available(iOS 26, *) {
+            NavigationStack {
+                modernContent
+            }
+        } else {
+            NavigationView {
+                content
+                    .searchable(text: $searchKey, prompt: "Keyword") {}
+                    .onSubmit(of: .search) { search() }
+                    .navigationTitle("Search - \(searchRegion.uppercased())")
+                    .toolbar { tools }
+            }
         }
     }
 
-    @ToolbarContentBuilder
-    var tools: some ToolbarContent {
-        ToolbarItem(placement: .topBarTrailing) {
-            Menu {
-                Picker(selection: $searchType) {
-                    ForEach(EntityType.allCases, id: \.self) { type in
-                        Text(type.rawValue).tag(type)
-                    }
-                } label: {
-                    Label("Type", systemImage: searchType.iconName)
-                }
-                .pickerStyle(.menu)
-                Divider()
-                if !regionKeys.filter({ possibleRegion.contains($0) }).isEmpty {
-                    buildPickView(
-                        for: regionKeys.filter { possibleRegion.contains($0) }
-                    ) {
-                        Label("Available Regions", systemImage: "checkmark.seal")
-                    }
+    var searchTypePicker: some View {
+        Picker(selection: $searchType) {
+            ForEach(EntityType.allCases) { type in
+                Text(type.rawValue).tag(type)
+            }
+        } label: {
+            Label("Type", systemImage: searchType.iconName)
+        }
+        .onChange(of: searchType) { _ in
+            searchResult = []
+        }
+    }
+
+    var possibleRegionKeys: [String] {
+        regionKeys.filter { possibleRegion.contains($0) }
+    }
+
+    @ViewBuilder
+    var searchRegionView: some View {
+        Group {
+            if !possibleRegionKeys.isEmpty {
+                buildPickView(
+                    for: possibleRegionKeys
+                ) {
+                    Label("Available Regions", systemImage: "checkmark.seal")
                 }
                 Menu {
                     buildPickView(
@@ -71,6 +83,28 @@ struct SearchView: View {
                 } label: {
                     Label("All Regions", systemImage: "globe")
                 }
+            } else {
+                // Reduce one interaction
+                buildPickView(
+                    for: regionKeys
+                ) {
+                    EmptyView()
+                }
+            }
+        }
+        .onChange(of: searchRegion) { _ in
+            searchResult = []
+        }
+    }
+
+    @ToolbarContentBuilder
+    var tools: some ToolbarContent {
+        ToolbarItem(placement: .automatic) {
+            Menu {
+                searchTypePicker
+                    .pickerStyle(.menu)
+                Divider()
+                searchRegionView
             } label: {
                 Image(systemName: "ellipsis.circle")
             }
@@ -92,12 +126,6 @@ struct SearchView: View {
             }
         }
         .animation(.spring, value: searchResult)
-        .onChange(of: searchRegion) { _ in
-            searchResult = []
-        }
-        .onChange(of: searchType) { _ in
-            searchResult = []
-        }
     }
 
     func buildPickView(for keys: [String], label: () -> some View) -> some View {
@@ -141,6 +169,70 @@ struct SearchView: View {
                     searchInput = "\(searchRegion) - \(searchKey) - Error: \(error.localizedDescription)"
                 }
             }
+        }
+    }
+}
+
+// MARK: - Liquid Glass
+
+@available(iOS 26.0, *)
+extension SearchView {
+    var modernContent: some View {
+        content
+            .searchable(text: $searchKey, placement: searchablePlacement, prompt: "Keyword")
+            .onSubmit(of: .search) { search() }
+            .toolbarVisibility(navigationBarVisibility, for: .navigationBar)
+            .navigationTitle(Text("Search - \(searchRegion.uppercased())"))
+            .toolbar {
+                if navigationBarVisibility != .hidden {
+                    tools
+                }
+            }
+            .safeAreaBar(edge: .top) {
+                if navigationBarVisibility == .hidden {
+                    HStack {
+                        searchTypePicker
+                            .buttonStyle(.glass)
+                        Spacer()
+
+                        Menu {
+                            searchRegionView
+                        } label: {
+                            Label(searchRegion, systemImage: "globe")
+                        }
+                        .menuIndicator(.visible)
+                        .buttonStyle(.glass)
+                    }
+                    .padding([.bottom, .horizontal])
+                }
+            }
+            .animation(.spring, value: searchResult)
+            .animation(.spring, value: searching)
+    }
+
+    var titleDisplayMode: NavigationBarItem.TitleDisplayMode {
+        if #available(iOS 26.0, *) {
+            return .inline // weird animation when using large title
+        } else {
+            return .automatic
+        }
+    }
+
+    var navigationBarVisibility: Visibility {
+        switch horizontalSizeClass {
+        case .compact:
+            return .hidden
+        default:
+            return .automatic
+        }
+    }
+
+    var searchablePlacement: SearchFieldPlacement {
+        switch horizontalSizeClass {
+        case .compact:
+            return .automatic
+        default:
+            return .toolbar
         }
     }
 }
