@@ -6,7 +6,7 @@
 
 ## 👀 概览
 
-![截图](../../../Resources/Screenshots/Screenshot-0.png)
+![截图](../../../Resources/Screenshots/README_PREVIEW.png)
 
 ## 🌟 主要功能
 
@@ -25,6 +25,7 @@
 
 - [iOS App Signer](https://dantheman827.github.io/ios-app-signer/)
 - 用于 `app.localhost.qaq.wiki` 的自签名证书（在“设置”中安装）
+- 或者在 [SideStore](https://sidestore.io) 中添加源 `https://raw.githubusercontent.com/Lakr233/Asspp/refs/heads/main/sidestore.json`
 
 ### 问题排查
 
