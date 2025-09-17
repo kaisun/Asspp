@@ -14,13 +14,12 @@ struct ProductVersionView: View {
 
     @StateObject var dvm = Downloads.this
     @State var obtainDownloadURL: Bool = false
-    @State var showDownloadPage = false
     @State var hint: String = ""
     @State var hintColor: Color?
 
     var body: some View {
         if let req = dvm.downloadRequest(forArchive: package) {
-            NavigationLink(destination: PackageView(pkg: req), isActive: $showDownloadPage) {
+            NavigationLink(destination: PackageView(pkg: req)) {
                 HStack {
                     Text(package.software.version)
                     Spacer()
@@ -62,7 +61,6 @@ struct ProductVersionView: View {
                     obtainDownloadURL = false
                     hint = String(localized: "Download Requested")
                     hintColor = nil
-                    showDownloadPage = true
                 }
             } catch {
                 DispatchQueue.main.async {

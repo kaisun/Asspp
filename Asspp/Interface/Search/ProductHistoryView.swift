@@ -14,10 +14,27 @@ struct ProductHistoryView: View {
     @Environment(\.dismiss) var dismiss
 
     var body: some View {
-        List(vm.versionIdentifiers, id: \.self) { key in
-            if let aid = vm.accountIdentifier, let pkg = vm.package(for: key) {
-                ProductVersionView(accountIdentifier: aid, package: pkg)
-                    .transition(.opacity)
+        List {
+            ForEach(vm.versionIdentifiers, id: \.self) { key in
+                if let aid = vm.accountIdentifier, let pkg = vm.package(for: key) {
+                    ProductVersionView(accountIdentifier: aid, package: pkg)
+                        .listRowBackground(Color.accentColor.opacity(0.1))
+                } else {
+                    Button {
+                        vm.populateVersionItem(for: key)
+                    } label: {
+                        HStack {
+                            Text(key)
+                            Spacer()
+                            if vm.loading {
+                                ProgressView()
+                            } else {
+                                Text("Load")
+                            }
+                        }
+                    }
+                    .disabled(vm.loading)
+                }
             }
         }
         .animation(.default, value: vm.versionIdentifiers)
