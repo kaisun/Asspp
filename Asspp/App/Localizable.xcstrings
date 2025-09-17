@@ -1004,6 +1004,16 @@
         }
       }
     },
+    "How to install an app?" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "如何安装软件？"
+          }
+        }
+      }
+    },
     "If you fail to acquire a license for a product, rotating the password token may help. This will use the initial password to authenticate with the App Store again." : {
       "localizations" : {
         "en" : {

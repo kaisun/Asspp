@@ -9,6 +9,8 @@ import ColorfulX
 import SwiftUI
 
 struct WelcomeView: View {
+    @State var openInstruction: Bool = false
+
     var body: some View {
         ZStack {
             VStack(spacing: 32) {
@@ -16,18 +18,27 @@ struct WelcomeView: View {
                     .resizable()
                     .aspectRatio(contentMode: .fit)
                     .frame(width: 80, height: 80)
+
                 Text("Welcome to Asspp")
                     .font(.system(.headline, design: .rounded))
-                inst
-                    .font(.system(.footnote, design: .rounded))
-                    .padding(.horizontal, 32)
-                    .fixedSize()
+
                 Spacer().frame(height: 0)
             }
 
             VStack(spacing: 16) {
                 Spacer()
-                Text(appVersion)
+                HStack(spacing: 8) {
+                    Text(version)
+                    Button {
+                        openInstruction = true
+                    } label: {
+                        Image(systemName: "questionmark.circle")
+                    }
+                    .popover(isPresented: $openInstruction) {
+                        SimpleInstrction()
+                            .padding(32)
+                    }
+                }
                 Text("App Store itself is unstable, retry if needed.")
             }
             .font(.footnote)
@@ -40,39 +51,5 @@ struct WelcomeView: View {
                 .opacity(0.25)
                 .ignoresSafeArea()
         )
-    }
-
-    var inst: some View {
-        VStack(spacing: 16) {
-            HStack {
-                Image(systemName: "1.circle.fill")
-                Text("Sign in to your account.")
-            }
-            .frame(maxWidth: .infinity, alignment: .leading)
-
-            HStack {
-                Image(systemName: "2.circle.fill")
-                Text("Search for apps you want to install.")
-            }
-            .frame(maxWidth: .infinity, alignment: .leading)
-
-            HStack {
-                Image(systemName: "3.circle.fill")
-                Text("Download and save the ipa file.")
-            }
-            .frame(maxWidth: .infinity, alignment: .leading)
-
-            HStack {
-                Image(systemName: "4.circle.fill")
-                Text("Install the certificate in settings page.")
-            }
-            .frame(maxWidth: .infinity, alignment: .leading)
-
-            HStack {
-                Image(systemName: "5.circle.fill")
-                Text("Install or AirDrop to install.")
-            }
-            .frame(maxWidth: .infinity, alignment: .leading)
-        }
     }
 }

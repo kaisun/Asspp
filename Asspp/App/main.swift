@@ -16,8 +16,15 @@ let logger = {
     return logger
 }()
 
+let version = [
+    Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String,
+    Bundle.main.infoDictionary?["CFBundleVersion"] as? String,
+]
+.compactMap { $0 ?? "?" }
+.joined(separator: ".")
+
 let bundleIdentifier = Bundle.main.bundleIdentifier!
-let appVersion = "\(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "") (\(Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? ""))"
+logger.info("Asspp \(bundleIdentifier) \(version) starting up...")
 
 private let availableDirectories = FileManager
     .default
