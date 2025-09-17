@@ -103,6 +103,26 @@ echo "[+] Extracted version: $FULL_VERSION"
 # Clean up temp directory
 rm -rf "$TEMP_DIR"
 
+# Check if the current version is the same as the version in the repository
+if command -v jq >/dev/null 2>&1; then
+    CURRENT_REPO_VERSION=$(jq -r '.apps[0].version' "$SIDESTORE_JSON" 2>/dev/null || echo "")
+    if [ "$CURRENT_REPO_VERSION" = "$FULL_VERSION" ]; then
+        echo "[+] Version $FULL_VERSION is already in the repository. No update needed."
+        echo "[+] Exiting early to avoid unnecessary commit."
+        exit 0
+    fi
+    echo "[+] Repository version: $CURRENT_REPO_VERSION -> New version: $FULL_VERSION"
+else
+    # Fallback to grep if jq is not available
+    CURRENT_REPO_VERSION=$(grep -o '"version": "[^"]*"' "$SIDESTORE_JSON" | head -1 | sed 's/"version": "\([^"]*\)"/\1/')
+    if [ "$CURRENT_REPO_VERSION" = "$FULL_VERSION" ]; then
+        echo "[+] Version $FULL_VERSION is already in the repository. No update needed."
+        echo "[+] Exiting early to avoid unnecessary commit."
+        exit 0
+    fi
+    echo "[+] Repository version: $CURRENT_REPO_VERSION -> New version: $FULL_VERSION"
+fi
+
 # Get current timestamp in ISO 8601 format
 CURRENT_DATE=$(date -u '+%Y-%m-%dT%H:%M:%S+00:00')
 echo "[+] Current date: $CURRENT_DATE"
