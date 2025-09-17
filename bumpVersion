@@ -1,0 +1,3 @@
+#!/bin/zsh
+
+Resources/Scripts/update-version.sh
