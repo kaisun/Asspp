@@ -5,9 +5,9 @@
 //  Created by 秋星桥 on 2024/7/13.
 //
 
+import ApplePackage
 import Foundation
 import SwiftUI
-import ApplePackage
 
 enum DownloadAction: Hashable {
     case suspend

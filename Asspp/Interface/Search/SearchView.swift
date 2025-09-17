@@ -212,27 +212,27 @@ extension SearchView {
 
     var titleDisplayMode: NavigationBarItem.TitleDisplayMode {
         if #available(iOS 26.0, *) {
-            return .inline // weird animation when using large title
+            .inline // weird animation when using large title
         } else {
-            return .automatic
+            .automatic
         }
     }
 
     var navigationBarVisibility: Visibility {
         switch horizontalSizeClass {
         case .compact:
-            return .hidden
+            .hidden
         default:
-            return .automatic
+            .automatic
         }
     }
 
     var searchablePlacement: SearchFieldPlacement {
         switch horizontalSizeClass {
         case .compact:
-            return .automatic
+            .automatic
         default:
-            return .toolbar
+            .toolbar
         }
     }
 }
