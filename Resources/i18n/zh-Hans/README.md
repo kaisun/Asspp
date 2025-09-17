@@ -25,7 +25,6 @@
 
 - [iOS App Signer](https://dantheman827.github.io/ios-app-signer/)
 - 用于 `app.localhost.qaq.wiki` 的自签名证书（在“设置”中安装）
-- 或者在 [SideStore](https://sidestore.io) 中添加源 `https://raw.githubusercontent.com/Lakr233/Asspp/refs/heads/main/sidestore.json`
 
 ### 问题排查
 
@@ -47,7 +46,8 @@
 
 ## 🚀 快速上手
 
-前往 [Releases](https://github.com/Lakr233/Asspp/releases) 页面下载最新版本。
+- 前往 [Releases](https://github.com/Lakr233/Asspp/releases) 页面下载最新版本。
+- 或者在 [SideStore](https://sidestore.io) 中添加源 `https://raw.githubusercontent.com/Lakr233/Asspp/refs/heads/main/sidestore.json`
 
 ## 📋 已构建的包
 
