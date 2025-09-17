@@ -78,7 +78,7 @@ fi
 if [ -f "$SIDESTORE_JSON" ]; then
     CURRENT_DATE=$(date -u '+%Y-%m-%dT%H:%M:%S+00:00')
     
-    sed -i '' "s/\"version\": \"[^\"]*\"/\"version\": \"$COMBINED_VERSION\"/" "$SIDESTORE_JSON"
+    sed -i '' "s/\"version\": \"[^\"]*\"/\"version\": \"$MARKETING_VERSION\"/" "$SIDESTORE_JSON" # needs to be consistent, otherwise sidestore will reject it
     sed -i '' "s/\"versionDate\": \"[^\"]*\"/\"versionDate\": \"$CURRENT_DATE\"/" "$SIDESTORE_JSON"
     sed -i '' "s|\"downloadURL\": \"https://github.com/Lakr233/Asspp/releases/download/[^/]*/Asspp.ipa\"|\"downloadURL\": \"https://github.com/Lakr233/Asspp/releases/download/$COMBINED_VERSION/Asspp.ipa\"|" "$SIDESTORE_JSON"
 fi
@@ -93,7 +93,7 @@ else
 fi
 
 if [ -f "$SIDESTORE_JSON" ]; then
-    if grep -q "\"version\": \"$COMBINED_VERSION\"" "$SIDESTORE_JSON" && \
+    if grep -q "\"version\": \"$MARKETING_VERSION\"" "$SIDESTORE_JSON" && \
        grep -q "\"downloadURL\": \"https://github.com/Lakr233/Asspp/releases/download/$COMBINED_VERSION/Asspp.ipa\"" "$SIDESTORE_JSON"; then
         echo "✅ JSON updated"
     else
