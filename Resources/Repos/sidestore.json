@@ -1,17 +1,17 @@
 {
   "name": "Asspp",
   "identifier": "com.qaq.Asspp",
-  "sourceURL": "https://raw.githubusercontent.com/Lakr233/Asspp/refs/heads/main/sidestore.json",
+  "sourceURL": "https://raw.githubusercontent.com/Lakr233/Asspp/refs/heads/main/Resources/Repos/sidestore.json",
   "apps": [
     {
       "name": "Asspp",
       "bundleIdentifier": "wiki.qaq.Asspp",
       "developerName": "Lakr233",
       "subtitle": "Seamless multi-account App Store management",
-      "version": "2.3.17",
-      "versionDate": "2025-08-11T05:00:00+03:00",
+      "version": "2.3",
+      "versionDate": "2025-09-17T19:12:22+00:00",
       "versionDescription": "https://github.com/Lakr233/Asspp/releases",
-      "downloadURL": "https://release-assets.githubusercontent.com/github-production-release-asset/827603038/b1c07dc1-d0fb-40c7-9557-d22e8a8a6a38",
+      "downloadURL": "https://github.com/Lakr233/Asspp/releases/download/2.3.18/Asspp.ipa",
       "localizedDescription": "Seamless multi-account App Store management",
       "iconURL": "https://raw.githubusercontent.com/Lakr233/Asspp/refs/heads/main/Asspp/App/Assets.xcassets/AppIcon.appiconset/asspp.png",
       "tintColor": "005392",
@@ -27,7 +27,7 @@
         "https://raw.githubusercontent.com/Lakr233/Asspp/refs/heads/main/Resources/Screenshots/Screenshot-8.png",
         "https://raw.githubusercontent.com/Lakr233/Asspp/refs/heads/main/Resources/Screenshots/Screenshot-9.png"
       ],
-      "size": 115466859
+      "size": 9951832
     }
   ]
 }
