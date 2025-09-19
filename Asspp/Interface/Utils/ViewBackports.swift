@@ -9,6 +9,15 @@ import SwiftUI
 
 extension View {
     @ViewBuilder
+    func mediumAndLargeDetents() -> some View {
+        if #available(iOS 16.0, *) {
+            presentationDetents([.medium, .large])
+        } else {
+            self
+        }
+    }
+
+    @ViewBuilder
     func neverMinimizeTab() -> some View {
         if #available(iOS 26.0, *) {
             tabBarMinimizeBehavior(.never)

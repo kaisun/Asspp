@@ -51,5 +51,6 @@ struct SimpleInstruction: View {
         }
         .font(.system(.body))
         .foregroundStyle(.primary)
+        .mediumAndLargeDetents()
     }
 }
