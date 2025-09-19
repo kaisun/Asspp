@@ -21,15 +21,15 @@ struct MainView: View {
             DownloadView()
                 .tabItem {
                     Label("Downloads", systemImage: "arrow.down.circle")
-                        .badge(dvm.runningTaskCount)
                 }
+                .badge(dvm.runningTaskCount) // putting badge inside will not work on iOS versions before 18
             SettingView()
                 .tabItem { Label("Settings", systemImage: "gear") }
         }
     }
 }
 
-@available(iOS 26.0, *)
+@available(iOS 18.0, *)
 struct NewMainView: View {
     @StateObject var dvm = Downloads.this
 
@@ -37,16 +37,15 @@ struct NewMainView: View {
         TabView {
             Tab("Home", systemImage: "house") { WelcomeView() }
             Tab("Accounts", systemImage: "person") { AccountView() }
-            Tab("Downloads", systemImage: "arrow.down.circle") { DownloadView() }
-                .badge(dvm.runningTaskCount)
-            Tab("Settings", systemImage: "gear") { SettingView() }
-
             Tab(role: .search) {
                 SearchView()
             }
+            Tab("Downloads", systemImage: "arrow.down.circle") { DownloadView() }
+                .badge(dvm.runningTaskCount)
+            Tab("Settings", systemImage: "gear") { SettingView() }
         }
-        .tabBarMinimizeBehavior(.never)
-        .tabViewSearchActivation(.searchTabSelection)
-        .tabViewStyle(.sidebarAdaptable)
+        .neverMinimizeTab()
+        .activateSearchWhenSearchTabSelected()
+        .sidebarAdaptableTabView()
     }
 }

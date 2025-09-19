@@ -110,12 +110,8 @@ struct PackageView: View {
             }
 
             Section {
-                if vm.demoMode {
-                    Text("88888888888")
-                        .redacted(reason: .placeholder)
-                } else {
-                    Text(pkg.account.account.email)
-                }
+                Text(pkg.account.account.email)
+                    .redacted(reason: .placeholder, isEnabled: vm.demoMode)
                 Text("\(pkg.account.account.store) - \(ApplePackage.Configuration.countryCode(for: pkg.account.account.store) ?? "-1")")
             } header: {
                 Text("Account")

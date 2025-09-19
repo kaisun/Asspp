@@ -33,17 +33,19 @@ struct SearchView: View {
     }
 
     var body: some View {
-        if #available(iOS 26, *) {
+        if #available(iOS 16, *) {
+            // Temporary workaround for the auto-pop issue on iOS 16 when using NavigationView
+            // reference: https://stackoverflow.com/questions/66559814/swiftui-navigationlink-pops-out-by-itself#comment136786758_77588007
             NavigationStack {
-                modernContent
+                if #available(iOS 26.0, *) {
+                    modernContent
+                } else {
+                    legacyContent
+                }
             }
         } else {
             NavigationView {
-                content
-                    .searchable(text: $searchKey, prompt: "Keyword") {}
-                    .onSubmit(of: .search) { search() }
-                    .navigationTitle("Search - \(searchRegion.uppercased())")
-                    .toolbar { tools }
+                legacyContent
             }
         }
     }
@@ -170,6 +172,16 @@ struct SearchView: View {
                 }
             }
         }
+    }
+}
+
+extension SearchView {
+    var legacyContent: some View {
+        content
+            .searchable(text: $searchKey, prompt: "Keyword") {}
+            .onSubmit(of: .search) { search() }
+            .navigationTitle("Search - \(searchRegion.uppercased())")
+            .toolbar { tools }
     }
 }
 

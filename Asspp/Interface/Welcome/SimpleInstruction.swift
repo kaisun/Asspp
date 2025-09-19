@@ -1,5 +1,5 @@
 //
-//  SimpleInstrction.swift
+//  SimpleInstruction.swift
 //  Asspp
 //
 //  Created by qaq on 9/17/25.
@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct SimpleInstrction: View {
+struct SimpleInstruction: View {
     var body: some View {
         VStack(spacing: 16) {
             Text("How to install an app?")
@@ -51,5 +51,6 @@ struct SimpleInstrction: View {
         }
         .font(.system(.body))
         .foregroundStyle(.primary)
+        .mediumAndLargeDetents()
     }
 }

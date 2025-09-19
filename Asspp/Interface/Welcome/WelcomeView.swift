@@ -35,7 +35,7 @@ struct WelcomeView: View {
                         Image(systemName: "questionmark.circle")
                     }
                     .popover(isPresented: $openInstruction) {
-                        SimpleInstrction()
+                        SimpleInstruction()
                             .padding(32)
                     }
                 }
