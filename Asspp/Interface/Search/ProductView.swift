@@ -98,10 +98,8 @@ struct ProductView: View {
             NavigationLink {
                 ProductHistoryView(vm: AppPackageArchive(accountID: selection, region: region, package: archive.package))
             } label: {
-                let badgeText = if let date = archive.releaseDate {
+                let badgeText = archive.releaseDate.flatMap { date in
                     Text(date.formatted(.relative(presentation: .numeric)))
-                } else {
-                    Text("")
                 }
 
                 Text("Version \(archive.package.software.version)")
