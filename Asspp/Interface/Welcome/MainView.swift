@@ -21,8 +21,8 @@ struct MainView: View {
             DownloadView()
                 .tabItem {
                     Label("Downloads", systemImage: "arrow.down.circle")
-                        .badge(dvm.runningTaskCount)
                 }
+                .badge(dvm.runningTaskCount) // putting badge inside will not work on iOS versions before 18
             SettingView()
                 .tabItem { Label("Settings", systemImage: "gear") }
         }
