@@ -98,31 +98,23 @@ struct ProductView: View {
             NavigationLink {
                 ProductHistoryView(vm: AppPackageArchive(accountID: selection, region: region, package: archive.package))
             } label: {
-                HStack {
-                    Text("Version \(archive.package.software.version)")
-                    Spacer()
-                    if let date = archive.releaseDate {
-                        Text(date.formatted(.relative(presentation: .numeric)))
-                            .foregroundStyle(.secondary)
-                    }
+                let badgeText = if let date = archive.releaseDate {
+                    Text(date.formatted(.relative(presentation: .numeric)))
+                } else {
+                    Text("")
                 }
+
+                Text("Version \(archive.package.software.version)")
+                    .badge(badgeText)
             }
 
             if let formattedSize {
-                HStack {
-                    Text("Size")
-                    Spacer()
-                    Text(formattedSize)
-                        .foregroundStyle(.secondary)
-                }
+                Text("Size")
+                    .badge(formattedSize)
             }
 
-            HStack {
-                Text("Compatibility")
-                Spacer()
-                Text("\(archive.package.software.minimumOsVersion)+")
-                    .foregroundStyle(.secondary)
-            }
+            Text("Compatibility")
+                .badge("\(archive.package.software.minimumOsVersion)+")
         } header: {
             Text("Package")
         }
